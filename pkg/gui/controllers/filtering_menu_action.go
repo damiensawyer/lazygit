@@ -25,6 +25,11 @@ func (self *FilteringMenuAction) Call() error {
 		if node != nil {
 			fileName = node.GetPath()
 		}
+	case self.c.Contexts().RepoFiles:
+		node := self.c.Contexts().RepoFiles.GetSelected()
+		if node != nil {
+			fileName = node.GetPath()
+		}
 	case self.c.Contexts().LocalCommits:
 		commit := self.c.Contexts().LocalCommits.GetSelected()
 		if commit != nil {
