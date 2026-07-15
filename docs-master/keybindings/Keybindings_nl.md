@@ -309,6 +309,8 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 
 | Key | Action | Info |
 |-----|--------|-------------|
+| `` <ctrl+o> `` | Kopieer de bestandsnaam naar het klembord |  |
+| `` y `` | Kopieer naar klembord |  |
 | `` <enter> `` | Enter bestand om geselecteerde regels toe te voegen aan de patch | If a file is selected, focus the main view so you can scroll through its content. If a directory is selected, toggle it collapsed/expanded. |
 | `` c `` | Restore to worktree | Replace the selected files/directories in your working tree with their state at the viewed commit. The restored versions are left unstaged, as if you had edited the files yourself. |
 | `` S `` | Save file/directory | Save a copy of the selected file (or every file under the selected directory) as it existed at the viewed commit, either to a path of your choosing or over its original location. |
