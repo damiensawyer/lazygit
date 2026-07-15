@@ -482,6 +482,20 @@ func (self *WorkingTreeCommands) CheckoutFile(commitHash, fileName string) error
 	return self.cmd.New(cmdArgs).Run()
 }
 
+// RestoreToWorktree restores the given paths (files or directories) to their
+// state at the given commit, writing to the worktree only: the index is left
+// alone, so the change shows up as unstaged modifications.
+func (self *WorkingTreeCommands) RestoreToWorktree(commitHash string, paths []string) error {
+	cmdArgs := NewGitCmd("restore").
+		Arg("--worktree").
+		Arg("--source=" + commitHash).
+		Arg("--").
+		Arg(paths...).
+		ToArgv()
+
+	return self.cmd.New(cmdArgs).Run()
+}
+
 // DiscardAnyUnstagedFileChanges discards any unstaged file changes via `git checkout -- .`
 func (self *WorkingTreeCommands) DiscardAnyUnstagedFileChanges() error {
 	cmdArgs := NewGitCmd("checkout").Arg("--", ".").

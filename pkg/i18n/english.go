@@ -447,6 +447,9 @@ type TranslationSet struct {
 	RepoFilesBinaryFile                   string
 	RepoFilesSymlink                      string
 	RepoFilesSubmodule                    string
+	RestoreToWorktree                     string
+	RestoreToWorktreeTooltip              string
+	RestoreToWorktreePrompt               string
 	CommitFilesTitle                      string
 	CheckoutCommitFileTooltip             string
 	CannotCheckoutWithModifiedFilesErr    string
@@ -1021,6 +1024,7 @@ type Actions struct {
 	AutoForwardBranches              string
 	CherryPick                       string
 	CheckoutFile                     string
+	RestoreFilesToWorktree           string
 	SquashCommitDown                 string
 	FixupCommit                      string
 	FixupCommitKeepMessage           string
@@ -1605,6 +1609,9 @@ func EnglishTranslationSet() *TranslationSet {
 		RepoFilesBinaryFile:                  "Binary file ({{.size}})",
 		RepoFilesSymlink:                     "Symlink to {{.target}}",
 		RepoFilesSubmodule:                   "Submodule at {{.hash}}",
+		RestoreToWorktree:                    "Restore to worktree",
+		RestoreToWorktreeTooltip:             "Replace the selected files/directories in your working tree with their state at the viewed commit. The restored versions are left unstaged, as if you had edited the files yourself.",
+		RestoreToWorktreePrompt:              "Are you sure you want to replace {{.paths}} in your working tree with the version at {{.ref}}?",
 		CommitFilesTitle:                     "Commit files",
 		CheckoutCommitFileTooltip:            "Checkout file. This replaces the file in your working tree with the version from the selected commit.",
 		CannotCheckoutWithModifiedFilesErr:   "You have local modifications for the file(s) you are trying to check out. You need to stash or discard these first.",
@@ -2132,6 +2139,7 @@ func EnglishTranslationSet() *TranslationSet {
 			CreateBranch:                     "Create branch",
 			CherryPick:                       "(Cherry-pick) paste commits",
 			CheckoutFile:                     "Checkout file",
+			RestoreFilesToWorktree:           "Restore files to worktree",
 			SquashCommitDown:                 "Squash commit down",
 			FixupCommit:                      "Fixup commit",
 			FixupCommitKeepMessage:           "Fixup commit (keep message)",

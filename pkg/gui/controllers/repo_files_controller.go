@@ -1,12 +1,15 @@
 package controllers
 
 import (
+	"errors"
+	"fmt"
 	"path/filepath"
 	"strings"
 
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
 	"github.com/jesseduffield/lazygit/pkg/gocui"
 	"github.com/jesseduffield/lazygit/pkg/gui/context"
+	"github.com/jesseduffield/lazygit/pkg/gui/controllers/helpers"
 	"github.com/jesseduffield/lazygit/pkg/gui/filetree"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
 	"github.com/jesseduffield/lazygit/pkg/utils"
@@ -47,6 +50,14 @@ func (self *RepoFilesController) GetKeybindings(opts types.KeybindingsOpts) []*t
 			GetDisabledReason: self.require(self.singleItemSelected()),
 			Description:       self.c.Tr.EnterCommitFile,
 			Tooltip:           self.c.Tr.EnterRepoFileTooltip,
+		},
+		{
+			Keys:              opts.GetKeys(opts.Config.RepoFiles.Restore),
+			Handler:           self.withItems(self.restore),
+			GetDisabledReason: self.require(self.itemsSelected()),
+			Description:       self.c.Tr.RestoreToWorktree,
+			Tooltip:           self.c.Tr.RestoreToWorktreeTooltip,
+			DisplayOnScreen:   true,
 		},
 		{
 			Keys:        opts.GetKeys(opts.Config.Files.ToggleTreeView),
@@ -109,6 +120,41 @@ func (self *RepoFilesController) enter(node *filetree.RepoFileNode) error {
 	mainViewContext := self.c.Contexts().Normal
 	mainViewContext.ClearSearchString()
 	self.c.Context().Push(mainViewContext, types.OnFocusOpts{})
+	return nil
+}
+
+func (self *RepoFilesController) restore(selectedNodes []*filetree.RepoFileNode) error {
+	selectedNodes = filetree.NormaliseSelectedNodes(selectedNodes)
+
+	paths := lo.Map(selectedNodes, func(node *filetree.RepoFileNode, _ int) string {
+		return node.GetPath()
+	})
+
+	for _, path := range paths {
+		if helpers.AnyTrackedFilesInPathExceptSubmodules(path, self.c.Model().Files, self.c.Model().Submodules) {
+			return errors.New(self.c.Tr.CannotCheckoutWithModifiedFilesErr)
+		}
+	}
+
+	hash := self.context().GetLoadedCommitHash()
+
+	self.c.Confirm(types.ConfirmOpts{
+		Title: self.c.Tr.RestoreToWorktree,
+		Prompt: utils.ResolvePlaceholderString(self.c.Tr.RestoreToWorktreePrompt, map[string]string{
+			"paths": fmt.Sprintf("'%s'", utils.FormatPaths(paths)),
+			"ref":   utils.ShortHash(hash),
+		}),
+		HandleConfirm: func() error {
+			self.c.LogAction(self.c.Tr.Actions.RestoreFilesToWorktree)
+			if err := self.c.Git().WorkingTree.RestoreToWorktree(hash, paths); err != nil {
+				return err
+			}
+
+			self.c.Refresh(types.RefreshOptions{Mode: types.ASYNC})
+			return nil
+		},
+	})
+
 	return nil
 }
 

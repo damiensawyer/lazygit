@@ -449,6 +449,7 @@ type KeybindingConfig struct {
 	AmendAttribute KeybindingAmendAttributeConfig `yaml:"amendAttribute"`
 	Stash          KeybindingStashConfig          `yaml:"stash"`
 	CommitFiles    KeybindingCommitFilesConfig    `yaml:"commitFiles"`
+	RepoFiles      KeybindingRepoFilesConfig      `yaml:"repoFiles"`
 	Main           KeybindingMainConfig           `yaml:"main"`
 	Submodules     KeybindingSubmodulesConfig     `yaml:"submodules"`
 	CommitMessage  KeybindingCommitMessageConfig  `yaml:"commitMessage"`
@@ -651,6 +652,10 @@ type KeybindingStashConfig struct {
 
 type KeybindingCommitFilesConfig struct {
 	CheckoutCommitFile Keybinding `yaml:"checkoutCommitFile"`
+}
+
+type KeybindingRepoFilesConfig struct {
+	Restore Keybinding `yaml:"restore"`
 }
 
 type KeybindingMainConfig struct {
@@ -1163,6 +1168,9 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 			},
 			CommitFiles: KeybindingCommitFilesConfig{
 				CheckoutCommitFile: Keybinding{"c"},
+			},
+			RepoFiles: KeybindingRepoFilesConfig{
+				Restore: Keybinding{"c"},
 			},
 			Main: KeybindingMainConfig{
 				PrevHunk:         Keybinding{"<left>", "h"},

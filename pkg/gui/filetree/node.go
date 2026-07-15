@@ -371,6 +371,39 @@ func (self *Node[T]) GetLeaves() []*Node[T] {
 	})
 }
 
+// A range selection can include both a node and one of its ancestors. Acting
+// on both would be redundant (the ancestor already covers the descendant) or
+// even an error, so this filters out any node that is a descendant of another
+// selected node.
+func NormaliseSelectedNodes[N interface {
+	GetInternalPath() string
+	IsFile() bool
+}](selectedNodes []N) []N {
+	return lo.Filter(selectedNodes, func(node N, _ int) bool {
+		return !isDescendantOfSelectedNodes(node, selectedNodes)
+	})
+}
+
+func isDescendantOfSelectedNodes[N interface {
+	GetInternalPath() string
+	IsFile() bool
+}](node N, selectedNodes []N) bool {
+	nodePath := node.GetInternalPath()
+
+	for _, selectedNode := range selectedNodes {
+		if selectedNode.IsFile() {
+			continue
+		}
+
+		selectedNodePath := selectedNode.GetInternalPath()
+
+		if strings.HasPrefix(nodePath, selectedNodePath+"/") {
+			return true
+		}
+	}
+	return false
+}
+
 func (self *Node[T]) ID() string {
 	return self.GetPath()
 }

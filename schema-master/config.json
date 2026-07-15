@@ -1675,6 +1675,9 @@
         "commitFiles": {
           "$ref": "#/$defs/KeybindingCommitFilesConfig"
         },
+        "repoFiles": {
+          "$ref": "#/$defs/KeybindingRepoFilesConfig"
+        },
         "main": {
           "$ref": "#/$defs/KeybindingMainConfig"
         },
@@ -2038,6 +2041,26 @@
             }
           ],
           "default": "E"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "KeybindingRepoFilesConfig": {
+      "properties": {
+        "restore": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "c"
         }
       },
       "additionalProperties": false,

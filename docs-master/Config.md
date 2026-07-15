@@ -814,6 +814,8 @@ keybinding:
     renameStash: r
   commitFiles:
     checkoutCommitFile: c
+  repoFiles:
+    restore: c
   main:
     prevHunk: [<left>, h]
     nextHunk: [<right>, l]
