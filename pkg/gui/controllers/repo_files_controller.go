@@ -46,6 +46,12 @@ func NewRepoFilesController(
 func (self *RepoFilesController) GetKeybindings(opts types.KeybindingsOpts) []*types.Binding {
 	bindings := []*types.Binding{
 		{
+			Keys:        opts.GetKeys(opts.Config.Files.CopyFileInfoToClipboard),
+			Handler:     self.openCopyMenu,
+			Description: self.c.Tr.CopyToClipboardMenu,
+			OpensMenu:   true,
+		},
+		{
 			Keys:              opts.GetKeys(opts.Config.Universal.GoInto),
 			Handler:           self.withItem(self.enter),
 			GetDisabledReason: self.require(self.singleItemSelected()),
@@ -164,6 +170,101 @@ func (self *RepoFilesController) restore(selectedNodes []*filetree.RepoFileNode)
 		},
 	})
 
+	return nil
+}
+
+func (self *RepoFilesController) openCopyMenu() error {
+	node := self.context().GetSelected()
+
+	copyNameItem := &types.MenuItem{
+		Label: self.c.Tr.CopyFileName,
+		OnPress: func() error {
+			if err := self.c.OS().CopyToClipboard(node.Name()); err != nil {
+				return err
+			}
+			self.c.Toast(self.c.Tr.FileNameCopiedToast)
+			return nil
+		},
+		DisabledReason: self.require(self.singleItemSelected())(),
+		Keys:           menuKey('n'),
+	}
+	copyRelativePathItem := &types.MenuItem{
+		Label: self.c.Tr.CopyRelativeFilePath,
+		OnPress: func() error {
+			if err := self.c.OS().CopyToClipboard(node.GetPath()); err != nil {
+				return err
+			}
+			self.c.Toast(self.c.Tr.FilePathCopiedToast)
+			return nil
+		},
+		DisabledReason: self.require(self.singleItemSelected())(),
+		Keys:           menuKey('p'),
+	}
+	copyAbsolutePathItem := &types.MenuItem{
+		Label: self.c.Tr.CopyAbsoluteFilePath,
+		OnPress: func() error {
+			absPath, err := filepath.Abs(node.GetPath())
+			if err != nil {
+				return err
+			}
+			if err := self.c.OS().CopyToClipboard(absPath); err != nil {
+				return err
+			}
+			self.c.Toast(self.c.Tr.FilePathCopiedToast)
+			return nil
+		},
+		DisabledReason: self.require(self.singleItemSelected())(),
+		Keys:           menuKey('P'),
+	}
+	copyFileContentItem := &types.MenuItem{
+		Label: self.c.Tr.CopyFileContent,
+		OnPress: func() error {
+			hash := self.context().GetLoadedCommitHash()
+			content, err := self.c.Git().Commit.ShowFileContentCmdObj(hash, node.GetPath()).RunWithOutput()
+			if err != nil {
+				return err
+			}
+			if err := self.c.OS().CopyToClipboard(content); err != nil {
+				return err
+			}
+			self.c.Toast(self.c.Tr.FileContentCopiedToast)
+			return nil
+		},
+		DisabledReason: self.require(self.singleItemSelected(self.canCopyContent))(),
+		Keys:           menuKey('c'),
+	}
+	copyBlobHashItem := &types.MenuItem{
+		Label: self.c.Tr.CopyBlobHash,
+		OnPress: func() error {
+			if err := self.c.OS().CopyToClipboard(node.File.BlobHash); err != nil {
+				return err
+			}
+			self.c.Toast(self.c.Tr.BlobHashCopiedToast)
+			return nil
+		},
+		DisabledReason: self.require(self.singleItemSelected(self.canCopyContent))(),
+		Keys:           menuKey('b'),
+	}
+
+	return self.c.Menu(types.CreateMenuOptions{
+		Title: self.c.Tr.CopyToClipboardMenu,
+		Items: []*types.MenuItem{
+			copyNameItem,
+			copyRelativePathItem,
+			copyAbsolutePathItem,
+			copyFileContentItem,
+			copyBlobHashItem,
+		},
+	})
+}
+
+func (self *RepoFilesController) canCopyContent(node *filetree.RepoFileNode) *types.DisabledReason {
+	if !node.IsFile() {
+		return &types.DisabledReason{
+			Text:             self.c.Tr.ErrCannotCopyContentOfDirectory,
+			ShowErrorInPanel: true,
+		}
+	}
 	return nil
 }
 

@@ -458,6 +458,8 @@ type TranslationSet struct {
 	SaveFileOverwritePrompt               string
 	FileSavedToast                        string
 	ErrCannotSaveSubmodule                string
+	CopyBlobHash                          string
+	BlobHashCopiedToast                   string
 	CommitFilesTitle                      string
 	CheckoutCommitFileTooltip             string
 	CannotCheckoutWithModifiedFilesErr    string
@@ -1629,6 +1631,8 @@ func EnglishTranslationSet() *TranslationSet {
 		SaveFileOverwritePrompt:              "'{{.path}}' already exists. Overwrite?",
 		FileSavedToast:                       "Saved to '{{.path}}'",
 		ErrCannotSaveSubmodule:               "Cannot save a submodule",
+		CopyBlobHash:                         "Blob hash",
+		BlobHashCopiedToast:                  "Blob hash copied to clipboard",
 		CommitFilesTitle:                     "Commit files",
 		CheckoutCommitFileTooltip:            "Checkout file. This replaces the file in your working tree with the version from the selected commit.",
 		CannotCheckoutWithModifiedFilesErr:   "You have local modifications for the file(s) you are trying to check out. You need to stash or discard these first.",

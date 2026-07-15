@@ -167,6 +167,13 @@ func (gui *Gui) GetInitialKeybindings() ([]*types.Binding, []*gocui.ViewMouseBin
 			Description:       gui.c.Tr.CopyPathToClipboard,
 		},
 		{
+			ViewName:          "repoFiles",
+			Keys:              opts.GetKeys(opts.Config.Universal.CopyToClipboard),
+			Handler:           gui.handleCopySelectedSideContextItemToClipboard,
+			GetDisabledReason: gui.getCopySelectedSideContextItemToClipboardDisabledReason,
+			Description:       gui.c.Tr.CopyPathToClipboard,
+		},
+		{
 			ViewName:    "",
 			Keys:        opts.GetKeys(opts.Config.Universal.ExtrasMenu),
 			Handler:     opts.Guards.NoPopupPanel(gui.handleCreateExtrasMenuPanel),
