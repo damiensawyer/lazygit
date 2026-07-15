@@ -580,6 +580,13 @@
           "description": "Fraction of the total screen width to use for the left side section. You may want to pick a small number (e.g. 0.2) if you're using a narrow screen, so that you can see more of the main section.\nNumber from 0 to 1.0.",
           "default": 0.3333
         },
+        "halfScreenModeSidePanelWidth": {
+          "type": "number",
+          "maximum": 1,
+          "minimum": 0,
+          "description": "Fraction of the total screen width to use for the left side section when in half screen mode.\nThis overrides `sidePanelWidth` when the screen is split half and half (after pressing '+' once).\nNumber from 0 to 1.0. Defaults to 0.5 (equal split).",
+          "default": 0.5
+        },
         "expandFocusedSidePanel": {
           "type": "boolean",
           "description": "If true, increase the height of the focused side window; creating an accordion effect.",
@@ -3162,6 +3169,48 @@
             }
           ],
           "default": "_"
+        },
+        "decreaseHalfScreenModeSidePanelWidth": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "\u003cshift+alt+left\u003e"
+        },
+        "increaseHalfScreenModeSidePanelWidth": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "\u003cshift+alt+right\u003e"
+        },
+        "resetHalfScreenModeSidePanelWidth": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "\u003cshift+alt+=\u003e"
         },
         "cyclePagers": {
           "oneOf": [

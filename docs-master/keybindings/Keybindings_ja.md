@@ -22,6 +22,9 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` R `` | 更新 | Gitの状態を更新します（`git status`、`git branch`などをバックグラウンドで実行してパネルの内容を更新します）。これは`git fetch`を実行しません。 |
 | `` + `` | 次の画面モード（通常/半分/全画面） |  |
 | `` _ `` | 前の画面モード |  |
+| `` <alt+shift+left> `` | Decrease half screen mode side panel width |  |
+| `` <alt+shift+right> `` | Increase half screen mode side panel width |  |
+| `` <alt+shift+=> `` | Reset half screen mode side panel width |  |
 | `` \| `` | Cycle pagers | Choose the next pager in the list of configured pagers. |
 | `` \ `` | Cycle pagers (reverse) | Choose the previous pager in the list of configured pagers. |
 | `` <esc> `` | キャンセル |  |

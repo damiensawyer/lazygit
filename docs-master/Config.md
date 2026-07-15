@@ -101,6 +101,13 @@ gui:
   # Number from 0 to 1.0.
   sidePanelWidth: 0.3333
 
+  # Fraction of the total screen width to use for the left side section when in
+  # half screen mode.
+  # This overrides `sidePanelWidth` when the screen is split half and half (after
+  # pressing '+' once).
+  # Number from 0 to 1.0. Defaults to 0.5 (equal split).
+  halfScreenModeSidePanelWidth: 0.5
+
   # If true, increase the height of the focused side window; creating an accordion
   # effect.
   expandFocusedSidePanel: false
@@ -714,6 +721,9 @@ keybinding:
     prevTab: '['
     nextScreenMode: +
     prevScreenMode: _
+    decreaseHalfScreenModeSidePanelWidth: <shift+alt+left>
+    increaseHalfScreenModeSidePanelWidth: <shift+alt+right>
+    resetHalfScreenModeSidePanelWidth: <shift+alt+=>
     cyclePagers: '|'
     cyclePagersReverse: \
     undo: z

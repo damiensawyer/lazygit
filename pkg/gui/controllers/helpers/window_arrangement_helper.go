@@ -63,6 +63,10 @@ type WindowArrangementArgs struct {
 	SplitMainPanel bool
 	// The current screen mode (normal, half, full)
 	ScreenMode types.ScreenMode
+	// The side panel width ratio used in half screen mode.
+	// Takes precedence over UserConfig.Gui.HalfScreenModeSidePanelWidth when
+	// set to a non-zero value, allowing runtime adjustment.
+	HalfScreenModeSidePanelWidth float64
 	// The content shown on the bottom left of the screen when showing a loader
 	// or toast e.g. 'Rebasing /'
 	AppStatus string
@@ -103,15 +107,16 @@ func (self *WindowArrangementHelper) GetWindowDimensions(informationStr string, 
 		ContentHeightForWindow: func(window string) int {
 			return self.windowHelper.GetContextForWindow(window).TotalContentHeight()
 		},
-		SplitMainPanel:   repoState.GetSplitMainPanel(),
-		ScreenMode:       repoState.GetScreenMode(),
-		AppStatus:        appStatus,
-		InformationStr:   informationStr,
-		ShowExtrasWindow: self.c.State().GetShowExtrasWindow(),
-		InDemo:           self.c.InDemo(),
-		IsAnyModeActive:  self.modeHelper.IsAnyModeActive(),
-		InSearchPrompt:   repoState.InSearchPrompt(),
-		SearchPrefix:     searchPrefix,
+		SplitMainPanel:               repoState.GetSplitMainPanel(),
+		ScreenMode:                   repoState.GetScreenMode(),
+		HalfScreenModeSidePanelWidth: repoState.GetHalfScreenModeSidePanelWidth(),
+		AppStatus:                    appStatus,
+		InformationStr:               informationStr,
+		ShowExtrasWindow:             self.c.State().GetShowExtrasWindow(),
+		InDemo:                       self.c.InDemo(),
+		IsAnyModeActive:              self.modeHelper.IsAnyModeActive(),
+		InSearchPrompt:               repoState.InSearchPrompt(),
+		SearchPrefix:                 searchPrefix,
 	}
 
 	return GetWindowDimensions(args)
@@ -251,6 +256,7 @@ func getMidSectionWeights(args WindowArrangementArgs) (int, int) {
 	sidePanelWidthRatio := args.UserConfig.Gui.SidePanelWidth
 	// Using 120 so that the default of 0.3333 will remain consistent with previous behavior
 	const maxColumnCount = 120
+
 	mainSectionWeight := int(math.Round(maxColumnCount * (1 - sidePanelWidthRatio)))
 	sideSectionWeight := int(math.Round(maxColumnCount * sidePanelWidthRatio))
 
@@ -264,10 +270,13 @@ func getMidSectionWeights(args WindowArrangementArgs) (int, int) {
 		}
 	} else {
 		if args.ScreenMode == types.SCREEN_HALF {
+			// In half screen mode with the side panel visible, use the
+			// half-screen-specific width ratio to determine the split.
+			sidePanelWidthRatio = args.HalfScreenModeSidePanelWidth
+			mainSectionWeight = int(math.Round(maxColumnCount * (1 - sidePanelWidthRatio)))
+			sideSectionWeight = int(math.Round(maxColumnCount * sidePanelWidthRatio))
 			if args.UserConfig.Gui.EnlargedSideViewLocation == "top" {
 				mainSectionWeight = sideSectionWeight * 2
-			} else {
-				mainSectionWeight = sideSectionWeight
 			}
 		} else if args.ScreenMode == types.SCREEN_FULL {
 			mainSectionWeight = 0

@@ -34,16 +34,17 @@ func TestGetWindowDimensions(t *testing.T) {
 			CurrentSideWindow: "files",
 			// Each panel shows its first tab by default; for the special-cased
 			// panels (status, stash) the view name matches the window name.
-			ActiveViewForWindow: func(window string) string { return window },
-			SplitMainPanel:      false,
-			ScreenMode:          types.SCREEN_NORMAL,
-			AppStatus:           "",
-			InformationStr:      "information",
-			ShowExtrasWindow:    false,
-			InDemo:              false,
-			IsAnyModeActive:     false,
-			InSearchPrompt:      false,
-			SearchPrefix:        "",
+			ActiveViewForWindow:          func(window string) string { return window },
+			SplitMainPanel:               false,
+			ScreenMode:                   types.SCREEN_NORMAL,
+			HalfScreenModeSidePanelWidth: 0.5,
+			AppStatus:                    "",
+			InformationStr:               "information",
+			ShowExtrasWindow:             false,
+			InDemo:                       false,
+			IsAnyModeActive:              false,
+			InSearchPrompt:               false,
+			SearchPrefix:                 "",
 		}
 	}
 

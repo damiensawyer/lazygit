@@ -414,6 +414,8 @@ type IRepoStateAccessor interface {
 	SetCurrentPopupOpts(*CreatePopupPanelOpts)
 	GetScreenMode() ScreenMode
 	SetScreenMode(ScreenMode)
+	GetHalfScreenModeSidePanelWidth() float64
+	SetHalfScreenModeSidePanelWidth(float64)
 	InSearchPrompt() bool
 	GetSearchState() *SearchState
 	SetSplitMainPanel(bool)

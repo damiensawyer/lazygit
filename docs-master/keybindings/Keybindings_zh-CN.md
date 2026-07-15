@@ -22,6 +22,9 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` R `` | 刷新 | 刷新Git状态（即在后台运行`git status`、`git branch`等命令以更新面板内容）。此操作不会执行`git fetch`。 |
 | `` + `` | 下一屏模式(正常/半屏/全屏) |  |
 | `` _ `` | 上一屏模式 |  |
+| `` <alt+shift+left> `` | Decrease half screen mode side panel width |  |
+| `` <alt+shift+right> `` | Increase half screen mode side panel width |  |
+| `` <alt+shift+=> `` | Reset half screen mode side panel width |  |
 | `` \| `` | 切换分页器 | 从已配置的分页器列表中选择下一个分页器 |
 | `` \ `` | Cycle pagers (reverse) | Choose the previous pager in the list of configured pagers. |
 | `` <esc> `` | 取消 |  |

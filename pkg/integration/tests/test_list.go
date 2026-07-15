@@ -161,6 +161,7 @@ var tests = []*components.IntegrationTest{
 	commit.StagedWithoutHooks,
 	commit.Unstaged,
 	config.CustomCommandsInPerRepoConfig,
+	config.HalfScreenModeSidePanelWidth,
 	config.NegativeRefspec,
 	config.RemoteNamedStar,
 	config.SidePanelsInPerRepoConfig,

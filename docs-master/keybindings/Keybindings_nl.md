@@ -22,6 +22,9 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` R `` | Verversen | Refresh the git state (i.e. run `git status`, `git branch`, etc in background to update the contents of panels). This does not run `git fetch`. |
 | `` + `` | Volgende scherm modus (normaal/half/groot) |  |
 | `` _ `` | Vorige scherm modus |  |
+| `` <alt+shift+left> `` | Decrease half screen mode side panel width |  |
+| `` <alt+shift+right> `` | Increase half screen mode side panel width |  |
+| `` <alt+shift+=> `` | Reset half screen mode side panel width |  |
 | `` \| `` | Cycle pagers | Choose the next pager in the list of configured pagers. |
 | `` \ `` | Cycle pagers (reverse) | Choose the previous pager in the list of configured pagers. |
 | `` <esc> `` | Annuleren |  |

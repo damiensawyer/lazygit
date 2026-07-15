@@ -62,6 +62,21 @@ func (self *GlobalController) GetKeybindings(opts types.KeybindingsOpts) []*type
 			Description: self.c.Tr.PrevScreenMode,
 		},
 		{
+			Keys:        opts.GetKeys(opts.Config.Universal.DecreaseHalfScreenModeSidePanelWidth),
+			Handler:     opts.Guards.NoPopupPanel(self.decreaseHalfScreenModeSidePanelWidth),
+			Description: self.c.Tr.DecreaseHalfScreenModeSidePanelWidth,
+		},
+		{
+			Keys:        opts.GetKeys(opts.Config.Universal.IncreaseHalfScreenModeSidePanelWidth),
+			Handler:     opts.Guards.NoPopupPanel(self.increaseHalfScreenModeSidePanelWidth),
+			Description: self.c.Tr.IncreaseHalfScreenModeSidePanelWidth,
+		},
+		{
+			Keys:        opts.GetKeys(opts.Config.Universal.ResetHalfScreenModeSidePanelWidth),
+			Handler:     opts.Guards.NoPopupPanel(self.resetHalfScreenModeSidePanelWidth),
+			Description: self.c.Tr.ResetHalfScreenModeSidePanelWidth,
+		},
+		{
 			Keys:              opts.GetKeys(opts.Config.Universal.CyclePagers),
 			Handler:           opts.Guards.NoPopupPanel(self.cyclePagers),
 			GetDisabledReason: self.canCyclePagers,
@@ -168,6 +183,56 @@ func (self *GlobalController) nextScreenMode() error {
 
 func (self *GlobalController) prevScreenMode() error {
 	return (&ScreenModeActions{c: self.c}).Prev()
+}
+
+func (self *GlobalController) decreaseHalfScreenModeSidePanelWidth() error {
+	repoState := self.c.State().GetRepoState()
+	if repoState.GetScreenMode() != types.SCREEN_HALF {
+		return nil
+	}
+
+	current := repoState.GetHalfScreenModeSidePanelWidth() - 0.05
+	if current < 0.1 {
+		current = 0.1
+	}
+	repoState.SetHalfScreenModeSidePanelWidth(current)
+	self.c.Refresh(types.RefreshOptions{Mode: types.ASYNC})
+	self.c.Toast(utils.ResolvePlaceholderString(
+		self.c.Tr.HalfScreenModeSidePanelWidthChanged,
+		map[string]string{"width": strconv.FormatFloat(current, 'f', 2, 64)},
+	))
+	return nil
+}
+
+func (self *GlobalController) increaseHalfScreenModeSidePanelWidth() error {
+	repoState := self.c.State().GetRepoState()
+	if repoState.GetScreenMode() != types.SCREEN_HALF {
+		return nil
+	}
+
+	current := repoState.GetHalfScreenModeSidePanelWidth() + 0.05
+	if current > 0.9 {
+		current = 0.9
+	}
+	repoState.SetHalfScreenModeSidePanelWidth(current)
+	self.c.Refresh(types.RefreshOptions{Mode: types.ASYNC})
+	self.c.Toast(utils.ResolvePlaceholderString(
+		self.c.Tr.HalfScreenModeSidePanelWidthChanged,
+		map[string]string{"width": strconv.FormatFloat(current, 'f', 2, 64)},
+	))
+	return nil
+}
+
+func (self *GlobalController) resetHalfScreenModeSidePanelWidth() error {
+	repoState := self.c.State().GetRepoState()
+	if repoState.GetScreenMode() != types.SCREEN_HALF {
+		return nil
+	}
+
+	repoState.SetHalfScreenModeSidePanelWidth(0.5)
+	self.c.Refresh(types.RefreshOptions{Mode: types.ASYNC})
+	self.c.Toast(self.c.Tr.HalfScreenModeSidePanelWidthReset)
+	return nil
 }
 
 func (self *GlobalController) cyclePagers() error {

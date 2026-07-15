@@ -255,6 +255,8 @@ type GuiRepoState struct {
 
 	ScreenMode types.ScreenMode
 
+	HalfScreenModeSidePanelWidth float64
+
 	CurrentPopupOpts *types.CreatePopupPanelOpts
 
 	LastBackgroundFetchTime time.Time
@@ -312,6 +314,14 @@ func (self *GuiRepoState) GetScreenMode() types.ScreenMode {
 
 func (self *GuiRepoState) SetScreenMode(value types.ScreenMode) {
 	self.ScreenMode = value
+}
+
+func (self *GuiRepoState) GetHalfScreenModeSidePanelWidth() float64 {
+	return self.HalfScreenModeSidePanelWidth
+}
+
+func (self *GuiRepoState) SetHalfScreenModeSidePanelWidth(value float64) {
+	self.HalfScreenModeSidePanelWidth = value
 }
 
 func (self *GuiRepoState) InSearchPrompt() bool {
@@ -650,7 +660,8 @@ func (gui *Gui) resetState(startArgs appTypes.StartArgs) types.Context {
 			Diffing:          diffing.New(),
 			MarkedBaseCommit: marked_base_commit.New(),
 		},
-		ScreenMode: initialScreenMode,
+		ScreenMode:                   initialScreenMode,
+		HalfScreenModeSidePanelWidth: 0.5,
 		// TODO: only use contexts from context manager
 		ContextMgr:  NewContextMgr(gui, contextTree),
 		Contexts:    contextTree,
