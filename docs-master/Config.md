@@ -816,6 +816,7 @@ keybinding:
     checkoutCommitFile: c
   repoFiles:
     restore: c
+    saveFile: S
   main:
     prevHunk: [<left>, h]
     nextHunk: [<right>, l]

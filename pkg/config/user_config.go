@@ -655,7 +655,8 @@ type KeybindingCommitFilesConfig struct {
 }
 
 type KeybindingRepoFilesConfig struct {
-	Restore Keybinding `yaml:"restore"`
+	Restore  Keybinding `yaml:"restore"`
+	SaveFile Keybinding `yaml:"saveFile"`
 }
 
 type KeybindingMainConfig struct {
@@ -1170,7 +1171,8 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 				CheckoutCommitFile: Keybinding{"c"},
 			},
 			RepoFiles: KeybindingRepoFilesConfig{
-				Restore: Keybinding{"c"},
+				Restore:  Keybinding{"c"},
+				SaveFile: Keybinding{"S"},
 			},
 			Main: KeybindingMainConfig{
 				PrevHunk:         Keybinding{"<left>", "h"},

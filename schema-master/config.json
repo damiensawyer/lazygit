@@ -2061,6 +2061,20 @@
             }
           ],
           "default": "c"
+        },
+        "saveFile": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "S"
         }
       },
       "additionalProperties": false,

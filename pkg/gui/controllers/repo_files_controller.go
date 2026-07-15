@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -58,6 +59,14 @@ func (self *RepoFilesController) GetKeybindings(opts types.KeybindingsOpts) []*t
 			Description:       self.c.Tr.RestoreToWorktree,
 			Tooltip:           self.c.Tr.RestoreToWorktreeTooltip,
 			DisplayOnScreen:   true,
+		},
+		{
+			Keys:              opts.GetKeys(opts.Config.RepoFiles.SaveFile),
+			Handler:           self.withItem(self.openSaveMenu),
+			GetDisabledReason: self.require(self.singleItemSelected(self.canSave)),
+			Description:       self.c.Tr.SaveFilesFromCommit,
+			Tooltip:           self.c.Tr.SaveFilesFromCommitTooltip,
+			OpensMenu:         true,
 		},
 		{
 			Keys:        opts.GetKeys(opts.Config.Files.ToggleTreeView),
@@ -156,6 +165,103 @@ func (self *RepoFilesController) restore(selectedNodes []*filetree.RepoFileNode)
 	})
 
 	return nil
+}
+
+func (self *RepoFilesController) canSave(node *filetree.RepoFileNode) *types.DisabledReason {
+	if node.File != nil && node.File.IsSubmodule() {
+		return &types.DisabledReason{Text: self.c.Tr.ErrCannotSaveSubmodule}
+	}
+
+	return nil
+}
+
+func (self *RepoFilesController) openSaveMenu(node *filetree.RepoFileNode) error {
+	saveFileAsItem := &types.MenuItem{
+		Label: self.c.Tr.SaveFileAs,
+		OnPress: func() error {
+			self.c.Prompt(types.PromptOpts{
+				Title:          self.c.Tr.SaveFileAsPromptTitle,
+				InitialContent: node.GetPath(),
+				HandleConfirm: func(path string) error {
+					return self.saveNode(node, path)
+				},
+			})
+			return nil
+		},
+		Keys: menuKey('s'),
+	}
+	saveToOriginalLocationItem := &types.MenuItem{
+		Label: self.c.Tr.SaveToOriginalLocation,
+		OnPress: func() error {
+			return self.saveNode(node, node.GetPath())
+		},
+		Keys: menuKey('o'),
+	}
+
+	return self.c.Menu(types.CreateMenuOptions{
+		Title: self.c.Tr.SaveFilesFromCommit,
+		Items: []*types.MenuItem{
+			saveFileAsItem,
+			saveToOriginalLocationItem,
+		},
+	})
+}
+
+// Saves the node's file to the given path, or, for a directory node, every
+// file below it into the given directory (submodule entries are skipped).
+// Asks for confirmation if the target path already exists.
+func (self *RepoFilesController) saveNode(node *filetree.RepoFileNode, targetPath string) error {
+	type fileToSave struct {
+		srcPath string
+		dstPath string
+	}
+
+	var filesToSave []fileToSave
+	if node.File != nil {
+		filesToSave = []fileToSave{{srcPath: node.GetPath(), dstPath: targetPath}}
+	} else {
+		for _, leaf := range node.GetLeaves() {
+			if leaf.File.IsSubmodule() {
+				continue
+			}
+			filesToSave = append(filesToSave, fileToSave{
+				srcPath: leaf.File.Path,
+				dstPath: targetPath + strings.TrimPrefix(leaf.File.Path, node.GetPath()),
+			})
+		}
+	}
+
+	hash := self.context().GetLoadedCommitHash()
+
+	targetExists := false
+	if _, err := os.Stat(targetPath); err == nil {
+		targetExists = true
+	}
+
+	return self.c.ConfirmIf(targetExists, types.ConfirmOpts{
+		Title: self.c.Tr.SaveFilesFromCommit,
+		Prompt: utils.ResolvePlaceholderString(self.c.Tr.SaveFileOverwritePrompt, map[string]string{
+			"path": targetPath,
+		}),
+		HandleConfirm: func() error {
+			self.c.LogAction(self.c.Tr.Actions.SaveFilesFromCommit)
+			for _, file := range filesToSave {
+				content, err := self.c.Git().Commit.GetFilteredFileContent(hash, file.srcPath)
+				if err != nil {
+					return err
+				}
+				if err := self.c.OS().CreateFileWithContent(file.dstPath, content); err != nil {
+					return err
+				}
+			}
+
+			self.c.Toast(utils.ResolvePlaceholderString(self.c.Tr.FileSavedToast, map[string]string{
+				"path": targetPath,
+			}))
+			self.c.Refresh(types.RefreshOptions{Mode: types.ASYNC, Scope: []types.RefreshableView{types.FILES}})
+			return nil
+		},
+	})
 }
 
 func (self *RepoFilesController) GetOnRenderToMain() func() {

@@ -393,6 +393,7 @@ var tests = []*components.IntegrationTest{
 	remote.AddForkRemote,
 	repo_files.BrowseAllFilesAtCommit,
 	repo_files.RestoreToWorktree,
+	repo_files.SaveFileAtCommit,
 	repo_files.ViewFileAtCommit,
 	shell_commands.BasicShellCommand,
 	shell_commands.ComplexShellCommand,

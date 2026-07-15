@@ -319,6 +319,18 @@ func (self *CommitCommands) GetBlobSize(hash string, filePath string) (int64, er
 	return strconv.ParseInt(strings.TrimSpace(output), 10, 64)
 }
 
+// GetFilteredFileContent returns the content of a file at the given commit
+// with smudge/eol filters applied, i.e. the exact bytes a checkout would
+// write to the worktree.
+func (self *CommitCommands) GetFilteredFileContent(hash string, filePath string) (string, error) {
+	cmdArgs := NewGitCmd("cat-file").
+		Arg("--filters").
+		Arg(fmt.Sprintf("%s:%s", hash, filePath)).
+		ToArgv()
+
+	return self.cmd.New(cmdArgs).DontLog().RunWithOutput()
+}
+
 func (self *CommitCommands) ShowFileContentCmdObj(hash string, filePath string) *oscommands.CmdObj {
 	cmdArgs := NewGitCmd("show").
 		Arg(fmt.Sprintf("%s:%s", hash, filePath)).

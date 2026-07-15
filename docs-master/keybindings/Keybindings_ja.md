@@ -65,6 +65,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 |-----|--------|-------------|
 | `` <enter> `` | ファイルに入る / ディレクトリの折りたたみを切り替える | If a file is selected, focus the main view so you can scroll through its content. If a directory is selected, toggle it collapsed/expanded. |
 | `` c `` | Restore to worktree | Replace the selected files/directories in your working tree with their state at the viewed commit. The restored versions are left unstaged, as if you had edited the files yourself. |
+| `` S `` | Save file/directory | Save a copy of the selected file (or every file under the selected directory) as it existed at the viewed commit, either to a path of your choosing or over its original location. |
 | `` ` `` | ファイルツリービューを切り替え | ファイル表示をフラット表示とツリー表示で切り替えます。フラット表示はすべてのファイルパスを一覧で表示し、ツリー表示はディレクトリごとにファイルをグループ化します。<br><br>デフォルトは設定ファイル内の 'gui.showFileTree' キーで変更できます。 |
 | `` - `` | すべてのファイルを折りたたむ | ファイルツリー内のすべてのディレクトリを折りたたみます |
 | `` = `` | すべてのファイルを展開 | ファイルツリー内のすべてのディレクトリを展開します |
