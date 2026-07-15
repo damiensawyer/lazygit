@@ -1582,6 +1582,20 @@
           ],
           "default": "\u003cctrl+l\u003e"
         },
+        "toggleOverviewMode": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "~"
+        },
         "openInBrowser": {
           "oneOf": [
             {
