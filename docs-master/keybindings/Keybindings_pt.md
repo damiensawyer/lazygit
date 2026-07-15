@@ -345,6 +345,8 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` y `` | Copy to clipboard |  |
 | `` <enter> `` | Insira o arquivo / Alternar diretório recolhido | If a file is selected, focus the main view so you can scroll through its content. If a directory is selected, toggle it collapsed/expanded. |
 | `` c `` | Restore to worktree | Replace the selected files/directories in your working tree with their state at the viewed commit. The restored versions are left unstaged, as if you had edited the files yourself. |
+| `` o `` | Abrir arquivo | Abrir arquivo no aplicativo padrão. |
+| `` e `` | Editar | Abrir arquivo no editor externo. |
 | `` S `` | Save file/directory | Save a copy of the selected file (or every file under the selected directory) as it existed at the viewed commit, either to a path of your choosing or over its original location. |
 | `` ` `` | Alternar exibição de árvore de arquivo | Toggle file view between flat and tree layout. Flat layout shows all file paths in a single list, tree layout groups files by directory.<br><br>The default can be changed in the config file with the key 'gui.showFileTree'. |
 | `` - `` | Recolher todos os arquivos | Recolher todos os diretórios na árvore de arquivos |
