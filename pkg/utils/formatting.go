@@ -215,6 +215,20 @@ func ShortHash(hash string) string {
 	return hash[:COMMIT_HASH_SHORT_SIZE]
 }
 
+// Returns a human-readable representation of a byte count, e.g. "1.5 MiB"
+func FormatBytes(size int64) string {
+	const unit = 1024
+	if size < unit {
+		return fmt.Sprintf("%d B", size)
+	}
+	div, exp := int64(unit), 0
+	for n := size / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %ciB", float64(size)/float64(div), "KMGTPE"[exp])
+}
+
 // Returns comma-separated list of paths, with ellipsis if there are more than 3
 // e.g. "foo, bar, baz, [...3 more]"
 func FormatPaths(paths []string) string {

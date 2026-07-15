@@ -392,6 +392,7 @@ var tests = []*components.IntegrationTest{
 	reflog.Reset,
 	remote.AddForkRemote,
 	repo_files.BrowseAllFilesAtCommit,
+	repo_files.ViewFileAtCommit,
 	shell_commands.BasicShellCommand,
 	shell_commands.ComplexShellCommand,
 	shell_commands.DeleteFromHistory,

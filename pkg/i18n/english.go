@@ -443,6 +443,10 @@ type TranslationSet struct {
 	BrowseAllFilesAtCommit                string
 	BrowseAllFilesAtCommitTooltip         string
 	LoadingFilesAtRefStatus               string
+	EnterRepoFileTooltip                  string
+	RepoFilesBinaryFile                   string
+	RepoFilesSymlink                      string
+	RepoFilesSubmodule                    string
 	CommitFilesTitle                      string
 	CheckoutCommitFileTooltip             string
 	CannotCheckoutWithModifiedFilesErr    string
@@ -1597,6 +1601,10 @@ func EnglishTranslationSet() *TranslationSet {
 		BrowseAllFilesAtCommit:               "Browse all files at commit",
 		BrowseAllFilesAtCommitTooltip:        "Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them.",
 		LoadingFilesAtRefStatus:              "Loading files",
+		EnterRepoFileTooltip:                 "If a file is selected, focus the main view so you can scroll through its content. If a directory is selected, toggle it collapsed/expanded.",
+		RepoFilesBinaryFile:                  "Binary file ({{.size}})",
+		RepoFilesSymlink:                     "Symlink to {{.target}}",
+		RepoFilesSubmodule:                   "Submodule at {{.hash}}",
 		CommitFilesTitle:                     "Commit files",
 		CheckoutCommitFileTooltip:            "Checkout file. This replaces the file in your working tree with the version from the selected commit.",
 		CannotCheckoutWithModifiedFilesErr:   "You have local modifications for the file(s) you are trying to check out. You need to stash or discard these first.",

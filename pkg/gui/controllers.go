@@ -273,6 +273,7 @@ func (gui *Gui) resetHelpersAndControllers() {
 		gui.State.Contexts.ReflogCommits,
 		gui.State.Contexts.SubCommits,
 		gui.State.Contexts.CommitFiles,
+		gui.State.Contexts.RepoFiles,
 		gui.State.Contexts.Stash,
 	} {
 		controllers.AttachControllers(context, controllers.NewSwitchToFocusedMainViewController(

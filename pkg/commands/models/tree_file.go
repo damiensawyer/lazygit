@@ -12,6 +12,7 @@ type TreeFile struct {
 }
 
 const (
+	treeFileModeDir       int32 = 0o040000
 	treeFileModeSymlink   int32 = 0o120000
 	treeFileModeSubmodule int32 = 0o160000
 )
@@ -30,6 +31,12 @@ func (f *TreeFile) GetPath() string {
 
 func (f *TreeFile) IsSubmodule() bool {
 	return f.Mode == treeFileModeSubmodule
+}
+
+// Only directory *entries* (from a non-recursive ls-tree) have this mode; the
+// trees making up a recursive listing are never returned as entries themselves.
+func (f *TreeFile) IsDir() bool {
+	return f.Mode == treeFileModeDir
 }
 
 func (f *TreeFile) IsSymlink() bool {

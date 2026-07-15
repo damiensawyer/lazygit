@@ -2,9 +2,11 @@ package git_commands
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/go-errors/errors"
+	"github.com/jesseduffield/lazygit/pkg/commands/models"
 	"github.com/jesseduffield/lazygit/pkg/commands/oscommands"
 )
 
@@ -279,6 +281,42 @@ func (self *CommitCommands) ResolveRefToCommitHash(ref string) (string, error) {
 	}
 
 	return strings.TrimSpace(output), nil
+}
+
+// IsFileBinary reports whether the given file is binary at the given commit,
+// using git's own binary detection: in a numstat diff against the empty tree,
+// binary files get "-" for their added/deleted line counts.
+func (self *CommitCommands) IsFileBinary(hash string, filePath string) (bool, error) {
+	cmdArgs := NewGitCmd("diff").
+		Arg("--no-ext-diff").
+		Arg("--numstat").
+		Arg(models.EmptyTreeCommitHash).
+		Arg(hash).
+		Arg("--").
+		Arg(filePath).
+		ToArgv()
+
+	output, err := self.cmd.New(cmdArgs).DontLog().RunWithOutput()
+	if err != nil {
+		return false, err
+	}
+
+	return strings.HasPrefix(output, "-\t-\t"), nil
+}
+
+// GetBlobSize returns the size in bytes of the given file at the given commit.
+func (self *CommitCommands) GetBlobSize(hash string, filePath string) (int64, error) {
+	cmdArgs := NewGitCmd("cat-file").
+		Arg("-s").
+		Arg(fmt.Sprintf("%s:%s", hash, filePath)).
+		ToArgv()
+
+	output, err := self.cmd.New(cmdArgs).DontLog().RunWithOutput()
+	if err != nil {
+		return 0, err
+	}
+
+	return strconv.ParseInt(strings.TrimSpace(output), 10, 64)
 }
 
 func (self *CommitCommands) ShowFileContentCmdObj(hash string, filePath string) *oscommands.CmdObj {

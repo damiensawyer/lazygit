@@ -39,6 +39,25 @@ func (self *TreeFileLoader) GetTreeFiles(ref string) ([]*models.TreeFile, error)
 	return parseTreeFiles(output)
 }
 
+// GetTreeDirEntries returns the immediate entries of the given directory at
+// the given ref (i.e. a non-recursive listing, one level deep). Directory
+// entries are included, with mode 040000.
+func (self *TreeFileLoader) GetTreeDirEntries(ref string, dir string) ([]*models.TreeFile, error) {
+	cmdArgs := NewGitCmd("ls-tree").
+		Arg("-z").
+		Arg(ref).
+		Arg("--").
+		Arg(dir + "/").
+		ToArgv()
+
+	output, err := self.cmd.New(cmdArgs).DontLog().RunWithOutput()
+	if err != nil {
+		return nil, err
+	}
+
+	return parseTreeFiles(output)
+}
+
 // Parses the output of `git ls-tree -z -r`, i.e. NUL-separated entries of the
 // form "<mode> <type> <hash>\t<path>". Trees this large can have hundreds of
 // thousands of entries, so we scan the string by hand rather than using a
