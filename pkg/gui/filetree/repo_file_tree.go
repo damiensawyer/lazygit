@@ -47,8 +47,7 @@ type RepoFileTree struct {
 	textFilter     string
 	useFuzzySearch bool
 
-	flattened   []FlattenedRepoFileNode
-	indexByPath map[string]int
+	flattened []FlattenedRepoFileNode
 }
 
 var _ IRepoFileTree = &RepoFileTree{}
@@ -86,9 +85,16 @@ func (self *RepoFileTree) Get(index int) *RepoFileNode {
 	return NewRepoFileNode(self.flattened[index].Node)
 }
 
+// A linear scan: this is only called for occasional operations (re-finding
+// the selection after a mutation), so scanning is cheaper overall than
+// maintaining a path->index map on every rebuild of the flattened cache.
 func (self *RepoFileTree) GetIndexForPath(path string) (int, bool) {
-	index, found := self.indexByPath[path]
-	return index, found
+	for i, entry := range self.flattened {
+		if entry.Node.GetInternalPath() == path {
+			return i, true
+		}
+	}
+	return -1, false
 }
 
 func (self *RepoFileTree) GetAllItems() []*RepoFileNode {
@@ -230,7 +236,6 @@ func (self *RepoFileTree) GetFlattenedRange(startIdx int, endIdx int) []Flattene
 
 func (self *RepoFileTree) refreshFlattened() {
 	self.flattened = self.flattened[:0]
-	self.indexByPath = make(map[string]int, len(self.indexByPath))
 	self.flattenAux(self.tree, -1, -1)
 }
 
@@ -245,7 +250,6 @@ func (self *RepoFileTree) flattenAux(node *Node[models.TreeFile], treeDepth int,
 
 	isRoot := treeDepth == -1
 	if !isRoot {
-		self.indexByPath[node.GetInternalPath()] = len(self.flattened)
 		self.flattened = append(self.flattened, FlattenedRepoFileNode{
 			Node:        node,
 			TreeDepth:   treeDepth,

@@ -1,6 +1,7 @@
 package filetree
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
@@ -191,6 +192,38 @@ func TestRepoFileTreeGetFlattenedRange(t *testing.T) {
 
 	assert.Empty(t, tree.GetFlattenedRange(3, 3))
 	assert.Len(t, tree.GetFlattenedRange(-5, 100), 5)
+}
+
+// Exercises tree building and the flattened-cache rebuild at the scale of a
+// very large repository (300k files). Cursor movement and rendering don't
+// appear here because they are O(1)/O(viewport) against the cache.
+func BenchmarkRepoFileTreeAtScale(b *testing.B) {
+	files := make([]*models.TreeFile, 0, 300_000)
+	for i := range 300_000 {
+		files = append(files, &models.TreeFile{
+			Path: fmt.Sprintf("dir%d/sub%d/file%d.txt", i%1000, i%37, i),
+			Mode: 0o100644,
+		})
+	}
+	tree := NewRepoFileTree(
+		func() []*models.TreeFile { return files },
+		common.NewDummyCommon(),
+		true,
+	)
+
+	b.Run("SetTree", func(b *testing.B) {
+		for b.Loop() {
+			tree.SetTree()
+		}
+	})
+
+	b.Run("ToggleCollapsed", func(b *testing.B) {
+		for b.Loop() {
+			// rebuilds the flattened cache twice
+			tree.ToggleCollapsed("./dir1")
+			tree.ToggleCollapsed("./dir1")
+		}
+	})
 }
 
 func TestRepoFileTreeViewModelSelectionFollowsMutations(t *testing.T) {
