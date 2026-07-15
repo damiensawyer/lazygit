@@ -89,11 +89,11 @@ func (self *ContextLinesController) Toggle() error {
 		saved := self.c.UserConfig().Git.DiffContextSizeSaved
 		if saved > 0 {
 			self.c.UserConfig().Git.DiffContextSize = saved
-			self.c.Toast(fmt.Sprintf(self.c.Tr.DiffContextSizeChanged, saved))
+			self.c.Toast(fmt.Sprintf(self.c.Tr.RestoreDiffContextSize, saved))
 		} else {
 			// No saved value (unusual), just decrease to a reasonable default.
 			self.c.UserConfig().Git.DiffContextSize = 3
-			self.c.Toast(fmt.Sprintf(self.c.Tr.DiffContextSizeChanged, 3))
+			self.c.Toast(fmt.Sprintf(self.c.Tr.RestoreDiffContextSize, 3))
 		}
 		currentContext := self.c.Context().CurrentSide()
 		switch currentContext.GetKey() {
@@ -108,7 +108,10 @@ func (self *ContextLinesController) Toggle() error {
 	}
 
 	// Currently in normal mode: save current size and show full file.
-	self.c.UserConfig().Git.DiffContextSizeSaved = currentSize
+	// Only save the value if it's not already at max (avoids saving MaxUint64).
+	if currentSize != math.MaxUint64 {
+		self.c.UserConfig().Git.DiffContextSizeSaved = currentSize
+	}
 	self.c.UserConfig().Git.DiffContextSize = math.MaxUint64
 	self.c.Toast(self.c.Tr.FullFileDiffView)
 	currentContext := self.c.Context().CurrentSide()
