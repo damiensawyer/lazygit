@@ -95,6 +95,25 @@ func BuildTreeFromCommitFiles(
 	return buildTree(files, (*models.CommitFile).GetPath, showRootItem, cmp)
 }
 
+func BuildTreeFromTreeFiles(
+	files []*models.TreeFile,
+	showRootItem bool,
+	cmp func(a, b *Node[models.TreeFile]) int,
+) *Node[models.TreeFile] {
+	return buildTree(files, (*models.TreeFile).GetPath, showRootItem, cmp)
+}
+
+func BuildFlatTreeFromTreeFiles(
+	files []*models.TreeFile,
+	showRootItem bool,
+	cmp func(a, b *Node[models.TreeFile]) int,
+) *Node[models.TreeFile] {
+	rootAux := BuildTreeFromTreeFiles(files, showRootItem, cmp)
+	sortedFiles := rootAux.GetLeaves()
+
+	return &Node[models.TreeFile]{Children: sortedFiles}
+}
+
 func BuildFlatTreeFromFiles(
 	files []*models.File,
 	showRootItem bool,
