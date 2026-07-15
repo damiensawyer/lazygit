@@ -460,6 +460,7 @@ type TranslationSet struct {
 	ErrCannotSaveSubmodule                string
 	CopyBlobHash                          string
 	BlobHashCopiedToast                   string
+	ErrFileNotInWorktree                  string
 	CommitFilesTitle                      string
 	CheckoutCommitFileTooltip             string
 	CannotCheckoutWithModifiedFilesErr    string
@@ -1633,6 +1634,7 @@ func EnglishTranslationSet() *TranslationSet {
 		ErrCannotSaveSubmodule:               "Cannot save a submodule",
 		CopyBlobHash:                         "Blob hash",
 		BlobHashCopiedToast:                  "Blob hash copied to clipboard",
+		ErrFileNotInWorktree:                 "Does not exist in the working tree",
 		CommitFilesTitle:                     "Commit files",
 		CheckoutCommitFileTooltip:            "Checkout file. This replaces the file in your working tree with the version from the selected commit.",
 		CannotCheckoutWithModifiedFilesErr:   "You have local modifications for the file(s) you are trying to check out. You need to stash or discard these first.",

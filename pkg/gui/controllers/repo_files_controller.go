@@ -67,6 +67,20 @@ func (self *RepoFilesController) GetKeybindings(opts types.KeybindingsOpts) []*t
 			DisplayOnScreen:   true,
 		},
 		{
+			Keys:              opts.GetKeys(opts.Config.Universal.OpenFile),
+			Handler:           self.withItem(self.open),
+			GetDisabledReason: self.require(self.singleItemSelected(self.existsInWorktree)),
+			Description:       self.c.Tr.OpenFile,
+			Tooltip:           self.c.Tr.OpenFileTooltip,
+		},
+		{
+			Keys:              opts.GetKeys(opts.Config.Universal.Edit),
+			Handler:           self.withItems(self.edit),
+			GetDisabledReason: self.require(self.itemsSelected(self.canEditFiles)),
+			Description:       self.c.Tr.Edit,
+			Tooltip:           self.c.Tr.EditFileTooltip,
+		},
+		{
 			Keys:              opts.GetKeys(opts.Config.RepoFiles.SaveFile),
 			Handler:           self.withItem(self.openSaveMenu),
 			GetDisabledReason: self.require(self.singleItemSelected(self.canSave)),
@@ -265,6 +279,48 @@ func (self *RepoFilesController) canCopyContent(node *filetree.RepoFileNode) *ty
 			ShowErrorInPanel: true,
 		}
 	}
+	return nil
+}
+
+// These open/edit the *working directory* version of the file (like the
+// commit-files panel does), which may no longer exist.
+func (self *RepoFilesController) open(node *filetree.RepoFileNode) error {
+	return self.c.Helpers().Files.OpenFile(node.GetPath())
+}
+
+func (self *RepoFilesController) edit(nodes []*filetree.RepoFileNode) error {
+	return self.c.Helpers().Files.EditFiles(lo.FilterMap(nodes,
+		func(node *filetree.RepoFileNode, _ int) (string, bool) {
+			return node.GetPath(), node.IsFile() && nodeExistsInWorktree(node)
+		}))
+}
+
+func nodeExistsInWorktree(node *filetree.RepoFileNode) bool {
+	_, err := os.Stat(node.GetPath())
+	return err == nil
+}
+
+func (self *RepoFilesController) existsInWorktree(node *filetree.RepoFileNode) *types.DisabledReason {
+	if !nodeExistsInWorktree(node) {
+		return &types.DisabledReason{Text: self.c.Tr.ErrFileNotInWorktree}
+	}
+
+	return nil
+}
+
+func (self *RepoFilesController) canEditFiles(nodes []*filetree.RepoFileNode) *types.DisabledReason {
+	if lo.NoneBy(nodes, func(node *filetree.RepoFileNode) bool { return node.IsFile() }) {
+		return &types.DisabledReason{
+			Text:             self.c.Tr.ErrCannotEditDirectory,
+			ShowErrorInPanel: true,
+		}
+	}
+	if lo.NoneBy(nodes, func(node *filetree.RepoFileNode) bool {
+		return node.IsFile() && nodeExistsInWorktree(node)
+	}) {
+		return &types.DisabledReason{Text: self.c.Tr.ErrFileNotInWorktree}
+	}
+
 	return nil
 }
 
