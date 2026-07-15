@@ -30,6 +30,7 @@ type Views struct {
 	CommitMessage     *gocui.View
 	CommitDescription *gocui.View
 	CommitFiles       *gocui.View
+	RepoFiles         *gocui.View
 	SubCommits        *gocui.View
 	Information       *gocui.View
 	AppStatus         *gocui.View

@@ -113,6 +113,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` u `` | View upstream options | View options relating to the branch's upstream e.g. setting/unsetting the upstream and resetting to the upstream. |
 | `` <ctrl+t> `` | Abrir ferramenta de diff externa (git difftool) |  |
 | `` 0 `` | Focar visualização principal |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Ver commits |  |
 | `` / `` | Filtrar a visualização atual por texto |  |
 
@@ -132,6 +133,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` g `` | Restaurar | Ver opções de redefinição (soft/mixed/hard) para redefinir para o item selecionado. |
 | `` <ctrl+t> `` | Abrir ferramenta de diff externa (git difftool) |  |
 | `` 0 `` | Focar visualização principal |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Ver commits |  |
 | `` / `` | Filtrar a visualização atual por texto |  |
 
@@ -194,6 +196,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | Abrir ferramenta de diff externa (git difftool) |  |
 | `` * `` | Select commits of current branch |  |
 | `` 0 `` | Focar visualização principal |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Ver arquivos |  |
 | `` / `` | Pesquisar na visualização atual por texto |  |
 
@@ -210,6 +213,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` g `` | Restaurar | Ver opções de redefinição (soft/mixed/hard) para redefinir para o item selecionado. |
 | `` <ctrl+t> `` | Abrir ferramenta de diff externa (git difftool) |  |
 | `` 0 `` | Focar visualização principal |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Ver commits |  |
 | `` / `` | Filtrar a visualização atual por texto |  |
 
@@ -317,6 +321,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | Abrir ferramenta de diff externa (git difftool) |  |
 | `` * `` | Select commits of current branch |  |
 | `` 0 `` | Focar visualização principal |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Ver commits |  |
 | `` / `` | Filtrar a visualização atual por texto |  |
 
@@ -330,6 +335,16 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` e `` | Editar | Edit the selected remote's name or URL. |
 | `` f `` | Buscar | Fetch updates from the remote repository. This retrieves new commits and branches without merging them into your local branches. |
 | `` F `` | Add fork remote | Quickly add a fork remote by replacing the owner in the origin URL and optionally check out a branch from new remote. |
+| `` / `` | Filtrar a visualização atual por texto |  |
+
+## Repo files
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` <enter> `` | Insira o arquivo / Alternar diretório recolhido |  |
+| `` ` `` | Alternar exibição de árvore de arquivo | Toggle file view between flat and tree layout. Flat layout shows all file paths in a single list, tree layout groups files by directory.<br><br>The default can be changed in the config file with the key 'gui.showFileTree'. |
+| `` - `` | Recolher todos os arquivos | Recolher todos os diretórios na árvore de arquivos |
+| `` = `` | Expandir todos os arquivos | Expandir todos os diretórios na árvore do arquivo |
 | `` / `` | Filtrar a visualização atual por texto |  |
 
 ## Secundário
@@ -351,6 +366,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` w `` | Nova árvore de trabalho |  |
 | `` r `` | Renomear o stash |  |
 | `` 0 `` | Focar visualização principal |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Ver arquivos |  |
 | `` / `` | Filtrar a visualização atual por texto |  |
 
@@ -382,6 +398,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | Abrir ferramenta de diff externa (git difftool) |  |
 | `` * `` | Select commits of current branch |  |
 | `` 0 `` | Focar visualização principal |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Ver arquivos |  |
 | `` / `` | Pesquisar na visualização atual por texto |  |
 

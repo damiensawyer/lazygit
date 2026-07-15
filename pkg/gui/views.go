@@ -40,6 +40,7 @@ func (gui *Gui) orderedViewNameMappings() []viewNameMapping {
 		{viewPtr: &gui.Views.Stash, name: "stash"},
 		{viewPtr: &gui.Views.SubCommits, name: "subCommits"},
 		{viewPtr: &gui.Views.CommitFiles, name: "commitFiles"},
+		{viewPtr: &gui.Views.RepoFiles, name: "repoFiles"},
 
 		{viewPtr: &gui.Views.Staging, name: "staging"},
 		{viewPtr: &gui.Views.StagingSecondary, name: "stagingSecondary"},
@@ -183,6 +184,7 @@ func (gui *Gui) configureViewProperties() {
 	gui.Views.Commits.Title = gui.c.Tr.CommitsTitle
 	gui.Views.ReflogCommits.Title = gui.c.Tr.ReflogCommitsTitle
 	gui.Views.CommitFiles.Title = gui.c.Tr.CommitFiles
+	gui.Views.RepoFiles.Title = gui.c.Tr.RepoFilesTitle
 	gui.Views.Branches.Title = gui.c.Tr.BranchesTitle
 	gui.Views.Remotes.Title = gui.c.Tr.RemotesTitle
 	gui.Views.Worktrees.Title = gui.c.Tr.WorktreesTitle

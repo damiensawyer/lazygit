@@ -553,6 +553,7 @@ type KeybindingUniversalConfig struct {
 	IncreaseRenameSimilarityThreshold Keybinding `yaml:"increaseRenameSimilarityThreshold"`
 	DecreaseRenameSimilarityThreshold Keybinding `yaml:"decreaseRenameSimilarityThreshold"`
 	OpenDiffTool                      Keybinding `yaml:"openDiffTool"`
+	BrowseAllFilesAtCommit            Keybinding `yaml:"browseAllFilesAtCommit"`
 	EditConfig                        Keybinding `yaml:"editConfig"`
 }
 
@@ -1071,6 +1072,7 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 				IncreaseRenameSimilarityThreshold: Keybinding{")"},
 				DecreaseRenameSimilarityThreshold: Keybinding{"("},
 				OpenDiffTool:                      Keybinding{"<ctrl+t>"},
+				BrowseAllFilesAtCommit:            Keybinding{"E"},
 				EditConfig:                        Keybinding{"<alt+shift+c>"},
 			},
 			Status: KeybindingStatusConfig{

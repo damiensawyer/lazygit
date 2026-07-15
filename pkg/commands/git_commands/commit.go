@@ -266,6 +266,21 @@ func (self *CommitCommands) ShowCmdObj(hash string, filterPaths []string) *oscom
 	return self.cmd.New(cmdArgs).DontLog()
 }
 
+// ResolveRefToCommitHash returns the full hash of the commit the given ref
+// points to, peeling annotated tags.
+func (self *CommitCommands) ResolveRefToCommitHash(ref string) (string, error) {
+	cmdArgs := NewGitCmd("rev-parse").
+		Arg("--verify", "--quiet", ref+"^{commit}").
+		ToArgv()
+
+	output, err := self.cmd.New(cmdArgs).DontLog().RunWithOutput()
+	if err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(output), nil
+}
+
 func (self *CommitCommands) ShowFileContentCmdObj(hash string, filePath string) *oscommands.CmdObj {
 	cmdArgs := NewGitCmd("show").
 		Arg(fmt.Sprintf("%s:%s", hash, filePath)).

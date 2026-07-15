@@ -730,6 +730,7 @@ keybinding:
     increaseRenameSimilarityThreshold: )
     decreaseRenameSimilarityThreshold: (
     openDiffTool: <ctrl+t>
+    browseAllFilesAtCommit: E
     editConfig: <alt+shift+c>
   status:
     checkForUpdate: u

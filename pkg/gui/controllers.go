@@ -179,6 +179,7 @@ func (gui *Gui) resetHelpersAndControllers() {
 	gitFlowController := controllers.NewGitFlowController(common)
 	stashController := controllers.NewStashController(common)
 	commitFilesController := controllers.NewCommitFilesController(common)
+	repoFilesController := controllers.NewRepoFilesController(common)
 	patchExplorerControllerFactory := controllers.NewPatchExplorerControllerFactory(common)
 	stagingController := controllers.NewStagingController(common, gui.State.Contexts.Staging, gui.State.Contexts.StagingSecondary, false)
 	stagingSecondaryController := controllers.NewStagingController(common, gui.State.Contexts.StagingSecondary, gui.State.Contexts.Staging, true)
@@ -220,6 +221,7 @@ func (gui *Gui) resetHelpersAndControllers() {
 		gui.State.Contexts.ReflogCommits,
 		gui.State.Contexts.LocalCommits,
 		gui.State.Contexts.CommitFiles,
+		gui.State.Contexts.RepoFiles,
 		gui.State.Contexts.SubCommits,
 		gui.State.Contexts.Stash,
 	} {
@@ -243,6 +245,20 @@ func (gui *Gui) resetHelpersAndControllers() {
 		gui.State.Contexts.Stash,
 	} {
 		controllers.AttachControllers(context, controllers.NewSwitchToDiffFilesController(
+			common, context,
+		))
+	}
+
+	for _, context := range []controllers.CanSwitchToRepoFiles{
+		gui.State.Contexts.LocalCommits,
+		gui.State.Contexts.SubCommits,
+		gui.State.Contexts.ReflogCommits,
+		gui.State.Contexts.Branches,
+		gui.State.Contexts.RemoteBranches,
+		gui.State.Contexts.Tags,
+		gui.State.Contexts.Stash,
+	} {
+		controllers.AttachControllers(context, controllers.NewSwitchToRepoFilesController(
 			common, context,
 		))
 	}
@@ -343,6 +359,10 @@ func (gui *Gui) resetHelpersAndControllers() {
 
 	controllers.AttachControllers(gui.State.Contexts.CommitFiles,
 		commitFilesController,
+	)
+
+	controllers.AttachControllers(gui.State.Contexts.RepoFiles,
+		repoFilesController,
 	)
 
 	controllers.AttachControllers(gui.State.Contexts.Remotes,

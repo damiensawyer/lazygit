@@ -438,6 +438,11 @@ type TranslationSet struct {
 	CommitFilesDynamicTitle               string
 	RemoteBranchesDynamicTitle            string
 	ViewItemFiles                         string
+	RepoFilesTitle                        string
+	RepoFilesDynamicTitle                 string
+	BrowseAllFilesAtCommit                string
+	BrowseAllFilesAtCommitTooltip         string
+	LoadingFilesAtRefStatus               string
 	CommitFilesTitle                      string
 	CheckoutCommitFileTooltip             string
 	CannotCheckoutWithModifiedFilesErr    string
@@ -1587,6 +1592,11 @@ func EnglishTranslationSet() *TranslationSet {
 		CommitFilesDynamicTitle:              "Diff files (%s)",
 		RemoteBranchesDynamicTitle:           "Remote branches (%s)",
 		ViewItemFiles:                        "View files",
+		RepoFilesTitle:                       "Repo files",
+		RepoFilesDynamicTitle:                "Files at %s",
+		BrowseAllFilesAtCommit:               "Browse all files at commit",
+		BrowseAllFilesAtCommitTooltip:        "Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them.",
+		LoadingFilesAtRefStatus:              "Loading files",
 		CommitFilesTitle:                     "Commit files",
 		CheckoutCommitFileTooltip:            "Checkout file. This replaces the file in your working tree with the version from the selected commit.",
 		CannotCheckoutWithModifiedFilesErr:   "You have local modifications for the file(s) you are trying to check out. You need to stash or discard these first.",

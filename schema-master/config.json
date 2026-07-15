@@ -3405,6 +3405,20 @@
           ],
           "default": "\u003cctrl+t\u003e"
         },
+        "browseAllFilesAtCommit": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "E"
+        },
         "editConfig": {
           "oneOf": [
             {

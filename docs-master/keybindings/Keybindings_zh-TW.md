@@ -59,6 +59,16 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <enter> `` | 確認 |  |
 | `` <esc> `` | 關閉/取消 |  |
 
+## Repo files
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` <enter> `` | 輸入檔案以將選定的行添加至補丁（或切換目錄折疊） |  |
+| `` ` `` | 顯示檔案樹狀視圖 | Toggle file view between flat and tree layout. Flat layout shows all file paths in a single list, tree layout groups files by directory.<br><br>The default can be changed in the config file with the key 'gui.showFileTree'. |
+| `` - `` | Collapse all files | Collapse all directories in the files tree |
+| `` = `` | Expand all files | Expand all directories in the file tree |
+| `` / `` | 搜尋 |  |
+
 ## 主面板 (補丁生成)
 
 | Key | Action | Info |
@@ -148,6 +158,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | 開啟外部差異工具 (git difftool) |  |
 | `` * `` | Select commits of current branch |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | 檢視所選項目的檔案 |  |
 | `` / `` | 搜尋 |  |
 
@@ -214,6 +225,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | 開啟外部差異工具 (git difftool) |  |
 | `` * `` | Select commits of current branch |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | 檢視所選項目的檔案 |  |
 | `` / `` | 搜尋 |  |
 
@@ -255,6 +267,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` w `` | New worktree |  |
 | `` r `` | 重新命名收藏 |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | 檢視所選項目的檔案 |  |
 | `` / `` | 搜尋 |  |
 
@@ -275,6 +288,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | 開啟外部差異工具 (git difftool) |  |
 | `` * `` | Select commits of current branch |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | 檢視提交 |  |
 | `` / `` | 搜尋 |  |
 
@@ -306,6 +320,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` u `` | 檢視遠端設定 | 檢視有關遠端分支的設定（例如重設至遠端） |
 | `` <ctrl+t> `` | 開啟外部差異工具 (git difftool) |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | 檢視提交 |  |
 | `` / `` | 搜尋 |  |
 
@@ -322,6 +337,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` g `` | 重設 | View reset options (soft/mixed/hard) for resetting onto selected item. |
 | `` <ctrl+t> `` | 開啟外部差異工具 (git difftool) |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | 檢視提交 |  |
 | `` / `` | 搜尋 |  |
 
@@ -413,5 +429,6 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` g `` | 檢視重設選項 | View reset options (soft/mixed/hard) for resetting onto selected item. |
 | `` <ctrl+t> `` | 開啟外部差異工具 (git difftool) |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | 檢視提交 |  |
 | `` / `` | 搜尋 |  |

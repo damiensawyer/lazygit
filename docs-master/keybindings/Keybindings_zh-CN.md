@@ -52,6 +52,16 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` ] `` | 下一个标签 |  |
 | `` [ `` | 上一个标签 |  |
 
+## Repo files
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` <enter> `` | 输入文件以将所选行添加到补丁中(或切换目录折叠) |  |
+| `` ` `` | 切换文件树视图 | 在平面布局和树布局之间切换文件视图。平面布局在单个列表中显示所有文件路径，树布局按目录分组文件。<br><br>可以在配置文件中使用 'gui.showFileTree' 键更改默认设置。 |
+| `` - `` | 折叠全部文件 | 折叠文件树中的全部目录 |
+| `` = `` | 展开全部文件 | 展开文件树中的全部目录 |
+| `` / `` | 通过文本过滤当前视图 |  |
+
 ## 子提交
 
 | Key | Action | Info |
@@ -69,6 +79,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | 使用外部差异比较工具(git difftool) |  |
 | `` * `` | 选择当前分支的提交 |  |
 | `` 0 `` | 聚焦主视图 |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | 查看提交的文件 |  |
 | `` / `` | 开始搜索 |  |
 
@@ -113,6 +124,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | 使用外部差异比较工具(git difftool) |  |
 | `` * `` | 选择当前分支的提交 |  |
 | `` 0 `` | 聚焦主视图 |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | 查看提交 |  |
 | `` / `` | 通过文本过滤当前视图 |  |
 
@@ -155,6 +167,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | 使用外部差异比较工具(git difftool) |  |
 | `` * `` | 选择当前分支的提交 |  |
 | `` 0 `` | 聚焦主视图 |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | 查看提交的文件 |  |
 | `` / `` | 开始搜索 |  |
 
@@ -246,6 +259,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` u `` | 查看上游选项 | 查看与分支上游相关的选项，例如设置/取消设置上游和重置为上游。 |
 | `` <ctrl+t> `` | 使用外部差异比较工具(git difftool) |  |
 | `` 0 `` | 聚焦主视图 |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | 查看提交 |  |
 | `` / `` | 通过文本过滤当前视图 |  |
 
@@ -278,6 +292,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` g `` | 重置 | 查看重置选项 (soft/mixed/hard) 用于重置到选择项 |
 | `` <ctrl+t> `` | 使用外部差异比较工具(git difftool) |  |
 | `` 0 `` | 聚焦主视图 |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | 查看提交 |  |
 | `` / `` | 通过文本过滤当前视图 |  |
 
@@ -375,6 +390,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` w `` | 新建工作树 |  |
 | `` r `` | 重命名贮藏 |  |
 | `` 0 `` | 聚焦主视图 |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | 查看提交的文件 |  |
 | `` / `` | 通过文本过滤当前视图 |  |
 
@@ -413,5 +429,6 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` g `` | 查看重置选项 | 查看重置选项 (soft/mixed/hard) 用于重置到选择项 |
 | `` <ctrl+t> `` | 使用外部差异比较工具(git difftool) |  |
 | `` 0 `` | 聚焦主视图 |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | 查看提交 |  |
 | `` / `` | 通过文本过滤当前视图 |  |
