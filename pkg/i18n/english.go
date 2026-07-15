@@ -783,7 +783,10 @@ type TranslationSet struct {
 	IncreaseContextInDiffViewTooltip         string
 	DecreaseContextInDiffView                string
 	DecreaseContextInDiffViewTooltip         string
+	ToggleContextInDiffView                  string
+	ToggleContextInDiffViewTooltip           string
 	DiffContextSizeChanged                   string
+	FullFileDiffView                         string
 	IncreaseRenameSimilarityThreshold        string
 	IncreaseRenameSimilarityThresholdTooltip string
 	DecreaseRenameSimilarityThreshold        string
@@ -1930,7 +1933,10 @@ func EnglishTranslationSet() *TranslationSet {
 		IncreaseContextInDiffViewTooltip:         "Increase the amount of the context shown around changes in the diff view.\n\nThe default can be changed in the config file with the key 'git.diffContextSize'.",
 		DecreaseContextInDiffView:                "Decrease diff context size",
 		DecreaseContextInDiffViewTooltip:         "Decrease the amount of the context shown around changes in the diff view.\n\nThe default can be changed in the config file with the key 'git.diffContextSize'.",
+		ToggleContextInDiffView:                  "Toggle full file diff view",
+		ToggleContextInDiffViewTooltip:           "Toggle between showing only changed lines with context and showing the entire file.\n\nPress again to restore the previous context size.",
 		DiffContextSizeChanged:                   "Changed diff context size to %d",
+		FullFileDiffView:                         "Showing full file diff",
 		IncreaseRenameSimilarityThresholdTooltip: "Increase the similarity threshold for a deletion and addition pair to be treated as a rename.\n\nThe default can be changed in the config file with the key 'git.renameSimilarityThreshold'.",
 		IncreaseRenameSimilarityThreshold:        "Increase rename similarity threshold",
 		DecreaseRenameSimilarityThresholdTooltip: "Decrease the similarity threshold for a deletion and addition pair to be treated as a rename.\n\nThe default can be changed in the config file with the key 'git.renameSimilarityThreshold'.",

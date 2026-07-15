@@ -329,6 +329,8 @@ type GitConfig struct {
 	IgnoreWhitespaceInDiffView bool `yaml:"ignoreWhitespaceInDiffView"`
 	// The number of lines of context to show around each diff hunk. Can be changed from within Lazygit with the `{` and `}` keys.
 	DiffContextSize uint64 `yaml:"diffContextSize"`
+	// Saved context size for toggling with `<alt+}>`. Used internally when toggling full-file diff view.
+	DiffContextSizeSaved uint64 `yaml:"-"`
 	// The threshold for considering a file to be renamed, in percent. Can be changed from within Lazygit with the `(` and `)` keys.
 	RenameSimilarityThreshold int `yaml:"renameSimilarityThreshold" jsonschema:"minimum=0,maximum=100"`
 	// If true, do not spawn a separate process when using GPG
@@ -550,6 +552,7 @@ type KeybindingUniversalConfig struct {
 	ToggleWhitespaceInDiffView        Keybinding `yaml:"toggleWhitespaceInDiffView"`
 	IncreaseContextInDiffView         Keybinding `yaml:"increaseContextInDiffView"`
 	DecreaseContextInDiffView         Keybinding `yaml:"decreaseContextInDiffView"`
+	ToggleContextInDiffView           Keybinding `yaml:"toggleContextInDiffView"`
 	IncreaseRenameSimilarityThreshold Keybinding `yaml:"increaseRenameSimilarityThreshold"`
 	DecreaseRenameSimilarityThreshold Keybinding `yaml:"decreaseRenameSimilarityThreshold"`
 	OpenDiffTool                      Keybinding `yaml:"openDiffTool"`
@@ -1068,6 +1071,7 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 				ToggleWhitespaceInDiffView:        Keybinding{"<ctrl+w>"},
 				IncreaseContextInDiffView:         Keybinding{"}"},
 				DecreaseContextInDiffView:         Keybinding{"{"},
+				ToggleContextInDiffView:           Keybinding{"<alt+shift+]>", "<alt+]>"},
 				IncreaseRenameSimilarityThreshold: Keybinding{")"},
 				DecreaseRenameSimilarityThreshold: Keybinding{"("},
 				OpenDiffTool:                      Keybinding{"<ctrl+t>"},
