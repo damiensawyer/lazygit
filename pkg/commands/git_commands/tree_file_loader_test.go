@@ -1,6 +1,8 @@
 package git_commands
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
@@ -76,6 +78,25 @@ func TestParseTreeFiles(t *testing.T) {
 				assert.Equal(t, test.output, result)
 			}
 		})
+	}
+}
+
+// Exercises the parser at the scale of a very large repository (300k files),
+// which is the scale the repo-files panel is designed to handle.
+func BenchmarkParseTreeFiles(b *testing.B) {
+	var sb strings.Builder
+	for i := range 300_000 {
+		fmt.Fprintf(&sb, "100644 blob e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\tdir%d/sub%d/file%d.txt\x00",
+			i%1000, i%37, i)
+	}
+	output := sb.String()
+
+	b.ResetTimer()
+	for b.Loop() {
+		treeFiles, err := parseTreeFiles(output)
+		if err != nil || len(treeFiles) != 300_000 {
+			b.Fatal("unexpected parse result")
+		}
 	}
 }
 
