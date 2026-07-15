@@ -122,6 +122,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | Open external diff tool (git difftool) |  |
 | `` * `` | Select commits of current branch |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | View files |  |
 | `` / `` | Search the current view by text |  |
 
@@ -201,6 +202,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` u `` | View upstream options | View options relating to the branch's upstream e.g. setting/unsetting the upstream and resetting to the upstream. |
 | `` <ctrl+t> `` | Open external diff tool (git difftool) |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | View commits |  |
 | `` / `` | Filter the current view by text |  |
 
@@ -293,6 +295,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | Open external diff tool (git difftool) |  |
 | `` * `` | Select commits of current branch |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | View commits |  |
 | `` / `` | Filter the current view by text |  |
 
@@ -312,6 +315,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` g `` | Reset | View reset options (soft/mixed/hard) for resetting onto selected item. |
 | `` <ctrl+t> `` | Open external diff tool (git difftool) |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | View commits |  |
 | `` / `` | Filter the current view by text |  |
 
@@ -325,6 +329,23 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` e `` | Edit | Edit the selected remote's name or URL. |
 | `` f `` | Fetch | Fetch updates from the remote repository. This retrieves new commits and branches without merging them into your local branches. |
 | `` F `` | Add fork remote | Quickly add a fork remote by replacing the owner in the origin URL and optionally check out a branch from new remote. |
+| `` / `` | Filter the current view by text |  |
+
+## Repo files
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` <ctrl+o> `` | Copy path to clipboard |  |
+| `` y `` | Copy to clipboard |  |
+| `` <enter> `` | Enter file / Toggle directory collapsed | If a file is selected, focus the main view so you can scroll through its content. If a directory is selected, toggle it collapsed/expanded. |
+| `` c `` | Restore to worktree | Replace the selected files/directories in your working tree with their state at the viewed commit. The restored versions are left unstaged, as if you had edited the files yourself. |
+| `` o `` | Open file | Open file in default application. |
+| `` e `` | Edit | Open file in external editor. |
+| `` S `` | Save file/directory | Save a copy of the selected file (or every file under the selected directory) as it existed at the viewed commit, either to a path of your choosing or over its original location. |
+| `` ` `` | Toggle file tree view | Toggle file view between flat and tree layout. Flat layout shows all file paths in a single list, tree layout groups files by directory.<br><br>The default can be changed in the config file with the key 'gui.showFileTree'. |
+| `` - `` | Collapse all files | Collapse all directories in the files tree |
+| `` = `` | Expand all files | Expand all directories in the file tree |
+| `` 0 `` | Focus main view |  |
 | `` / `` | Filter the current view by text |  |
 
 ## Secondary
@@ -346,6 +367,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` w `` | New worktree |  |
 | `` r `` | Rename stash |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | View files |  |
 | `` / `` | Filter the current view by text |  |
 
@@ -377,6 +399,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | Open external diff tool (git difftool) |  |
 | `` * `` | Select commits of current branch |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | View files |  |
 | `` / `` | Search the current view by text |  |
 
@@ -407,6 +430,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` g `` | Reset | View reset options (soft/mixed/hard) for resetting onto selected item. |
 | `` <ctrl+t> `` | Open external diff tool (git difftool) |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | View commits |  |
 | `` / `` | Filter the current view by text |  |
 

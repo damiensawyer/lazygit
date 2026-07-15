@@ -95,6 +95,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | Otwórz zewnętrzne narzędzie różnic (git difftool) |  |
 | `` * `` | Select commits of current branch |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Wyświetl pliki |  |
 | `` / `` | Szukaj w bieżącym widoku po tekście |  |
 
@@ -133,6 +134,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | Otwórz zewnętrzne narzędzie różnic (git difftool) |  |
 | `` * `` | Select commits of current branch |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Pokaż commity |  |
 | `` / `` | Filtruj bieżący widok po tekście |  |
 
@@ -187,6 +189,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` u `` | Pokaż opcje upstream | Pokaż opcje dotyczące upstream gałęzi, np. ustawianie/usuwanie upstream i resetowanie do upstream. |
 | `` <ctrl+t> `` | Otwórz zewnętrzne narzędzie różnic (git difftool) |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Pokaż commity |  |
 | `` / `` | Filtruj bieżący widok po tekście |  |
 
@@ -314,6 +317,23 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <enter> `` | Potwierdź |  |
 | `` <esc> `` | Zamknij |  |
 
+## Repo files
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` <ctrl+o> `` | Kopiuj ścieżkę do schowka |  |
+| `` y `` | Kopiuj do schowka |  |
+| `` <enter> `` | Wejdź do pliku / Przełącz zwiń katalog | If a file is selected, focus the main view so you can scroll through its content. If a directory is selected, toggle it collapsed/expanded. |
+| `` c `` | Restore to worktree | Replace the selected files/directories in your working tree with their state at the viewed commit. The restored versions are left unstaged, as if you had edited the files yourself. |
+| `` o `` | Otwórz plik | Otwórz plik w domyślnej aplikacji. |
+| `` e `` | Edytuj | Otwórz plik w zewnętrznym edytorze. |
+| `` S `` | Save file/directory | Save a copy of the selected file (or every file under the selected directory) as it existed at the viewed commit, either to a path of your choosing or over its original location. |
+| `` ` `` | Przełącz widok drzewa plików | Toggle file view between flat and tree layout. Flat layout shows all file paths in a single list, tree layout groups files by directory.<br><br>The default can be changed in the config file with the key 'gui.showFileTree'. |
+| `` - `` | Collapse all files | Collapse all directories in the files tree |
+| `` = `` | Expand all files | Expand all directories in the file tree |
+| `` 0 `` | Focus main view |  |
+| `` / `` | Filtruj bieżący widok po tekście |  |
+
 ## Schowek
 
 | Key | Action | Info |
@@ -325,6 +345,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` w `` | Nowe drzewo pracy |  |
 | `` r `` | Zmień nazwę schowka |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Wyświetl pliki |  |
 | `` / `` | Filtruj bieżący widok po tekście |  |
 
@@ -356,6 +377,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | Otwórz zewnętrzne narzędzie różnic (git difftool) |  |
 | `` * `` | Select commits of current branch |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Wyświetl pliki |  |
 | `` / `` | Szukaj w bieżącym widoku po tekście |  |
 
@@ -386,6 +408,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` g `` | Reset | Wyświetl opcje resetu (miękki/mieszany/twardy) do wybranego elementu. |
 | `` <ctrl+t> `` | Otwórz zewnętrzne narzędzie różnic (git difftool) |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Pokaż commity |  |
 | `` / `` | Filtruj bieżący widok po tekście |  |
 
@@ -417,5 +440,6 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` g `` | Reset | Wyświetl opcje resetu (miękki/mieszany/twardy) do wybranego elementu. |
 | `` <ctrl+t> `` | Otwórz zewnętrzne narzędzie różnic (git difftool) |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Pokaż commity |  |
 | `` / `` | Filtruj bieżący widok po tekście |  |

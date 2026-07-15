@@ -98,6 +98,10 @@ func (self *Views) CommitFiles() *ViewDriver {
 	return self.regularView("commitFiles")
 }
 
+func (self *Views) RepoFiles() *ViewDriver {
+	return self.regularView("repoFiles")
+}
+
 func (self *Views) Stash() *ViewDriver {
 	return self.regularView("stash")
 }

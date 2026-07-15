@@ -49,6 +49,84 @@ func RenderCommitFileTree(
 	})
 }
 
+// Renders the rows of the repo file tree that fall within the given range.
+// Unlike the other render functions in this file, this one is viewport-bounded
+// because the tree holds every file in the repository, which can be far too
+// many to render per interaction.
+func RenderRepoFileTree(
+	tree *filetree.RepoFileTreeViewModel,
+	showFileIcons bool,
+	customIconsConfig *config.CustomIconsConfig,
+	startIdx int,
+	endIdx int,
+) []string {
+	collapsedPaths := tree.CollapsedPaths()
+	entries := tree.GetFlattenedRange(startIdx, endIdx)
+	lines := make([]string, 0, len(entries))
+	for _, entry := range entries {
+		node := entry.Node
+		isCollapsed := !node.IsFile() && collapsedPaths.IsCollapsed(node.GetInternalPath())
+		lines = append(lines, getRepoFileLine(isCollapsed, entry.TreeDepth, entry.VisualDepth, node, showFileIcons, customIconsConfig))
+	}
+
+	return lines
+}
+
+func getRepoFileLine(
+	isCollapsed bool,
+	treeDepth int,
+	visualDepth int,
+	node *filetree.Node[models.TreeFile],
+	showFileIcons bool,
+	customIconsConfig *config.CustomIconsConfig,
+) string {
+	indentation := strings.Repeat("  ", visualDepth)
+	name := treeFileNameAtDepth(node, treeDepth)
+	file := node.File
+	output := indentation
+
+	isDirectory := file == nil
+	nameColor := theme.DefaultTextColor
+
+	if isDirectory {
+		arrow := EXPANDED_ARROW
+		if isCollapsed {
+			arrow = COLLAPSED_ARROW
+		}
+
+		output += nameColor.Sprint(arrow) + " "
+	}
+
+	name = utils.EscapeSpecialChars(name)
+	isSubmodule := file != nil && file.IsSubmodule()
+
+	if showFileIcons {
+		icon := icons.IconForFile(name, isSubmodule, false, isDirectory, customIconsConfig)
+		paint := color.HEX(icon.Color, false)
+		output += paint.Sprint(icon.Icon) + " "
+	}
+
+	output += nameColor.Sprint(name)
+
+	if isSubmodule {
+		output += theme.DefaultTextColor.Sprint(" (submodule)")
+	}
+
+	return output
+}
+
+func treeFileNameAtDepth(node *filetree.Node[models.TreeFile], depth int) string {
+	splitName := split(node.GetInternalPath())
+	if depth == 0 && splitName[0] == "." {
+		if len(splitName) == 1 {
+			return "/"
+		}
+		depth = 1
+	}
+
+	return join(splitName[depth:])
+}
+
 // Returns the status of a commit file in terms of its inclusion in the custom patch
 func commitFilePatchStatus(node *filetree.Node[models.CommitFile], tree *filetree.CommitFileTreeViewModel, patchBuilder *patch.PatchBuilder) patch.PatchStatus {
 	// This is a little convoluted because we're dealing with either a leaf or a non-leaf.

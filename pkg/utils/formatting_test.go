@@ -258,6 +258,15 @@ func BenchmarkStringWidthAsciiOriginal(b *testing.B) {
 	}
 }
 
+func TestFormatBytes(t *testing.T) {
+	assert.Equal(t, "0 B", FormatBytes(0))
+	assert.Equal(t, "1023 B", FormatBytes(1023))
+	assert.Equal(t, "1.0 KiB", FormatBytes(1024))
+	assert.Equal(t, "1.5 KiB", FormatBytes(1536))
+	assert.Equal(t, "2.4 MiB", FormatBytes(2517630))
+	assert.Equal(t, "3.0 GiB", FormatBytes(3221225472))
+}
+
 func BenchmarkStringWidthAsciiOptimized(b *testing.B) {
 	for b.Loop() {
 		StringWidth("some ASCII string")

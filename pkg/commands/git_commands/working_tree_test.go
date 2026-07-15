@@ -462,6 +462,15 @@ func TestWorkingTreeCheckoutFile(t *testing.T) {
 	}
 }
 
+func TestWorkingTreeRestoreToWorktree(t *testing.T) {
+	runner := oscommands.NewFakeRunner(t).
+		ExpectGitArgs([]string{"restore", "--worktree", "--source=11af912", "--", "dir1", "file.txt"}, "", nil)
+	instance := buildWorkingTreeCommands(commonDeps{runner: runner})
+
+	assert.NoError(t, instance.RestoreToWorktree("11af912", []string{"dir1", "file.txt"}))
+	runner.CheckForMissingCalls()
+}
+
 func TestWorkingTreeDiscardUnstagedFileChanges(t *testing.T) {
 	type scenario struct {
 		testName string

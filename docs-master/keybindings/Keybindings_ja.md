@@ -62,6 +62,23 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <enter> `` | 確認 |  |
 | `` <esc> `` | 閉じる/キャンセル |  |
 
+## Repo files
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` <ctrl+o> `` | パスをクリップボードにコピー |  |
+| `` y `` | クリップボードにコピー |  |
+| `` <enter> `` | ファイルに入る / ディレクトリの折りたたみを切り替える | If a file is selected, focus the main view so you can scroll through its content. If a directory is selected, toggle it collapsed/expanded. |
+| `` c `` | Restore to worktree | Replace the selected files/directories in your working tree with their state at the viewed commit. The restored versions are left unstaged, as if you had edited the files yourself. |
+| `` o `` | ファイルを開く | デフォルトのアプリケーションでファイルを開きます。 |
+| `` e `` | 編集 | 外部エディタでファイルを開きます。 |
+| `` S `` | Save file/directory | Save a copy of the selected file (or every file under the selected directory) as it existed at the viewed commit, either to a path of your choosing or over its original location. |
+| `` ` `` | ファイルツリービューを切り替え | ファイル表示をフラット表示とツリー表示で切り替えます。フラット表示はすべてのファイルパスを一覧で表示し、ツリー表示はディレクトリごとにファイルをグループ化します。<br><br>デフォルトは設定ファイル内の 'gui.showFileTree' キーで変更できます。 |
+| `` - `` | すべてのファイルを折りたたむ | ファイルツリー内のすべてのディレクトリを折りたたみます |
+| `` = `` | すべてのファイルを展開 | ファイルツリー内のすべてのディレクトリを展開します |
+| `` 0 `` | メインビューにフォーカス |  |
+| `` / `` | 現在のビューをテキストでフィルタリング |  |
+
 ## コミット
 
 | Key | Action | Info |
@@ -102,6 +119,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | 外部差分ツールを開く（git difftool） |  |
 | `` * `` | 現在のブランチのコミットを選択 |  |
 | `` 0 `` | メインビューにフォーカス |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | ファイルを表示 |  |
 | `` / `` | 現在のビューをテキストで検索 |  |
 
@@ -149,6 +167,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | 外部差分ツールを開く（git difftool） |  |
 | `` * `` | 現在のブランチのコミットを選択 |  |
 | `` 0 `` | メインビューにフォーカス |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | ファイルを表示 |  |
 | `` / `` | 現在のビューをテキストで検索 |  |
 
@@ -177,6 +196,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` w `` | 新しいワークツリー |  |
 | `` r `` | スタッシュの名前を変更 |  |
 | `` 0 `` | メインビューにフォーカス |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | ファイルを表示 |  |
 | `` / `` | 現在のビューをテキストでフィルタリング |  |
 
@@ -212,6 +232,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` g `` | リセット | 選択した項目へのリセットオプション（ソフト/ミックス/ハード）を表示します。各リセットタイプの詳細は次の通りです：<br>- ソフトリセット：変更を保持し、ステージされた状態にします<br>- ミックスリセット：変更を保持し、ステージされていない状態にします<br>- ハードリセット：すべての変更を破棄します |
 | `` <ctrl+t> `` | 外部差分ツールを開く（git difftool） |  |
 | `` 0 `` | メインビューにフォーカス |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | コミットを表示 |  |
 | `` / `` | 現在のビューをテキストでフィルタリング |  |
 
@@ -337,6 +358,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | 外部差分ツールを開く（git difftool） |  |
 | `` * `` | 現在のブランチのコミットを選択 |  |
 | `` 0 `` | メインビューにフォーカス |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | コミットを表示 |  |
 | `` / `` | 現在のビューをテキストでフィルタリング |  |
 
@@ -368,6 +390,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` g `` | リセット | 選択した項目へのリセットオプション（ソフト/ミックス/ハード）を表示します。各リセットタイプの詳細は次の通りです：<br>- ソフトリセット：変更を保持し、ステージされた状態にします<br>- ミックスリセット：変更を保持し、ステージされていない状態にします<br>- ハードリセット：すべての変更を破棄します |
 | `` <ctrl+t> `` | 外部差分ツールを開く（git difftool） |  |
 | `` 0 `` | メインビューにフォーカス |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | コミットを表示 |  |
 | `` / `` | 現在のビューをテキストでフィルタリング |  |
 
@@ -399,6 +422,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` u `` | アップストリームオプションを表示 | ブランチのアップストリームに関連するオプションを表示します（例：アップストリームの設定/解除やアップストリームへのリセット）。 |
 | `` <ctrl+t> `` | 外部差分ツールを開く（git difftool） |  |
 | `` 0 `` | メインビューにフォーカス |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | コミットを表示 |  |
 | `` / `` | 現在のビューをテキストでフィルタリング |  |
 

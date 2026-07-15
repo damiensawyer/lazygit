@@ -33,6 +33,7 @@ func NewContextTree(c *ContextCommon) *ContextTree {
 		RemoteBranches:  NewRemoteBranchesContext(c),
 		LocalCommits:    NewLocalCommitsContext(c),
 		CommitFiles:     commitFilesContext,
+		RepoFiles:       NewRepoFilesContext(c),
 		ReflogCommits:   NewReflogCommitsContext(c),
 		SubCommits:      NewSubCommitsContext(c),
 		Branches:        NewBranchesContext(c),

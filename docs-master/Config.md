@@ -740,6 +740,7 @@ keybinding:
     increaseRenameSimilarityThreshold: )
     decreaseRenameSimilarityThreshold: (
     openDiffTool: <ctrl+t>
+    browseAllFilesAtCommit: E
     editConfig: <alt+shift+c>
   status:
     checkForUpdate: u
@@ -824,6 +825,9 @@ keybinding:
     renameStash: r
   commitFiles:
     checkoutCommitFile: c
+  repoFiles:
+    restore: c
+    saveFile: S
   main:
     prevHunk: [<left>, h]
     nextHunk: [<right>, l]

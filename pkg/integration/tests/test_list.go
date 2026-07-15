@@ -22,6 +22,7 @@ import (
 	"github.com/jesseduffield/lazygit/pkg/integration/tests/patch_building"
 	"github.com/jesseduffield/lazygit/pkg/integration/tests/reflog"
 	"github.com/jesseduffield/lazygit/pkg/integration/tests/remote"
+	"github.com/jesseduffield/lazygit/pkg/integration/tests/repo_files"
 	"github.com/jesseduffield/lazygit/pkg/integration/tests/shell_commands"
 	"github.com/jesseduffield/lazygit/pkg/integration/tests/staging"
 	"github.com/jesseduffield/lazygit/pkg/integration/tests/stash"
@@ -393,6 +394,13 @@ var tests = []*components.IntegrationTest{
 	reflog.Patch,
 	reflog.Reset,
 	remote.AddForkRemote,
+	repo_files.BrowseAllFilesAtCommit,
+	repo_files.CopyMenu,
+	repo_files.FileHistory,
+	repo_files.OpenFileNotInWorktree,
+	repo_files.RestoreToWorktree,
+	repo_files.SaveFileAtCommit,
+	repo_files.ViewFileAtCommit,
 	shell_commands.BasicShellCommand,
 	shell_commands.ComplexShellCommand,
 	shell_commands.DeleteFromHistory,

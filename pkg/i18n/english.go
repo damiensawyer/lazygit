@@ -438,6 +438,29 @@ type TranslationSet struct {
 	CommitFilesDynamicTitle               string
 	RemoteBranchesDynamicTitle            string
 	ViewItemFiles                         string
+	RepoFilesTitle                        string
+	RepoFilesDynamicTitle                 string
+	BrowseAllFilesAtCommit                string
+	BrowseAllFilesAtCommitTooltip         string
+	LoadingFilesAtRefStatus               string
+	EnterRepoFileTooltip                  string
+	RepoFilesBinaryFile                   string
+	RepoFilesSymlink                      string
+	RepoFilesSubmodule                    string
+	RestoreToWorktree                     string
+	RestoreToWorktreeTooltip              string
+	RestoreToWorktreePrompt               string
+	SaveFilesFromCommit                   string
+	SaveFilesFromCommitTooltip            string
+	SaveFileAs                            string
+	SaveToOriginalLocation                string
+	SaveFileAsPromptTitle                 string
+	SaveFileOverwritePrompt               string
+	FileSavedToast                        string
+	ErrCannotSaveSubmodule                string
+	CopyBlobHash                          string
+	BlobHashCopiedToast                   string
+	ErrFileNotInWorktree                  string
 	CommitFilesTitle                      string
 	CheckoutCommitFileTooltip             string
 	CannotCheckoutWithModifiedFilesErr    string
@@ -1027,6 +1050,8 @@ type Actions struct {
 	AutoForwardBranches              string
 	CherryPick                       string
 	CheckoutFile                     string
+	RestoreFilesToWorktree           string
+	SaveFilesFromCommit              string
 	SquashCommitDown                 string
 	FixupCommit                      string
 	FixupCommitKeepMessage           string
@@ -1602,6 +1627,29 @@ func EnglishTranslationSet() *TranslationSet {
 		CommitFilesDynamicTitle:              "Diff files (%s)",
 		RemoteBranchesDynamicTitle:           "Remote branches (%s)",
 		ViewItemFiles:                        "View files",
+		RepoFilesTitle:                       "Repo files",
+		RepoFilesDynamicTitle:                "Files at %s",
+		BrowseAllFilesAtCommit:               "Browse all files at commit",
+		BrowseAllFilesAtCommitTooltip:        "Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them.",
+		LoadingFilesAtRefStatus:              "Loading files",
+		EnterRepoFileTooltip:                 "If a file is selected, focus the main view so you can scroll through its content. If a directory is selected, toggle it collapsed/expanded.",
+		RepoFilesBinaryFile:                  "Binary file ({{.size}})",
+		RepoFilesSymlink:                     "Symlink to {{.target}}",
+		RepoFilesSubmodule:                   "Submodule at {{.hash}}",
+		RestoreToWorktree:                    "Restore to worktree",
+		RestoreToWorktreeTooltip:             "Replace the selected files/directories in your working tree with their state at the viewed commit. The restored versions are left unstaged, as if you had edited the files yourself.",
+		RestoreToWorktreePrompt:              "Are you sure you want to replace {{.paths}} in your working tree with the version at {{.ref}}?",
+		SaveFilesFromCommit:                  "Save file/directory",
+		SaveFilesFromCommitTooltip:           "Save a copy of the selected file (or every file under the selected directory) as it existed at the viewed commit, either to a path of your choosing or over its original location.",
+		SaveFileAs:                           "Save as...",
+		SaveToOriginalLocation:               "Save to original location",
+		SaveFileAsPromptTitle:                "Save to path",
+		SaveFileOverwritePrompt:              "'{{.path}}' already exists. Overwrite?",
+		FileSavedToast:                       "Saved to '{{.path}}'",
+		ErrCannotSaveSubmodule:               "Cannot save a submodule",
+		CopyBlobHash:                         "Blob hash",
+		BlobHashCopiedToast:                  "Blob hash copied to clipboard",
+		ErrFileNotInWorktree:                 "Does not exist in the working tree",
 		CommitFilesTitle:                     "Commit files",
 		CheckoutCommitFileTooltip:            "Checkout file. This replaces the file in your working tree with the version from the selected commit.",
 		CannotCheckoutWithModifiedFilesErr:   "You have local modifications for the file(s) you are trying to check out. You need to stash or discard these first.",
@@ -2144,6 +2192,8 @@ func EnglishTranslationSet() *TranslationSet {
 			CreateBranch:                     "Create branch",
 			CherryPick:                       "(Cherry-pick) paste commits",
 			CheckoutFile:                     "Checkout file",
+			RestoreFilesToWorktree:           "Restore files to worktree",
+			SaveFilesFromCommit:              "Save files from commit",
 			SquashCommitDown:                 "Squash commit down",
 			FixupCommit:                      "Fixup commit",
 			FixupCommitKeepMessage:           "Fixup commit (keep message)",

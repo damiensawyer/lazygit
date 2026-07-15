@@ -7,22 +7,23 @@ import (
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
 )
 
-func BuildTreeFromFiles(
-	files []*models.File,
+func buildTree[T any](
+	files []*T,
+	getPath func(*T) string,
 	showRootItem bool,
-	cmp func(a, b *Node[models.File]) int,
-) *Node[models.File] {
-	root := &Node[models.File]{}
+	cmp func(a, b *Node[T]) int,
+) *Node[T] {
+	root := &Node[T]{}
 
-	childrenMapsByNode := make(map[*Node[models.File]]map[string]*Node[models.File])
+	childrenMapsByNode := make(map[*Node[T]]map[string]*Node[T])
 
-	var curr *Node[models.File]
+	var curr *Node[T]
 	for _, file := range files {
-		splitPath := SplitFileTreePath(file.Path, showRootItem)
+		splitPath := SplitFileTreePath(getPath(file), showRootItem)
 		curr = root
 	outer:
 		for i := range splitPath {
-			var setFile *models.File
+			var setFile *T
 			isFile := i == len(splitPath)-1
 			if isFile {
 				setFile = file
@@ -30,11 +31,11 @@ func BuildTreeFromFiles(
 
 			path := join(splitPath[:i+1])
 
-			var currNodeChildrenMap map[string]*Node[models.File]
+			var currNodeChildrenMap map[string]*Node[T]
 			var isCurrNodeMapped bool
 
 			if currNodeChildrenMap, isCurrNodeMapped = childrenMapsByNode[curr]; !isCurrNodeMapped {
-				currNodeChildrenMap = make(map[string]*Node[models.File])
+				currNodeChildrenMap = make(map[string]*Node[T])
 				childrenMapsByNode[curr] = currNodeChildrenMap
 			}
 
@@ -49,7 +50,7 @@ func BuildTreeFromFiles(
 				continue outer
 			}
 
-			newChild := &Node[models.File]{
+			newChild := &Node[T]{
 				path: path,
 				File: setFile,
 			}
@@ -65,6 +66,14 @@ func BuildTreeFromFiles(
 	root.Compress()
 
 	return root
+}
+
+func BuildTreeFromFiles(
+	files []*models.File,
+	showRootItem bool,
+	cmp func(a, b *Node[models.File]) int,
+) *Node[models.File] {
+	return buildTree(files, (*models.File).GetPath, showRootItem, cmp)
 }
 
 func BuildFlatTreeFromCommitFiles(
@@ -83,48 +92,26 @@ func BuildTreeFromCommitFiles(
 	showRootItem bool,
 	cmp func(a, b *Node[models.CommitFile]) int,
 ) *Node[models.CommitFile] {
-	root := &Node[models.CommitFile]{}
+	return buildTree(files, (*models.CommitFile).GetPath, showRootItem, cmp)
+}
 
-	var curr *Node[models.CommitFile]
-	for _, file := range files {
-		splitPath := SplitFileTreePath(file.Path, showRootItem)
-		curr = root
-	outer:
-		for i := range splitPath {
-			var setFile *models.CommitFile
-			isFile := i == len(splitPath)-1
-			if isFile {
-				setFile = file
-			}
+func BuildTreeFromTreeFiles(
+	files []*models.TreeFile,
+	showRootItem bool,
+	cmp func(a, b *Node[models.TreeFile]) int,
+) *Node[models.TreeFile] {
+	return buildTree(files, (*models.TreeFile).GetPath, showRootItem, cmp)
+}
 
-			path := join(splitPath[:i+1])
+func BuildFlatTreeFromTreeFiles(
+	files []*models.TreeFile,
+	showRootItem bool,
+	cmp func(a, b *Node[models.TreeFile]) int,
+) *Node[models.TreeFile] {
+	rootAux := BuildTreeFromTreeFiles(files, showRootItem, cmp)
+	sortedFiles := rootAux.GetLeaves()
 
-			for _, existingChild := range curr.Children {
-				if existingChild.path == path {
-					curr = existingChild
-					continue outer
-				}
-			}
-
-			if i == 0 && len(files) == 1 && len(splitPath) == 2 {
-				// skip the root item when there's only one file at top level; we don't need it in that case
-				continue outer
-			}
-
-			newChild := &Node[models.CommitFile]{
-				path: path,
-				File: setFile,
-			}
-			curr.Children = append(curr.Children, newChild)
-
-			curr = newChild
-		}
-	}
-
-	root.Sort(cmp)
-	root.Compress()
-
-	return root
+	return &Node[models.TreeFile]{Children: sortedFiles}
 }
 
 func BuildFlatTreeFromFiles(

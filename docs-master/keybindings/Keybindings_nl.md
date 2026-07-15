@@ -124,6 +124,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` u `` | View upstream options | View options relating to the branch's upstream e.g. setting/unsetting the upstream and resetting to the upstream. |
 | `` <ctrl+t> `` | Open externe diff applicatie (git difftool) |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Bekijk commits |  |
 | `` / `` | Filter the current view by text |  |
 
@@ -194,6 +195,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | Open externe diff applicatie (git difftool) |  |
 | `` * `` | Select commits of current branch |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Bekijk gecommite bestanden |  |
 | `` / `` | Start met zoeken |  |
 
@@ -271,6 +273,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | Open externe diff applicatie (git difftool) |  |
 | `` * `` | Select commits of current branch |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Bekijk commits |  |
 | `` / `` | Filter the current view by text |  |
 
@@ -290,6 +293,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` g `` | Bekijk reset opties | View reset options (soft/mixed/hard) for resetting onto selected item. |
 | `` <ctrl+t> `` | Open externe diff applicatie (git difftool) |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Bekijk commits |  |
 | `` / `` | Filter the current view by text |  |
 
@@ -303,6 +307,23 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` e `` | Edit | Wijzig remote |
 | `` f `` | Fetch | Fetch remote |
 | `` F `` | Add fork remote | Quickly add a fork remote by replacing the owner in the origin URL and optionally check out a branch from new remote. |
+| `` / `` | Filter the current view by text |  |
+
+## Repo files
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` <ctrl+o> `` | Kopieer de bestandsnaam naar het klembord |  |
+| `` y `` | Kopieer naar klembord |  |
+| `` <enter> `` | Enter bestand om geselecteerde regels toe te voegen aan de patch | If a file is selected, focus the main view so you can scroll through its content. If a directory is selected, toggle it collapsed/expanded. |
+| `` c `` | Restore to worktree | Replace the selected files/directories in your working tree with their state at the viewed commit. The restored versions are left unstaged, as if you had edited the files yourself. |
+| `` o `` | Open bestand | Open bestand in standaardapplicatie. |
+| `` e `` | Edit | Open bestand in externe editor. |
+| `` S `` | Save file/directory | Save a copy of the selected file (or every file under the selected directory) as it existed at the viewed commit, either to a path of your choosing or over its original location. |
+| `` ` `` | Toggle bestandsboom weergave | Toggle file view between flat and tree layout. Flat layout shows all file paths in a single list, tree layout groups files by directory.<br><br>The default can be changed in the config file with the key 'gui.showFileTree'. |
+| `` - `` | Collapse all files | Collapse all directories in the files tree |
+| `` = `` | Vouw alle bestanden uit | Vouw alle mappen in de bestandsstructuur uit |
+| `` 0 `` | Focus main view |  |
 | `` / `` | Filter the current view by text |  |
 
 ## Secondary
@@ -346,6 +367,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` w `` | New worktree |  |
 | `` r `` | Hernoem stash |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Bekijk gecommite bestanden |  |
 | `` / `` | Filter the current view by text |  |
 
@@ -377,6 +399,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+t> `` | Open externe diff applicatie (git difftool) |  |
 | `` * `` | Select commits of current branch |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Bekijk gecommite bestanden |  |
 | `` / `` | Start met zoeken |  |
 
@@ -407,6 +430,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` g `` | Resetten | View reset options (soft/mixed/hard) for resetting onto selected item. |
 | `` <ctrl+t> `` | Open externe diff applicatie (git difftool) |  |
 | `` 0 `` | Focus main view |  |
+| `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Bekijk commits |  |
 | `` / `` | Filter the current view by text |  |
 

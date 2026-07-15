@@ -27,6 +27,26 @@ func filterFilesByText(files []*models.File, filter string, useFuzzySearch bool)
 	})
 }
 
+type treeFilePathSource struct {
+	files []*models.TreeFile
+}
+
+func (s *treeFilePathSource) String(i int) string {
+	return s.files[i].Path
+}
+
+func (s *treeFilePathSource) Len() int {
+	return len(s.files)
+}
+
+func filterTreeFilesByText(files []*models.TreeFile, filter string, useFuzzySearch bool) []*models.TreeFile {
+	source := &treeFilePathSource{files: files}
+	matches := utils.FindFrom(filter, source, useFuzzySearch)
+	return lo.Map(matches, func(match fuzzy.Match, _ int) *models.TreeFile {
+		return files[match.Index]
+	})
+}
+
 type commitFilePathSource struct {
 	files []*models.CommitFile
 }

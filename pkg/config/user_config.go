@@ -455,6 +455,7 @@ type KeybindingConfig struct {
 	AmendAttribute KeybindingAmendAttributeConfig `yaml:"amendAttribute"`
 	Stash          KeybindingStashConfig          `yaml:"stash"`
 	CommitFiles    KeybindingCommitFilesConfig    `yaml:"commitFiles"`
+	RepoFiles      KeybindingRepoFilesConfig      `yaml:"repoFiles"`
 	Main           KeybindingMainConfig           `yaml:"main"`
 	Submodules     KeybindingSubmodulesConfig     `yaml:"submodules"`
 	CommitMessage  KeybindingCommitMessageConfig  `yaml:"commitMessage"`
@@ -563,6 +564,7 @@ type KeybindingUniversalConfig struct {
 	IncreaseRenameSimilarityThreshold Keybinding `yaml:"increaseRenameSimilarityThreshold"`
 	DecreaseRenameSimilarityThreshold Keybinding `yaml:"decreaseRenameSimilarityThreshold"`
 	OpenDiffTool                      Keybinding `yaml:"openDiffTool"`
+	BrowseAllFilesAtCommit            Keybinding `yaml:"browseAllFilesAtCommit"`
 	EditConfig                        Keybinding `yaml:"editConfig"`
 }
 
@@ -661,6 +663,11 @@ type KeybindingStashConfig struct {
 
 type KeybindingCommitFilesConfig struct {
 	CheckoutCommitFile Keybinding `yaml:"checkoutCommitFile"`
+}
+
+type KeybindingRepoFilesConfig struct {
+	Restore  Keybinding `yaml:"restore"`
+	SaveFile Keybinding `yaml:"saveFile"`
 }
 
 type KeybindingMainConfig struct {
@@ -1087,6 +1094,7 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 				IncreaseRenameSimilarityThreshold:    Keybinding{")"},
 				DecreaseRenameSimilarityThreshold:    Keybinding{"("},
 				OpenDiffTool:                         Keybinding{"<ctrl+t>"},
+				BrowseAllFilesAtCommit:            Keybinding{"E"},
 				EditConfig:                           Keybinding{"<alt+shift+c>"},
 			},
 			Status: KeybindingStatusConfig{
@@ -1178,6 +1186,10 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 			},
 			CommitFiles: KeybindingCommitFilesConfig{
 				CheckoutCommitFile: Keybinding{"c"},
+			},
+			RepoFiles: KeybindingRepoFilesConfig{
+				Restore:  Keybinding{"c"},
+				SaveFile: Keybinding{"S"},
 			},
 			Main: KeybindingMainConfig{
 				PrevHunk:         Keybinding{"<left>", "h"},
