@@ -1062,7 +1062,7 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 				PrevScreenMode:                    Keybinding{"_"},
 				CyclePagers:                       Keybinding{"|"},
 				CyclePagersReverse:                Keybinding{"\\"},
-				ToggleShowFinalVersion:            Keybinding{"<a-|>"},
+				ToggleShowFinalVersion:            Keybinding{"<alt+\\>"},
 				Undo:                              Keybinding{"z"},
 				Redo:                              Keybinding{"Z"},
 				FilteringMenu:                     Keybinding{"<ctrl+s>"},

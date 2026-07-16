@@ -724,7 +724,7 @@ keybinding:
     prevScreenMode: _
     cyclePagers: '|'
     cyclePagersReverse: \
-    toggleShowFinalVersion: <a-|>
+    toggleShowFinalVersion: <alt+\>
     undo: z
     redo: Z
     filteringMenu: <ctrl+s>

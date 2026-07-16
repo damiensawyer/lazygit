@@ -3207,7 +3207,7 @@
               "type": "array"
             }
           ],
-          "default": "\u003ca-|\u003e"
+          "default": "\u003calt+\\\u003e"
         },
         "undo": {
           "oneOf": [
