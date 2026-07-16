@@ -313,6 +313,14 @@ gui:
   # One of: 'normal' (default) | 'half' | 'full'
   screenMode: normal
 
+  # The color scheme to syntax-highlight file contents with when showing the final
+  # version of a file (see the toggleShowFinalVersion keybinding).
+  # By default this is empty, meaning the terminal's own 16 ANSI colors are used,
+  # so that highlighting follows your terminal's theme.
+  # Setting one of Chroma's style names (e.g. 'monokai', 'github', 'dracula') uses
+  # that style's own colors instead, ignoring your terminal's theme.
+  syntaxHighlightStyle: ""
+
   # Window border style.
   # One of 'rounded' (default) | 'single' | 'double' | 'hidden' | 'bold'
   border: rounded
@@ -726,6 +734,7 @@ keybinding:
     resetHalfScreenModeSidePanelWidth: <shift+alt+=>
     cyclePagers: '|'
     cyclePagersReverse: \
+    toggleShowFinalVersion: <alt+\>
     undo: z
     redo: Z
     filteringMenu: <ctrl+s>

@@ -91,6 +91,12 @@ func (self *GlobalController) GetKeybindings(opts types.KeybindingsOpts) []*type
 			Tooltip:           self.c.Tr.CyclePagersReverseTooltip,
 		},
 		{
+			Keys:        opts.GetKeys(opts.Config.Universal.ToggleShowFinalVersion),
+			Handler:     opts.Guards.NoPopupPanel(self.toggleShowFinalVersion),
+			Description: self.c.Tr.ToggleShowFinalVersion,
+			Tooltip:     self.c.Tr.ToggleShowFinalVersionTooltip,
+		},
+		{
 			Keys:              opts.GetKeys(opts.Config.Universal.Return),
 			Handler:           self.escape,
 			Description:       self.c.Tr.Cancel,
@@ -250,9 +256,11 @@ func (self *GlobalController) cyclePagersBackward() error {
 	return nil
 }
 
-// onPagerChanged re-renders the main view so the newly selected pager takes
-// effect, and shows a toast naming it.
-func (self *GlobalController) onPagerChanged() {
+// rerenderMainView re-renders the main view from the current side panel, so
+// that a change to how the main view is rendered takes effect immediately. It
+// does nothing unless the main view belongs to the current side panel, since
+// otherwise there is nothing on screen to bring up to date.
+func (self *GlobalController) rerenderMainView() {
 	currentSide := self.c.Context().CurrentSide()
 	currentKey := self.c.Context().Current().GetKey()
 	if currentSide.GetKey() == currentKey ||
@@ -260,6 +268,12 @@ func (self *GlobalController) onPagerChanged() {
 		currentKey == context.NORMAL_SECONDARY_CONTEXT_KEY {
 		currentSide.HandleRenderToMain()
 	}
+}
+
+// onPagerChanged re-renders the main view so the newly selected pager takes
+// effect, and shows a toast naming it.
+func (self *GlobalController) onPagerChanged() {
+	self.rerenderMainView()
 
 	pagerConfig := self.c.State().GetPagerConfig()
 	current, total := pagerConfig.CurrentPagerIndex()
@@ -276,6 +290,21 @@ func (self *GlobalController) onPagerChanged() {
 		"current": strconv.Itoa(current + 1),
 		"total":   strconv.Itoa(total),
 	}))
+}
+
+func (self *GlobalController) toggleShowFinalVersion() error {
+	showFinalVersion := !self.c.State().GetShowFinalVersion()
+	self.c.State().SetShowFinalVersion(showFinalVersion)
+
+	self.rerenderMainView()
+
+	if showFinalVersion {
+		self.c.Toast(self.c.Tr.ShowingFinalVersion)
+	} else {
+		self.c.Toast(self.c.Tr.ShowingDiffs)
+	}
+
+	return nil
 }
 
 func (self *GlobalController) canCyclePagers() *types.DisabledReason {

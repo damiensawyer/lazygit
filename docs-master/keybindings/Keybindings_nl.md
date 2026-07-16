@@ -27,6 +27,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <alt+shift+=> `` | Reset half screen mode side panel width |  |
 | `` \| `` | Cycle pagers | Choose the next pager in the list of configured pagers. |
 | `` \ `` | Cycle pagers (reverse) | Choose the previous pager in the list of configured pagers. |
+| `` <alt+\> `` | Toggle showing final version | Show the full contents of each changed file in the main view, rather than a diff of it. Lets you move through the file list to read the files a change set touches, as they ended up, instead of only what changed in them. |
 | `` <esc> `` | Annuleren |  |
 | `` ? `` | Open menu |  |
 | `` <ctrl+s> `` | Bekijk scoping opties | View options for filtering the commit log, so that only commits matching the filter are shown. |

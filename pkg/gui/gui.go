@@ -110,6 +110,10 @@ type Gui struct {
 	// the extras window contains things like the command log
 	ShowExtrasWindow bool
 
+	// when set, the main view shows the full contents of the selected file
+	// rather than a diff of it
+	ShowFinalVersion bool
+
 	PopupHandler types.IPopupHandler
 
 	// Bumped every time we switch to a different repository (in resetState).
@@ -189,6 +193,14 @@ func (self *StateAccessor) GetShowExtrasWindow() bool {
 
 func (self *StateAccessor) SetShowExtrasWindow(value bool) {
 	self.gui.ShowExtrasWindow = value
+}
+
+func (self *StateAccessor) GetShowFinalVersion() bool {
+	return self.gui.ShowFinalVersion
+}
+
+func (self *StateAccessor) SetShowFinalVersion(value bool) {
+	self.gui.ShowFinalVersion = value
 }
 
 func (self *StateAccessor) GetRetainOriginalDir() bool {

@@ -645,6 +645,13 @@ type TranslationSet struct {
 	SelectedPager                         string
 	DefaultPagerName                      string
 	ExternalDiffPagerName                 string
+	ToggleShowFinalVersion                string
+	ToggleShowFinalVersionTooltip         string
+	ShowingFinalVersion                   string
+	ShowingDiffs                          string
+	FinalVersionTitle                     string
+	FinalVersionOfBinaryFile              string
+	FinalVersionMissing                   string
 	StartSearch                           string
 	StartFilter                           string
 	SelectRemoteRepository                string
@@ -1837,6 +1844,13 @@ func EnglishTranslationSet() *TranslationSet {
 		SelectedPager:                        "Pager: {{.name}} ({{.current}} of {{.total}})",
 		DefaultPagerName:                     "(default)",
 		ExternalDiffPagerName:                "(external diff)",
+		ToggleShowFinalVersion:           "Toggle showing final version",
+		ToggleShowFinalVersionTooltip:    "Show the full contents of each changed file in the main view, rather than a diff of it. Lets you move through the file list to read the files a change set touches, as they ended up, instead of only what changed in them.",
+		ShowingFinalVersion:              "Showing final version of files",
+		ShowingDiffs:                     "Showing diffs",
+		FinalVersionTitle:                "Final version",
+		FinalVersionOfBinaryFile:         "This is a binary file, so its contents can't be shown.",
+		FinalVersionMissing:              "This file doesn't exist anymore, so it has no final version to show.",
 		StartSearch:                          "Search the current view by text",
 		StartFilter:                          "Filter the current view by text",
 		SelectRemoteRepository:               "Select base repository for pull requests",

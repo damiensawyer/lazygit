@@ -200,6 +200,10 @@ type GuiConfig struct {
 	// Default size for focused window. Can be changed from within Lazygit with '+' and '_' (but this won't change the default).
 	// One of: 'normal' (default) | 'half' | 'full'
 	ScreenMode string `yaml:"screenMode" jsonschema:"enum=normal,enum=half,enum=full"`
+	// The color scheme to syntax-highlight file contents with when showing the final version of a file (see the toggleShowFinalVersion keybinding).
+	// By default this is empty, meaning the terminal's own 16 ANSI colors are used, so that highlighting follows your terminal's theme.
+	// Setting one of Chroma's style names (e.g. 'monokai', 'github', 'dracula') uses that style's own colors instead, ignoring your terminal's theme.
+	SyntaxHighlightStyle string `yaml:"syntaxHighlightStyle"`
 	// Window border style.
 	// One of 'rounded' (default) | 'single' | 'double' | 'hidden' | 'bold'
 	Border string `yaml:"border" jsonschema:"enum=single,enum=double,enum=rounded,enum=hidden,enum=bold"`
@@ -547,6 +551,7 @@ type KeybindingUniversalConfig struct {
 	ResetHalfScreenModeSidePanelWidth    Keybinding `yaml:"resetHalfScreenModeSidePanelWidth"`
 	CyclePagers                          Keybinding `yaml:"cyclePagers"`
 	CyclePagersReverse                   Keybinding `yaml:"cyclePagersReverse"`
+	ToggleShowFinalVersion  Keybinding `yaml:"toggleShowFinalVersion"`
 	Undo                                 Keybinding `yaml:"undo"`
 	Redo                                 Keybinding `yaml:"redo"`
 	FilteringMenu                        Keybinding `yaml:"filteringMenu"`
@@ -1079,6 +1084,7 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 				ResetHalfScreenModeSidePanelWidth:    Keybinding{"<shift+alt+=>"},
 				CyclePagers:                          Keybinding{"|"},
 				CyclePagersReverse:                   Keybinding{"\\"},
+				ToggleShowFinalVersion:            Keybinding{"<alt+\\>"},
 				Undo:                                 Keybinding{"z"},
 				Redo:                                 Keybinding{"Z"},
 				FilteringMenu:                        Keybinding{"<ctrl+s>"},

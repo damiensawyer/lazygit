@@ -254,6 +254,15 @@ func (self *FilesController) GetOnRenderToMain() func() {
 				return
 			}
 
+			// Showing the final version deliberately takes precedence over the
+			// conflict and diff rendering below: the point of it is to read the
+			// file as it now stands, which is just as useful mid-conflict.
+			if self.c.State().GetShowFinalVersion() && node.File != nil {
+				self.c.Helpers().MergeConflicts.ResetMergeState()
+				self.c.Helpers().FinalVersion.RenderWorktreeFile(node.GetPath())
+				return
+			}
+
 			if self.isSubmoduleCommitConflict(node.File) {
 				self.renderSubmoduleConflict(node)
 				return

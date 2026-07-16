@@ -684,3 +684,19 @@ func TestKeyFromLabel_RoundTripFromLabelForKey(t *testing.T) {
 		})
 	}
 }
+
+// Terminals disagree about how to report a modified character that needs shift
+// to type: those speaking a CSI-u style protocol send the unshifted codepoint
+// with shift as a separate modifier, so they deliver alt+| as alt+shift+\, while
+// older terminals send ESC+| and so deliver it as alt+|. A binding on a shifted
+// character therefore only ever matches one kind of terminal and does nothing at
+// all on the other. Keeping this default unshifted is what makes it work
+// everywhere, so guard against it quietly growing a shift modifier.
+func TestToggleShowFinalVersionDefaultIsUnshifted(t *testing.T) {
+	bindings := GetDefaultConfig().Keybinding.Universal.ToggleShowFinalVersion
+	assert.Len(t, bindings, 1)
+
+	key, ok := KeyFromLabel(bindings[0])
+	assert.True(t, ok, "expected default binding %q to parse", bindings[0])
+	assert.Equal(t, gocui.NewKeyStrMod("\\", gocui.ModAlt), key)
+}

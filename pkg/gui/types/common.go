@@ -401,6 +401,10 @@ type IStateAccessor interface {
 	SetUpdating(bool)
 	GetShowExtrasWindow() bool
 	SetShowExtrasWindow(bool)
+	// tells us whether the main view shows the full contents of the selected
+	// file rather than a diff of it
+	GetShowFinalVersion() bool
+	SetShowFinalVersion(bool)
 	GetRetainOriginalDir() bool
 	SetRetainOriginalDir(bool)
 	GetItemOperation(item HasUrn) ItemOperation
