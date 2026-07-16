@@ -173,6 +173,15 @@ func (self *CommitFilesController) GetOnRenderToMain() func() {
 		}
 
 		from, to := self.context().GetFromAndToForDiff()
+
+		// Here the final version of a file is how the commit left it, rather
+		// than how it looks on disk now: the commit is the change set being
+		// read, and later commits may well have moved on from it.
+		if self.c.State().GetShowFinalVersion() && node.File != nil {
+			self.c.Helpers().FinalVersion.RenderCommitFile(to, node.GetPath())
+			return
+		}
+
 		from, reverse := self.c.Modes().Diffing.GetFromAndReverseArgsForDiff(from)
 
 		paths := self.pathsForDiff(node)
