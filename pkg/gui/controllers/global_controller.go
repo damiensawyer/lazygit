@@ -182,9 +182,11 @@ func (self *GlobalController) cyclePagersBackward() error {
 	return nil
 }
 
-// onPagerChanged re-renders the main view so the newly selected pager takes
-// effect, and shows a toast naming it.
-func (self *GlobalController) onPagerChanged() {
+// rerenderMainView re-renders the main view from the current side panel, so
+// that a change to how the main view is rendered takes effect immediately. It
+// does nothing unless the main view belongs to the current side panel, since
+// otherwise there is nothing on screen to bring up to date.
+func (self *GlobalController) rerenderMainView() {
 	currentSide := self.c.Context().CurrentSide()
 	currentKey := self.c.Context().Current().GetKey()
 	if currentSide.GetKey() == currentKey ||
@@ -192,6 +194,12 @@ func (self *GlobalController) onPagerChanged() {
 		currentKey == context.NORMAL_SECONDARY_CONTEXT_KEY {
 		currentSide.HandleRenderToMain()
 	}
+}
+
+// onPagerChanged re-renders the main view so the newly selected pager takes
+// effect, and shows a toast naming it.
+func (self *GlobalController) onPagerChanged() {
+	self.rerenderMainView()
 
 	pagerConfig := self.c.State().GetPagerConfig()
 	current, total := pagerConfig.CurrentPagerIndex()
