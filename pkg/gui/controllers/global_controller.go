@@ -196,6 +196,7 @@ func (self *GlobalController) decreaseHalfScreenModeSidePanelWidth() error {
 		current = 0.1
 	}
 	repoState.SetHalfScreenModeSidePanelWidth(current)
+	self.c.SaveHalfScreenModeSidePanelWidth()
 	self.c.Refresh(types.RefreshOptions{Mode: types.ASYNC})
 	self.c.Toast(utils.ResolvePlaceholderString(
 		self.c.Tr.HalfScreenModeSidePanelWidthChanged,
@@ -215,6 +216,7 @@ func (self *GlobalController) increaseHalfScreenModeSidePanelWidth() error {
 		current = 0.9
 	}
 	repoState.SetHalfScreenModeSidePanelWidth(current)
+	self.c.SaveHalfScreenModeSidePanelWidth()
 	self.c.Refresh(types.RefreshOptions{Mode: types.ASYNC})
 	self.c.Toast(utils.ResolvePlaceholderString(
 		self.c.Tr.HalfScreenModeSidePanelWidthChanged,
@@ -230,6 +232,7 @@ func (self *GlobalController) resetHalfScreenModeSidePanelWidth() error {
 	}
 
 	repoState.SetHalfScreenModeSidePanelWidth(0.5)
+	self.c.SaveHalfScreenModeSidePanelWidth()
 	self.c.Refresh(types.RefreshOptions{Mode: types.ASYNC})
 	self.c.Toast(self.c.Tr.HalfScreenModeSidePanelWidthReset)
 	return nil

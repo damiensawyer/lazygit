@@ -1,6 +1,8 @@
 package gui
 
 import (
+	"path/filepath"
+
 	"github.com/jesseduffield/lazygit/pkg/commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/oscommands"
 	"github.com/jesseduffield/lazygit/pkg/config"
@@ -77,6 +79,14 @@ func (self *guiCommon) SaveAppState() error {
 func (self *guiCommon) SaveAppStateAndLogError() {
 	if err := self.gui.Config.SaveAppState(); err != nil {
 		self.gui.Log.Errorf("error when saving app state: %v", err)
+	}
+}
+
+func (self *guiCommon) SaveHalfScreenModeSidePanelWidth() {
+	repoPath := filepath.Join(self.gui.git.RepoPaths.RepoGitDirPath(), "lazygit.yml")
+	value := self.gui.State.HalfScreenModeSidePanelWidth
+	if err := self.gui.Config.SaveHalfScreenModeSidePanelWidth(repoPath, value); err != nil {
+		self.gui.Log.Errorf("error when saving half screen mode side panel width: %v", err)
 	}
 }
 

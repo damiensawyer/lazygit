@@ -620,6 +620,10 @@ func (gui *Gui) resetState(startArgs appTypes.StartArgs) types.Context {
 		gui.State = state
 		gui.State.ViewsSetup = false
 
+		// The repo we're switching to may have a per-repo config with different
+		// half screen mode side panel width, so update it.
+		gui.State.HalfScreenModeSidePanelWidth = gui.UserConfig().Gui.HalfScreenModeSidePanelWidth
+
 		// The repo we're switching to may have a per-repo config with a different
 		// side panel layout, so re-apply it to this repo's contexts.
 		gui.applySidePanelConfig()
@@ -661,7 +665,7 @@ func (gui *Gui) resetState(startArgs appTypes.StartArgs) types.Context {
 			MarkedBaseCommit: marked_base_commit.New(),
 		},
 		ScreenMode:                   initialScreenMode,
-		HalfScreenModeSidePanelWidth: 0.5,
+		HalfScreenModeSidePanelWidth: gui.UserConfig().Gui.HalfScreenModeSidePanelWidth,
 		// TODO: only use contexts from context manager
 		ContextMgr:  NewContextMgr(gui, contextTree),
 		Contexts:    contextTree,

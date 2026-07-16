@@ -51,6 +51,9 @@ type AppConfigurer interface {
 
 	GetAppState() *AppState
 	SaveAppState() error
+	// SaveHalfScreenModeSidePanelWidth writes halfScreenModeSidePanelWidth
+	// to the given per-repo config file path.
+	SaveHalfScreenModeSidePanelWidth(path string, value float64) error
 }
 
 type ConfigFilePolicy int
@@ -676,6 +679,23 @@ func (c *AppConfig) SaveAppState() error {
 	}
 
 	return err
+}
+
+// SaveHalfScreenModeSidePanelWidth writes the half screen mode side panel
+// width to the given per-repo config file path.
+func (c *AppConfig) SaveHalfScreenModeSidePanelWidth(path string, value float64) error {
+	type repoGui struct {
+		HalfScreenModeSidePanelWidth float64 `yaml:"halfScreenModeSidePanelWidth"`
+	}
+	type repoConfig struct {
+		Gui repoGui `yaml:"gui"`
+	}
+	marshalled, err := yaml.Marshal(repoConfig{Gui: repoGui{HalfScreenModeSidePanelWidth: value}})
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(path, marshalled, 0o644)
 }
 
 var stateFileName = "state.yml"
