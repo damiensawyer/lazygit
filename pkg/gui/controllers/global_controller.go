@@ -76,6 +76,12 @@ func (self *GlobalController) GetKeybindings(opts types.KeybindingsOpts) []*type
 			Tooltip:           self.c.Tr.CyclePagersReverseTooltip,
 		},
 		{
+			Keys:        opts.GetKeys(opts.Config.Universal.ToggleShowFinalVersion),
+			Handler:     opts.Guards.NoPopupPanel(self.toggleShowFinalVersion),
+			Description: self.c.Tr.ToggleShowFinalVersion,
+			Tooltip:     self.c.Tr.ToggleShowFinalVersionTooltip,
+		},
+		{
 			Keys:              opts.GetKeys(opts.Config.Universal.Return),
 			Handler:           self.escape,
 			Description:       self.c.Tr.Cancel,
@@ -216,6 +222,21 @@ func (self *GlobalController) onPagerChanged() {
 		"current": strconv.Itoa(current + 1),
 		"total":   strconv.Itoa(total),
 	}))
+}
+
+func (self *GlobalController) toggleShowFinalVersion() error {
+	showFinalVersion := !self.c.State().GetShowFinalVersion()
+	self.c.State().SetShowFinalVersion(showFinalVersion)
+
+	self.rerenderMainView()
+
+	if showFinalVersion {
+		self.c.Toast(self.c.Tr.ShowingFinalVersion)
+	} else {
+		self.c.Toast(self.c.Tr.ShowingDiffs)
+	}
+
+	return nil
 }
 
 func (self *GlobalController) canCyclePagers() *types.DisabledReason {

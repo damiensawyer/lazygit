@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/jesseduffield/lazygit/pkg/constants"
+	"github.com/jesseduffield/lazygit/pkg/highlight"
 	"github.com/jesseduffield/lazygit/pkg/utils"
 	"github.com/samber/lo"
 )
@@ -46,6 +47,9 @@ func (config *UserConfig) Validate() error {
 		[]string{"always", "never", "when-maximised"}); err != nil {
 		return err
 	}
+	if err := validateSyntaxHighlightStyle(config.Gui.SyntaxHighlightStyle); err != nil {
+		return err
+	}
 	if err := validatePagers(config.Git.Pagers); err != nil {
 		return err
 	}
@@ -62,6 +66,16 @@ func (config *UserConfig) Validate() error {
 		return err
 	}
 	return nil
+}
+
+// An unknown style name would otherwise fall back to an arbitrary style, giving
+// the user highlighting that silently isn't the one they asked for.
+func validateSyntaxHighlightStyle(styleName string) error {
+	if styleName == "" || highlight.IsValidStyle(styleName) {
+		return nil
+	}
+	return fmt.Errorf("Unexpected value '%s' for 'gui.syntaxHighlightStyle'. Allowed values: an empty value to use the terminal's colors, or one of: %s",
+		styleName, strings.Join(highlight.StyleNames(), ", "))
 }
 
 func validateSidePanels(panels []SidePanel) error {

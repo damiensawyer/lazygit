@@ -24,6 +24,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` _ `` | Poprzedni tryb ekranu |  |
 | `` \| `` | Cycle pagers | Choose the next pager in the list of configured pagers. |
 | `` \ `` | Cycle pagers (reverse) | Choose the previous pager in the list of configured pagers. |
+| `` <alt+\|> `` | Toggle showing final version | Show the full contents of each changed file in the main view, rather than a diff of it. Lets you move through the file list to read the files a change set touches, as they ended up, instead of only what changed in them. |
 | `` <esc> `` | Anuluj |  |
 | `` ? `` | Otwórz menu przypisań klawiszy |  |
 | `` <ctrl+s> `` | Pokaż opcje filtrowania | Pokaż opcje filtrowania dziennika commitów, tak aby pokazywane były tylko commity pasujące do filtra. |
