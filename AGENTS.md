@@ -26,6 +26,24 @@ Windows box has only `just`).
   (most useful with `--sandbox` or `--slow`).
 - `just lint` — run golangci-lint.
 
+## Prefer gopls MCP tools for Go symbol questions
+
+When the gopls MCP tools are available in the session, prefer them over grep
+for type-aware questions about Go code: who calls a function or method
+(`go_symbol_references`), finding a symbol by fuzzy name (`go_search`), or
+inspecting a package's API (`go_package_api`). Method names in this codebase
+collide a lot (`draw`, `Show`, `Refresh` exist on several types), and grep
+needs manual filtering that gopls doesn't. This includes code under
+`vendor/`, which gopls resolves as part of the module build.
+
+Grep remains the right tool for strings, comments, config keys, non-Go
+files, and anything textual. Don't adopt the full workflow from
+`gopls mcp -instructions` (vulncheck on session start, `go_file_context`
+after every file read); that overhead isn't worth it here.
+
+If the tools aren't available in a session, fall back to grep silently —
+don't try to install, register, or start the server.
+
 ## When to commit
 
 Do not leave completed work uncommitted. Once a logical unit of work is done
@@ -195,6 +213,16 @@ that changes the relevant test(s) or adds new ones to demonstrate the bug, then
 fix the bug in a follow-up commit. This gives reviewers (and `git bisect`) a
 clear before/after and proves the test actually exercises the broken code path.
 
+This applies only to defects that existed before the entire branch or branch
+stack. Never use the bug-demonstration pattern for a regression introduced by
+an earlier commit in the current stack. Fix or rewrite the commit that
+introduced the regression so that no commit in the final history contains it.
+Put the regression test in a preparatory commit before the introducing commit,
+so it guards that commit in the final history. If the test cannot pass before
+the feature exists, restructure the implementation or test seam until it can;
+if that would require a design tradeoff, stop and discuss it rather than adding
+a later demonstration/fix pair.
+
 Use the `EXPECTED` / `ACTUAL` pattern in the bug-demonstrating commit. The test
 asserts the current (wrong) behavior so it passes on the broken code, with the
 correct expectation preserved inline as a comment. The fix commit then swaps
@@ -237,7 +265,11 @@ If you find yourself reaching for a local variable so that both forms can be
 expressed against the same receiver, the structure isn't right yet — go back
 and fix it instead of papering over it with a binding.
 
-Use this pattern only where it makes sense; don't apply it by default.
+Use this pattern only where it makes sense; don't apply it by default. Only
+ever use it for bugs, never for added features or behavior changes that aren't
+bugfixes; it is useful to demonstrate how a bug existed before fixing it, but
+it is never useful to demonstrate how a feature didn't exist before implementing
+it.
 
 ## Unify duplicated logic before you change it
 
@@ -411,3 +443,12 @@ Never run `find` (or similar) from `/` or other paths outside the project. All
 third-party code we use is vendored under `vendor/`, so dependency sources are
 reachable from inside the working tree — search there instead of the host
 filesystem.
+
+## gocui is in-tree, not a dependency
+
+The `gocui` TUI library is a fork maintained directly in this repo under
+`pkg/gocui` — it's an ordinary package, not a Go module dependency. Don't look
+for it in `go.mod`/`go.sum` or the module cache (`$GOMODCACHE`); it isn't
+there. When you need to read or change gocui internals (the task manager, the
+event loop, worker/UI-thread dispatch, view rendering), edit `pkg/gocui`
+directly.

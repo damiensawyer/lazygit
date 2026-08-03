@@ -16,6 +16,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` ( `` | Decrease rename similarity threshold | Decrease the similarity threshold for a deletion and addition pair to be treated as a rename.<br><br>The default can be changed in the config file with the key 'git.renameSimilarityThreshold'. |
 | `` } `` | Increase diff context size | Increase the amount of the context shown around changes in the diff view.<br><br>The default can be changed in the config file with the key 'git.diffContextSize'. |
 | `` { `` | Decrease diff context size | Decrease the amount of the context shown around changes in the diff view.<br><br>The default can be changed in the config file with the key 'git.diffContextSize'. |
+| `` <alt+shift+]>, <alt+]> `` | Toggle full file diff view | Toggle between showing only changed lines with context and showing the entire file.<br><br>Press again to restore the previous context size. |
 | `` : `` | Execute shell command | Bring up a prompt where you can enter a shell command to execute. |
 | `` <ctrl+p> `` | View custom patch options |  |
 | `` m `` | View merge/rebase options | View options to abort/continue/skip the current merge/rebase. |
@@ -25,8 +26,8 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <alt+shift+left> `` | Decrease half screen mode side panel width |  |
 | `` <alt+shift+right> `` | Increase half screen mode side panel width |  |
 | `` <alt+shift+=> `` | Reset half screen mode side panel width |  |
-| `` \| `` | Cycle pagers | Choose the next pager in the list of configured pagers. |
-| `` \ `` | Cycle pagers (reverse) | Choose the previous pager in the list of configured pagers. |
+| `` \| `` | Cycle diff renderers | Choose the next renderer in the list of configured diff renderers. |
+| `` \ `` | Cycle diff renderers (reverse) | Choose the previous renderer in the list of configured diff renderers. |
 | `` <alt+\> `` | Toggle showing final version | Show the full contents of each changed file in the main view, rather than a diff of it. Lets you move through the file list to read the files a change set touches, as they ended up, instead of only what changed in them. |
 | `` <esc> `` | Cancel |  |
 | `` ? `` | Open keybindings menu |  |

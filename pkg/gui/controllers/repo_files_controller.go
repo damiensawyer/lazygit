@@ -179,7 +179,7 @@ func (self *RepoFilesController) restore(selectedNodes []*filetree.RepoFileNode)
 				return err
 			}
 
-			self.c.Refresh(types.RefreshOptions{Mode: types.ASYNC})
+			self.c.Refresh(types.RefreshOptions{})
 			return nil
 		},
 	})
@@ -415,7 +415,7 @@ func (self *RepoFilesController) saveNode(node *filetree.RepoFileNode, targetPat
 			self.c.Toast(utils.ResolvePlaceholderString(self.c.Tr.FileSavedToast, map[string]string{
 				"path": targetPath,
 			}))
-			self.c.Refresh(types.RefreshOptions{Mode: types.ASYNC, Scope: []types.RefreshableView{types.FILES}})
+			self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.FILES}})
 			return nil
 		},
 	})

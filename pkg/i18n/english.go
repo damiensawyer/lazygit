@@ -367,12 +367,19 @@ type TranslationSet struct {
 	FwdNoLocalUpstream                    string
 	FwdCommitsToPush                      string
 	PullRequestNoUpstream                 string
+	PullRequestChecksPassing              string
+	PullRequestChecksPending              string
+	PullRequestChecksFailing              string
+	PullRequestChecksError                string
+	PullRequestChecksExpected             string
 	ErrorOccurred                         string
 	ConflictLabel                         string
 	PendingRebaseTodosSectionHeader       string
 	PendingCherryPicksSectionHeader       string
 	PendingRevertsSectionHeader           string
 	CommitsSectionHeader                  string
+	MoveCommitsHere                       string
+	MovingCommitsHere                     string
 	YouDied                               string
 	RewordNotSupported                    string
 	ChangingThisActionIsNotAllowed        string
@@ -427,6 +434,7 @@ type TranslationSet struct {
 	UndoingStatus                         string
 	RedoingStatus                         string
 	CheckingOutStatus                     string
+	CreatingBranchStatus                  string
 	CommittingStatus                      string
 	RewordingStatus                       string
 	RevertingStatus                       string
@@ -637,14 +645,14 @@ type TranslationSet struct {
 	ResetHalfScreenModeSidePanelWidth     string
 	HalfScreenModeSidePanelWidthChanged   string
 	HalfScreenModeSidePanelWidthReset     string
-	CyclePagers                           string
-	CyclePagersTooltip                    string
-	CyclePagersReverse                    string
-	CyclePagersReverseTooltip             string
-	CyclePagersDisabledReason             string
-	SelectedPager                         string
-	DefaultPagerName                      string
-	ExternalDiffPagerName                 string
+	CycleDiffRenderers                    string
+	CycleDiffRenderersTooltip             string
+	CycleDiffRenderersReverse             string
+	CycleDiffRenderersReverseTooltip      string
+	CycleDiffRenderersDisabledReason      string
+	SelectedDiffRenderers                 string
+	DefaultDiffRendererName               string
+	ExternalDiffDiffRendererName          string
 	ToggleShowFinalVersion                string
 	ToggleShowFinalVersionTooltip         string
 	ShowingFinalVersion                   string
@@ -1563,12 +1571,19 @@ func EnglishTranslationSet() *TranslationSet {
 		FwdNoLocalUpstream:                   "Cannot fast-forward a branch whose remote is not registered locally",
 		FwdCommitsToPush:                     "Cannot fast-forward a branch with commits to push",
 		PullRequestNoUpstream:                "Cannot open a pull request for a branch with no upstream",
+		PullRequestChecksPassing:             "Passing",
+		PullRequestChecksPending:             "Pending",
+		PullRequestChecksFailing:             "Failing",
+		PullRequestChecksError:               "Error",
+		PullRequestChecksExpected:            "Expected",
 		ErrorOccurred:                        "An error occurred! Please create an issue at",
 		ConflictLabel:                        "CONFLICT",
 		PendingRebaseTodosSectionHeader:      "Pending rebase todos",
 		PendingCherryPicksSectionHeader:      "Pending cherry-picks",
 		PendingRevertsSectionHeader:          "Pending reverts",
 		CommitsSectionHeader:                 "Commits",
+		MoveCommitsHere:                      "drop here",
+		MovingCommitsHere:                    "moving commits here",
 		YouDied:                              "YOU DIED!",
 		RewordNotSupported:                   "Rewording commits while interactively rebasing is not currently supported",
 		ChangingThisActionIsNotAllowed:       "Changing this kind of rebase todo entry is not allowed",
@@ -1623,6 +1638,7 @@ func EnglishTranslationSet() *TranslationSet {
 		UndoingStatus:                        "Undoing",
 		RedoingStatus:                        "Redoing",
 		CheckingOutStatus:                    "Checking out",
+		CreatingBranchStatus:                 "Creating branch",
 		CommittingStatus:                     "Committing",
 		RewordingStatus:                      "Rewording",
 		RevertingStatus:                      "Reverting",
@@ -1836,21 +1852,21 @@ func EnglishTranslationSet() *TranslationSet {
 		ResetHalfScreenModeSidePanelWidth:    "Reset half screen mode side panel width",
 		HalfScreenModeSidePanelWidthChanged:  "Half screen mode side panel width: {{.width}}",
 		HalfScreenModeSidePanelWidthReset:    "Reset half screen mode side panel width",
-		CyclePagers:                          "Cycle pagers",
-		CyclePagersTooltip:                   "Choose the next pager in the list of configured pagers.",
-		CyclePagersReverse:                   "Cycle pagers (reverse)",
-		CyclePagersReverseTooltip:            "Choose the previous pager in the list of configured pagers.",
-		CyclePagersDisabledReason:            "No other pagers configured",
-		SelectedPager:                        "Pager: {{.name}} ({{.current}} of {{.total}})",
-		DefaultPagerName:                     "(default)",
-		ExternalDiffPagerName:                "(external diff)",
-		ToggleShowFinalVersion:           "Toggle showing final version",
-		ToggleShowFinalVersionTooltip:    "Show the full contents of each changed file in the main view, rather than a diff of it. Lets you move through the file list to read the files a change set touches, as they ended up, instead of only what changed in them.",
-		ShowingFinalVersion:              "Showing final version of files",
-		ShowingDiffs:                     "Showing diffs",
-		FinalVersionTitle:                "Final version",
-		FinalVersionOfBinaryFile:         "This is a binary file, so its contents can't be shown.",
-		FinalVersionMissing:              "This file doesn't exist anymore, so it has no final version to show.",
+		CycleDiffRenderers:                   "Cycle diff renderers",
+		CycleDiffRenderersTooltip:            "Choose the next renderer in the list of configured diff renderers.",
+		CycleDiffRenderersReverse:            "Cycle diff renderers (reverse)",
+		CycleDiffRenderersReverseTooltip:     "Choose the previous renderer in the list of configured diff renderers.",
+		CycleDiffRenderersDisabledReason:     "No other diff renderers configured",
+		SelectedDiffRenderers:                "Diff renderer: {{.name}} ({{.current}} of {{.total}})",
+		DefaultDiffRendererName:              "(default)",
+		ExternalDiffDiffRendererName:         "(external diff)",
+		ToggleShowFinalVersion:               "Toggle showing final version",
+		ToggleShowFinalVersionTooltip:        "Show the full contents of each changed file in the main view, rather than a diff of it. Lets you move through the file list to read the files a change set touches, as they ended up, instead of only what changed in them.",
+		ShowingFinalVersion:                  "Showing final version of files",
+		ShowingDiffs:                         "Showing diffs",
+		FinalVersionTitle:                    "Final version",
+		FinalVersionOfBinaryFile:             "This is a binary file, so its contents can't be shown.",
+		FinalVersionMissing:                  "This file doesn't exist anymore, so it has no final version to show.",
 		StartSearch:                          "Search the current view by text",
 		StartFilter:                          "Filter the current view by text",
 		SelectRemoteRepository:               "Select base repository for pull requests",
@@ -2407,7 +2423,7 @@ keybinding:
     suspendApp: <disabled>
     redo: <ctrl+z>
 
-- The 'git.paging.useConfig' option has been removed. If you were relying on it to configure your pager, you'll have to explicitly set the pager again using the 'git.paging.pager' option.
+- The 'git.paging.useConfig' option has been removed. If you were relying on it to configure your pager, you'll have to explicitly set the command again using the 'git.diffRenderers.*.command' option.
 `,
 			"0.62.0": `- The default keybinding for submitting a commit from the commit description editor has changed from alt-enter to command-enter on Mac, or ctrl-enter on Linux and Windows; these are the same bindings that are used in many multi-line edit field situations, e.g. in GitHub comments. Unfortunately these are not supported by all terminals; see https://github.com/jesseduffield/lazygit/blob/master/docs/keybindings/Custom_Keybindings.md#terminal-compatibility for more on that. If you want to revert this change, you can do so by adding the following to your config:
 

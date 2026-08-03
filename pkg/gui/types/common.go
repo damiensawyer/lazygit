@@ -11,7 +11,6 @@ import (
 	"github.com/jesseduffield/lazygit/pkg/tasks"
 	"github.com/jesseduffield/lazygit/pkg/utils"
 	"github.com/sasha-s/go-deadlock"
-	"gopkg.in/ozeidan/fuzzy-patricia.v3/patricia"
 )
 
 type HelperCommon struct {
@@ -30,6 +29,17 @@ type IGuiCommon interface {
 	LogCommand(cmdStr string, isCommandLine bool)
 	// we call this when we want to refetch some models and render the result. Internally calls PostRefreshUpdate
 	Refresh(RefreshOptions)
+	// Like Refresh, but withholds keyboard input until the refreshed state is
+	// in place: keys pressed while the refresh is in flight are buffered and
+	// replayed once its model and view updates have run, instead of being
+	// handled against the stale, pre-refresh state. Use it when the very next
+	// keypress may depend on what the refresh produces — e.g. staging a hunk,
+	// where the refresh moves the selection to the next stageable hunk that
+	// the next press is meant to stage. Keep it to quick, narrow-scoped
+	// refreshes: one that includes COMMITS (or refreshes everything) can take
+	// very long in large repos and should usually not block input unless
+	// there's a very good reason (switching repos is one such example).
+	RefreshBlockingInput(RefreshOptions)
 	// Like Refresh, but for callers running on a worker goroutine (e.g. inside
 	// a WithWaitingStatus handler) rather than the UI thread. The refresh
 	// captures the model/context state it needs on the UI thread before doing
@@ -162,7 +172,7 @@ type IPopupHandler interface {
 	// Shows a popup prompting the user for input.
 	Prompt(opts PromptOpts)
 	WithWaitingStatus(message string, f func(gocui.Task) error) error
-	WithWaitingStatusSync(message string, f func() error) error
+	WithWaitingStatusBlockingInput(message string, f func(gocui.Task) error) error
 	Menu(opts CreateMenuOptions) error
 	Toast(message string)
 	ErrorToast(message string)
@@ -358,9 +368,6 @@ type Model struct {
 
 	MainBranches *git_commands.MainBranches
 
-	// for displaying suggestions while typing in a file name
-	FilesTrie *patricia.Trie
-
 	Authors map[string]*models.Author
 
 	HashPool *utils.StringPool
@@ -368,7 +375,6 @@ type Model struct {
 
 type Mutexes struct {
 	SubprocessMutex deadlock.Mutex
-	PopupMutex      deadlock.Mutex
 	PtyMutex        deadlock.Mutex
 }
 
@@ -395,7 +401,7 @@ type HasUrn interface {
 type IStateAccessor interface {
 	GetRepoPathStack() *utils.StringStack
 	GetRepoState() IRepoStateAccessor
-	GetPagerConfig() *config.PagerConfig
+	GetDiffRendererConfigManager() *config.DiffRendererConfigManager
 	// tells us whether we're currently updating lazygit
 	GetUpdating() bool
 	SetUpdating(bool)

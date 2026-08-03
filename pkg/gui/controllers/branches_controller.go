@@ -5,15 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gookit/color"
 	"github.com/jesseduffield/lazygit/pkg/commands/git_commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
 	"github.com/jesseduffield/lazygit/pkg/gocui"
 	"github.com/jesseduffield/lazygit/pkg/gui/context"
 	"github.com/jesseduffield/lazygit/pkg/gui/controllers/helpers"
 	"github.com/jesseduffield/lazygit/pkg/gui/presentation"
-	"github.com/jesseduffield/lazygit/pkg/gui/presentation/icons"
-	"github.com/jesseduffield/lazygit/pkg/gui/style"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
 	"github.com/jesseduffield/lazygit/pkg/utils"
 	"github.com/samber/lo"
@@ -214,13 +211,7 @@ func (self *BranchesController) GetOnRenderToMain() func() {
 
 				pr, ok := self.c.Model().PullRequestsMap[branch.Name]
 				if ok && presentation.ShouldShowPrForBranch(pr, branch.Name, self.c.UserConfig()) {
-					icon := lo.Ternary(icons.IsIconEnabled(), icons.IconForRemoteUrl(pr.Url)+"  ", "")
-					ptyTask.Prefix = style.PrintHyperlink(fmt.Sprintf("%s%s  %s  %s\n",
-						icon,
-						coloredStateText(pr.State),
-						pr.Title,
-						style.FgCyan.Sprintf("#%d", pr.Number)),
-						pr.Url)
+					ptyTask.Prefix = presentation.FormatPullRequestHeader(pr, self.c.Tr)
 					ptyTask.Prefix += strings.Repeat("─", self.c.Contexts().Normal.GetView().InnerWidth()) + "\n"
 				}
 			}
@@ -234,37 +225,6 @@ func (self *BranchesController) GetOnRenderToMain() func() {
 			})
 		})
 	}
-}
-
-func stateText(state string) string {
-	var icon, label string
-	switch state {
-	case "OPEN":
-		icon, label = " ", "Open"
-	case "CLOSED":
-		icon, label = " ", "Closed"
-	case "MERGED":
-		icon, label = " ", "Merged"
-	case "DRAFT":
-		icon, label = " ", "Draft"
-	default:
-		return ""
-	}
-	if icons.IsIconEnabled() {
-		return icon + label
-	}
-	return label
-}
-
-func coloredStateText(state string) string {
-	if icons.IsIconEnabled() {
-		return fmt.Sprintf("%s%s%s",
-			presentation.WithPrColor(state, "", false),
-			presentation.WithPrColor(state, color.RGB(0xFF, 0xFF, 0xFF, false).Sprint(stateText(state)), true),
-			presentation.WithPrColor(state, "", false))
-	}
-
-	return presentation.WithPrColor(state, stateText(state), false)
 }
 
 func (self *BranchesController) viewUpstreamOptions(selectedBranch *models.Branch) error {
@@ -331,7 +291,6 @@ func (self *BranchesController) viewUpstreamOptions(selectedBranch *models.Branc
 				return err
 			}
 			self.c.Refresh(types.RefreshOptions{
-				Mode: types.SYNC,
 				Scope: []types.RefreshableView{
 					types.BRANCHES,
 					types.COMMITS,
@@ -355,7 +314,6 @@ func (self *BranchesController) viewUpstreamOptions(selectedBranch *models.Branc
 					return err
 				}
 				self.c.Refresh(types.RefreshOptions{
-					Mode: types.SYNC,
 					Scope: []types.RefreshableView{
 						types.BRANCHES,
 						types.COMMITS,
@@ -546,7 +504,7 @@ func (self *BranchesController) forceCheckout() error {
 			if err := self.c.Git().Branch.Checkout(branch.Name, git_commands.CheckoutOptions{Force: true}); err != nil {
 				return err
 			}
-			self.c.Refresh(types.RefreshOptions{Mode: types.ASYNC})
+			self.c.Refresh(types.RefreshOptions{})
 			return nil
 		},
 	})
@@ -600,7 +558,6 @@ func (self *BranchesController) createNewBranchWithName(newBranchName string) er
 	}
 
 	self.c.Refresh(types.RefreshOptions{
-		Mode:                  types.ASYNC,
 		BranchSelection:       types.SelectCheckedOutBranch,
 		CommitSelection:       types.SelectHeadCommit,
 		SelectTopReflogCommit: true,
@@ -734,7 +691,7 @@ func (self *BranchesController) fastForward(branch *models.Branch) error {
 					WorktreePath:    worktreePath,
 				},
 			)
-			self.c.RefreshFromWorker(types.RefreshOptions{Mode: types.SYNC})
+			self.c.RefreshFromWorker(types.RefreshOptions{})
 			return err
 		}
 
@@ -743,7 +700,7 @@ func (self *BranchesController) fastForward(branch *models.Branch) error {
 		err := self.c.Git().Sync.FastForward(
 			task, branch.Name, branch.UpstreamRemote, branch.UpstreamBranch,
 		)
-		self.c.RefreshFromWorker(types.RefreshOptions{Mode: types.SYNC, Scope: []types.RefreshableView{types.BRANCHES}})
+		self.c.RefreshFromWorker(types.RefreshOptions{Scope: []types.RefreshableView{types.BRANCHES}})
 		return err
 	})
 }
@@ -760,7 +717,7 @@ func (self *BranchesController) createSortMenu() error {
 			if self.c.UserConfig().Git.LocalBranchSortOrder != sortOrder {
 				self.c.UserConfig().Git.LocalBranchSortOrder = sortOrder
 				self.c.Contexts().Branches.SetSelection(0)
-				self.c.Refresh(types.RefreshOptions{Mode: types.ASYNC, Scope: []types.RefreshableView{types.BRANCHES}})
+				self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.BRANCHES}})
 				return nil
 			}
 			return nil
@@ -788,7 +745,6 @@ func (self *BranchesController) rename(branch *models.Branch) error {
 				// onto the UI thread, so the re-selection (which reads Model.Branches) has to run in
 				// Then; reading it inline here would see the previous model.
 				self.c.Refresh(types.RefreshOptions{
-					Mode:  types.SYNC,
 					Scope: []types.RefreshableView{types.BRANCHES, types.WORKTREES},
 					Then: func() error {
 						// now that we've got our stuff again we need to find that branch and reselect it.

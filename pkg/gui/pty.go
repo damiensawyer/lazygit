@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/jesseduffield/lazygit/pkg/commands/oscommands"
+	"github.com/jesseduffield/lazygit/pkg/config"
 	"github.com/jesseduffield/lazygit/pkg/gocui"
 	"github.com/jesseduffield/lazygit/pkg/tasks"
 	"github.com/jesseduffield/lazygit/pkg/utils"
@@ -51,7 +52,7 @@ func (p ptyCmd) String() string          { return p.cmd.String() }
 func (p ptyCmd) GetProcess() *os.Process { return p.process }
 
 // Some commands need to output for a terminal to active certain behaviour.
-// For example,  git won't invoke the GIT_PAGER env var unless it thinks it's
+// For example, git won't invoke the GIT_PAGER env var unless it thinks it's
 // talking to a terminal. We typically write cmd outputs straight to a view,
 // which is just an io.Reader. the pty package lets us wrap a command in a
 // pseudo-terminal meaning we'll get the behaviour we want from the underlying
@@ -59,30 +60,24 @@ func (p ptyCmd) GetProcess() *os.Process { return p.process }
 func (gui *Gui) newPtyTask(view *gocui.View, cmd *exec.Cmd, prefix string) error {
 	width := view.InnerWidth()
 
-	// LAZYGIT_COLUMNS is documented in docs/Custom_Pagers.md for pager
-	// scripts that can't query the terminal width directly. We set it on
-	// every platform so those scripts remain portable.
+	// Set LAZYGIT_COLUMNS for diff renderer scripts that can't query the terminal width directly.
 	cmd.Env = append(cmd.Env, fmt.Sprintf("LAZYGIT_COLUMNS=%d", width))
 
-	pager := gui.stateAccessor.GetPagerConfig().GetPagerCommand(width)
-	externalDiffCommand := gui.stateAccessor.GetPagerConfig().GetExternalDiffCommand()
-	useExtDiffGitConfig := gui.stateAccessor.GetPagerConfig().GetUseExternalDiffGitConfig()
-
-	if pager == "" && externalDiffCommand == "" && !useExtDiffGitConfig {
-		// If we're not using a custom pager nor external diff command, then we don't need to use a pty
+	if gui.stateAccessor.GetDiffRendererConfigManager().GetDiffRendererType() == config.DiffRendererType_RawGit {
+		// If we're not using a custom diff renderer, then we don't need to use a pty
 		return gui.newCmdTask(view, cmd, prefix)
 	}
 
 	// Run the pty after layout so that it gets the correct size
 	gui.afterLayout(func() error {
-		// Need to get the width and the pager again because the layout might have
+		// Need to get the width and the pager command again because the layout might have
 		// changed the size of the view
 		width = view.InnerWidth()
-		pager := gui.stateAccessor.GetPagerConfig().GetPagerCommand(width)
+		pager := gui.stateAccessor.GetDiffRendererConfigManager().GetStdinFilterCommand(width)
 
 		cmdStr := strings.Join(cmd.Args, " ")
 
-		// This communicates to pagers that we're in a very simple
+		// This communicates to diff renderers that we're in a very simple
 		// terminal that they should not expect to have much capabilities.
 		// Moving the cursor, clearing the screen, or querying for colors are among such "advanced" capabilities.
 		// Context: https://github.com/jesseduffield/lazygit/issues/3419
@@ -93,13 +88,27 @@ func (gui *Gui) newPtyTask(view *gocui.View, cmd *exec.Cmd, prefix string) error
 
 		manager := gui.getManager(view)
 
+		// Size the pty from the view's dimensions here, on the UI thread; the
+		// start func below runs on the task's goroutine, which must not read the
+		// view's live dimensions while the UI thread is laying it out.
+		cols, rows := gui.desiredPtySize(view)
+
 		var p oscommands.Pty
+		var fallbackPipe io.ReadCloser
 		start := func() (tasks.Cmd, io.Reader) {
-			cols, rows := gui.desiredPtySize(view)
+			// The pty (and diff renderer) wrap to this width; apply it here, on the
+			// task's goroutine once the previous task has stopped, so it doesn't
+			// race that task's writes (see View.SetContentWidth).
+			view.SetContentWidth(width)
+
 			sp, err := oscommands.StartPty(cmd, cols, rows)
 			if err != nil {
 				gui.c.Log.Error(err)
-				return tasks.ExecCmd{Cmd: cmd}, nil
+				// Fall back to running the command without a pty: the diff renderer is
+				// lost, but the command's output still renders.
+				execCmd, pipe := startCmdWithPipe(cmd, gui.c.Log)
+				fallbackPipe = pipe
+				return execCmd, pipe
 			}
 			p = sp.Pty
 
@@ -114,6 +123,10 @@ func (gui *Gui) newPtyTask(view *gocui.View, cmd *exec.Cmd, prefix string) error
 			gui.Mutexes.PtyMutex.Lock()
 			if p != nil {
 				p.Close()
+			}
+			if fallbackPipe != nil {
+				fallbackPipe.Close()
+				fallbackPipe = nil
 			}
 			delete(gui.viewPtmxMap, view.Name())
 			gui.Mutexes.PtyMutex.Unlock()

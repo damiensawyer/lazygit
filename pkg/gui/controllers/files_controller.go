@@ -645,7 +645,7 @@ func (self *FilesController) press(nodes []*filetree.FileNode) error {
 		return err
 	}
 
-	self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.FILES}, Mode: types.ASYNC})
+	self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.FILES}})
 
 	self.context().HandleFocus(types.OnFocusOpts{})
 	return nil
@@ -930,7 +930,7 @@ func (self *FilesController) toggleStagedAll() error {
 		return err
 	}
 
-	self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.FILES}, Mode: types.ASYNC})
+	self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.FILES}})
 
 	self.context().HandleFocus(types.OnFocusOpts{})
 	return nil
@@ -1213,7 +1213,7 @@ func (self *FilesController) setStatusFiltering(filter filetree.FileTreeDisplayF
 	// Whenever we switch between untracked and other filters, we need to refresh the files view
 	// because the untracked files filter applies when running `git status`.
 	if previousFilter != filter && (previousFilter == filetree.DisplayUntracked || filter == filetree.DisplayUntracked) {
-		self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.FILES}, Mode: types.ASYNC})
+		self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.FILES}})
 	} else {
 		self.c.PostRefreshUpdate(self.context())
 	}
@@ -1536,6 +1536,7 @@ func (self *FilesController) onClickMain(opts gocui.ViewMouseBindingOpts) error 
 }
 
 func (self *FilesController) fetch() error {
+	fetchGeneration := self.c.State().GetRepoGeneration()
 	return self.c.WithWaitingStatus(self.c.Tr.FetchingStatus, func(task gocui.Task) error {
 		self.c.LogAction("Fetch")
 		err := self.c.Git().Sync.Fetch(task)
@@ -1544,7 +1545,7 @@ func (self *FilesController) fetch() error {
 			return errors.New(self.c.Tr.PassUnameWrong)
 		}
 
-		return self.c.Helpers().BranchesHelper.PostFetchRefresh(err, false)
+		return self.c.Helpers().BranchesHelper.PostFetchRefresh(err, false, fetchGeneration)
 	})
 }
 
@@ -1560,6 +1561,8 @@ func normalisedSelectedNodes(selectedNodes []*filetree.FileNode) []*filetree.Fil
 	})
 }
 
+// NOTE: there's a duplicate of this function in commits_files_controller.go; if you make
+// changes here, make them there, too. (We should unify them using generics.)
 func isDescendentOfSelectedNodes(node *filetree.FileNode, selectedNodes []*filetree.FileNode) bool {
 	nodePath := node.GetInternalPath()
 
@@ -1749,7 +1752,7 @@ func (self *FilesController) remove(selectedNodes []*filetree.FileNode) error {
 				return err
 			}
 
-			self.c.Refresh(types.RefreshOptions{Mode: types.ASYNC, Scope: []types.RefreshableView{types.FILES, types.WORKTREES}})
+			self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.FILES, types.WORKTREES}})
 			return nil
 		},
 		Keys: self.c.KeybindingsOpts().GetKeys(self.c.UserConfig().Keybinding.Files.ConfirmDiscard),
@@ -1775,7 +1778,7 @@ func (self *FilesController) remove(selectedNodes []*filetree.FileNode) error {
 				return err
 			}
 
-			self.c.Refresh(types.RefreshOptions{Mode: types.ASYNC, Scope: []types.RefreshableView{types.FILES, types.WORKTREES}})
+			self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.FILES, types.WORKTREES}})
 			return nil
 		},
 		Keys: menuKey('u'),
@@ -1817,7 +1820,7 @@ func (self *FilesController) ResetSubmodule(submodule *models.SubmoduleConfig) e
 			return err
 		}
 
-		self.c.RefreshFromWorker(types.RefreshOptions{Mode: types.ASYNC, Scope: []types.RefreshableView{types.FILES, types.SUBMODULES}})
+		self.c.RefreshFromWorker(types.RefreshOptions{Scope: []types.RefreshableView{types.FILES, types.SUBMODULES}})
 		return nil
 	})
 }

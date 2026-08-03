@@ -237,7 +237,6 @@ func (self *ModeHelper) EnterOverviewMode() error {
 
 	return self.c.WithWaitingStatus(self.c.Tr.LoadingCommits, func(gocui.Task) error {
 		self.c.RefreshFromWorker(types.RefreshOptions{
-			Mode:  types.SYNC,
 			Scope: []types.RefreshableView{types.COMMITS},
 			Then: func() error {
 				if hiddenSelectionHash == "" {

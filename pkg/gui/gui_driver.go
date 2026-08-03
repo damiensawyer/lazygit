@@ -25,17 +25,27 @@ type GuiDriver struct {
 var _ integrationTypes.GuiDriver = &GuiDriver{}
 
 func (self *GuiDriver) PressKey(keyStr string) {
+	self.PressKeysRapidly(keyStr)
+}
+
+// PressKeysRapidly presses the given keys in immediate succession, waiting for
+// lazygit to become idle only after the last one. Keys pressed this way can
+// arrive while the previous key's processing is still in flight, like a user
+// typing faster than lazygit handles the input.
+func (self *GuiDriver) PressKeysRapidly(keyStrs ...string) {
 	self.CheckAllToastsAcknowledged()
 
-	key, ok := config.KeyFromLabel(keyStr)
-	if !ok {
-		self.Fail("Unrecognized key: " + keyStr)
-	}
+	for _, keyStr := range keyStrs {
+		key, ok := config.KeyFromLabel(keyStr)
+		if !ok {
+			self.Fail("Unrecognized key: " + keyStr)
+		}
 
-	self.gui.g.ReplayKeyEvent(gocui.NewTcellKeyEventWrapper(
-		tcell.NewEventKey(tcell.Key(key.KeyName()), key.Str(), tcell.ModMask(key.Mod())),
-		0,
-	))
+		self.gui.g.ReplayKeyEvent(gocui.NewTcellKeyEventWrapper(
+			tcell.NewEventKey(tcell.Key(key.KeyName()), key.Str(), tcell.ModMask(key.Mod())),
+			0,
+		))
+	}
 
 	self.waitTillIdle()
 }
@@ -43,16 +53,48 @@ func (self *GuiDriver) PressKey(keyStr string) {
 func (self *GuiDriver) Click(x, y int) {
 	self.CheckAllToastsAcknowledged()
 
+	self.replayMouseEvent(x, y, tcell.ButtonPrimary)
+	self.replayMouseEvent(x, y, tcell.ButtonNone)
+}
+
+func (self *GuiDriver) ClickAndHold(x, y int) {
+	self.CheckAllToastsAcknowledged()
+	self.replayMouseEvent(x, y, tcell.ButtonPrimary)
+}
+
+// MouseMove reports the mouse at a new position with the left button still
+// held down, i.e. a drag movement. (No test needs pointer motion without a
+// button held, so that variant doesn't exist.)
+func (self *GuiDriver) MouseMove(x, y int) {
+	self.replayMouseEvent(x, y, tcell.ButtonPrimary)
+}
+
+func (self *GuiDriver) MouseRelease(x, y int) {
+	self.replayMouseEvent(x, y, tcell.ButtonNone)
+}
+
+func (self *GuiDriver) MouseReleaseWithoutWaiting(x, y int) {
+	self.replayMouseEventWithoutWaiting(x, y, tcell.ButtonNone)
+}
+
+func (self *GuiDriver) WaitUntilIdle() {
+	self.waitTillIdle()
+}
+
+func (self *GuiDriver) OnUIThreadAndWait(f func()) {
+	_ = self.gui.g.OnUIThreadAndWait(func() error { f(); return nil })
+}
+
+func (self *GuiDriver) replayMouseEvent(x, y int, buttons tcell.ButtonMask) {
+	self.replayMouseEventWithoutWaiting(x, y, buttons)
+	self.waitTillIdle()
+}
+
+func (self *GuiDriver) replayMouseEventWithoutWaiting(x, y int, buttons tcell.ButtonMask) {
 	self.gui.g.ReplayMouseEvent(gocui.NewTcellMouseEventWrapper(
-		tcell.NewEventMouse(x, y, tcell.ButtonPrimary, 0),
+		tcell.NewEventMouse(x, y, buttons, 0),
 		0,
 	))
-	self.waitTillIdle()
-	self.gui.g.ReplayMouseEvent(gocui.NewTcellMouseEventWrapper(
-		tcell.NewEventMouse(x, y, tcell.ButtonNone, 0),
-		0,
-	))
-	self.waitTillIdle()
 }
 
 // FocusIn simulates the terminal window regaining focus, which is how lazygit
@@ -64,6 +106,25 @@ func (self *GuiDriver) FocusIn() {
 		0,
 	))
 
+	self.waitTillIdle()
+}
+
+func (self *GuiDriver) FocusInAndClick(x, y int) {
+	self.CheckAllToastsAcknowledged()
+
+	self.gui.g.ReplayFocusEvent(gocui.NewTcellFocusEventWrapper(
+		tcell.NewEventFocus(true),
+		0,
+	))
+	self.gui.g.ReplayMouseEvent(gocui.NewTcellMouseEventWrapper(
+		tcell.NewEventMouse(x, y, tcell.ButtonPrimary, 0),
+		0,
+	))
+	self.waitTillIdle()
+	self.gui.g.ReplayMouseEvent(gocui.NewTcellMouseEventWrapper(
+		tcell.NewEventMouse(x, y, tcell.ButtonNone, 0),
+		0,
+	))
 	self.waitTillIdle()
 }
 
@@ -92,7 +153,10 @@ func (self *GuiDriver) Keys() config.KeybindingConfig {
 }
 
 func (self *GuiDriver) CurrentContext() types.Context {
-	return self.gui.c.Context().Current()
+	// Read the context manager directly rather than through c.Context(): the
+	// driver runs on the test goroutine, not the UI thread, so it must bypass
+	// the UI-thread assertion that accessor carries.
+	return self.gui.State.ContextMgr.Current()
 }
 
 func (self *GuiDriver) ContextForView(viewName string) types.Context {

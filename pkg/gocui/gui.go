@@ -148,6 +148,10 @@ type Gui struct {
 	maxX, maxY               int
 	outputMode               OutputMode
 	stop                     chan struct{}
+	// loopExited is closed when MainLoop returns, so callers (e.g. the
+	// integration-test harness) can wait for the event loop to actually finish
+	// rather than polling or sleeping a fixed interval.
+	loopExited chan struct{}
 
 	// BgColor and FgColor allow to configure the background and foreground
 	// colors of the GUI.
@@ -204,12 +208,22 @@ type Gui struct {
 	// busy?" doesn't count itself.
 	currentTask Task
 
-	lastHoverView *View
+	lastHoverView        *View
+	mouseCapture         *View
+	mouseGestureCanceled bool
 
 	// uiThreadID is the goroutine id of the main event loop, recorded when
 	// MainLoop starts. IsUIThread compares against it. Written once, read from
 	// worker goroutines, so it's atomic.
 	uiThreadID atomic.Int64
+
+	// blockInputCount, when greater than zero, withholds keyboard input from
+	// the handlers: key events are buffered into bufferedKeyEvents and replayed
+	// once the count drops back to zero, while mouse clicks and hover are
+	// dropped outright. It's a counter so blocking can nest. Both fields are
+	// only touched on the UI thread. See BeginBlockingEvents.
+	blockInputCount   int
+	bufferedKeyEvents []GocuiEvent
 }
 
 type NewGuiOpts struct {
@@ -252,6 +266,7 @@ func NewGui(opts NewGuiOpts) (*Gui, error) {
 	g.outputMode = opts.OutputMode
 
 	g.stop = make(chan struct{})
+	g.loopExited = make(chan struct{})
 
 	g.gEvents = make(chan GocuiEvent, 20)
 	g.userEvents = newUserEventQueue()
@@ -279,6 +294,12 @@ func NewGui(opts NewGuiOpts) (*Gui, error) {
 	g.PrevSearchMatchKeys = []Key{NewKeyRune('N')}
 
 	g.playRecording = opts.PlayRecording
+
+	// Record the UI thread here, at construction. This assumes NewGui is called
+	// on the same goroutine that will run MainLoop, which holds for all our
+	// callers -- and it means IsUIThread is already correct for the UI work that
+	// runs during startup, before we reach MainLoop.
+	g.uiThreadID.Store(goid.Get())
 
 	return g, nil
 }
@@ -340,6 +361,11 @@ func (g *Gui) Close() {
 	Screen.Fini()
 }
 
+// LoopExited returns a channel that is closed once MainLoop has returned.
+func (g *Gui) LoopExited() <-chan struct{} {
+	return g.loopExited
+}
+
 // Size returns the terminal's size.
 func (g *Gui) Size() (x, y int) {
 	return g.maxX, g.maxY
@@ -377,7 +403,7 @@ func (g *Gui) SetView(name string, x0, y0, x1, y1 int, overlaps byte) (*View, er
 		v.y1 = y1
 
 		if sizeChanged {
-			v.clearViewLines()
+			v.ClearViewLines()
 
 			if v.Editable {
 				cursorX, cursorY := v.TextArea.GetCursorXY()
@@ -573,6 +599,12 @@ func (g *Gui) DeleteView(name string) error {
 
 	for i, v := range g.views {
 		if v.name == name {
+			if g.mouseCapture == v {
+				g.CancelMouseCapture()
+			}
+			if g.lastHoverView == v {
+				g.lastHoverView = nil
+			}
 			g.views = append(g.views[:i], g.views[i+1:]...)
 			return nil
 		}
@@ -640,6 +672,24 @@ func (g *Gui) SetViewClickBinding(binding *ViewMouseBinding) error {
 	g.viewMouseBindings = append(g.viewMouseBindings, binding)
 
 	return nil
+}
+
+// captureMouse routes subsequent mouse events to view until the mouse button is
+// released or CancelMouseCapture is called.
+func (g *Gui) captureMouse(view *View) {
+	g.mouseCapture = view
+	g.mouseGestureCanceled = false
+}
+
+func (g *Gui) releaseMouseCapture() {
+	g.mouseCapture = nil
+}
+
+// CancelMouseCapture releases capture and ignores the rest of the physical
+// gesture until the mouse button is released.
+func (g *Gui) CancelMouseCapture() {
+	g.releaseMouseCapture()
+	g.mouseGestureCanceled = true
 }
 
 func (g *Gui) SetFocusHandler(handler func(bool) error) {
@@ -806,6 +856,42 @@ func (g *Gui) IsUIThread() bool {
 	return goid.Get() == g.uiThreadID.Load()
 }
 
+// BeginBlockingEvents starts withholding keyboard input from the handlers, so a
+// long-running operation can't be disrupted by keys the user presses while it
+// runs. Keys are buffered and replayed once EndBlockingEvents balances this
+// call; mouse clicks and hover are dropped for the duration. Scrolling,
+// resizing, focus changes and all rendering keep working throughout. It's a
+// counter, so blocking nests; every call must be paired with EndBlockingEvents.
+//
+// Must be called on the UI thread. Callers arrange this by beginning the block
+// synchronously from the keybinding handler, before dispatching the operation
+// to a worker — beginning it from the worker would race the next queued
+// keypress, which is exactly the input we mean to withhold.
+func (g *Gui) BeginBlockingEvents() {
+	g.blockInputCount++
+}
+
+// EndBlockingEvents balances a BeginBlockingEvents call. When the last nested
+// block ends, the keys buffered while blocked are replayed in order through the
+// normal dispatch path, so they act on the now-current context (a key whose
+// binding no longer exists is simply ignored, just as if it had been pressed
+// now). Must be called on the UI thread.
+func (g *Gui) EndBlockingEvents() error {
+	g.blockInputCount--
+	if g.blockInputCount > 0 {
+		return nil
+	}
+
+	buffered := g.bufferedKeyEvents
+	g.bufferedKeyEvents = nil
+	for i := range buffered {
+		if err := g.handleEvent(&buffered[i]); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // OnUIThreadAndWait runs f on the main event-loop goroutine and blocks the
 // caller until f has run, returning f's error. Use it to read UI-thread-owned
 // state (the model, contexts) from a worker without racing the UI thread.
@@ -921,7 +1007,7 @@ func (g *Gui) SetManagerFunc(manager func(*Gui) error) {
 // MainLoop runs the main loop until an error is returned. A successful
 // finish should return ErrQuit.
 func (g *Gui) MainLoop() error {
-	g.uiThreadID.Store(goid.Get())
+	defer close(g.loopExited)
 
 	go func() {
 		for {
@@ -1052,6 +1138,17 @@ func (g *Gui) processRemainingEvents() (bool, error) {
 // handleEvent handles an event, based on its type (key-press, error,
 // etc.)
 func (g *Gui) handleEvent(ev *GocuiEvent) error {
+	if g.blockInputCount > 0 && eventWithheldWhileBlocking(ev) {
+		if ev.Type == eventKey {
+			// Buffer keys so they replay against fresh state on unblock.
+			g.bufferedKeyEvents = append(g.bufferedKeyEvents, *ev)
+		}
+		// Mouse clicks and hover fall through to here without being buffered:
+		// replaying them once the operation has changed the layout underneath
+		// them would target the wrong thing, so we drop them outright.
+		return nil
+	}
+
 	switch ev.Type {
 	case eventKey, eventMouse, eventMouseMove:
 		return g.onKey(ev)
@@ -1067,6 +1164,24 @@ func (g *Gui) handleEvent(ev *GocuiEvent) error {
 		return nil
 	default:
 		return nil
+	}
+}
+
+// eventWithheldWhileBlocking reports whether an event must not reach the
+// handlers while input is blocked (see BeginBlockingEvents). Key events are
+// withheld (buffered for replay); mouse clicks and hover are withheld (dropped).
+// Everything else — mouse scrolling, resize, focus, paste, errors — flows
+// through as usual.
+func eventWithheldWhileBlocking(ev *GocuiEvent) bool {
+	switch ev.Type {
+	case eventKey:
+		return true
+	case eventMouse:
+		return !IsMouseScrollKey(ev.Key.KeyName())
+	case eventMouseMove:
+		return true
+	default:
+		return false
 	}
 }
 
@@ -1381,6 +1496,11 @@ func (g *Gui) drawListFooter(v *View, fgColor, bgColor Attribute) error {
 
 // flush updates the gui, re-drawing frames and buffers.
 func (g *Gui) flush() error {
+	// The screen must not be touched while suspended (see Suspend).
+	if g.isSuspended() {
+		return nil
+	}
+
 	// pretty sure we don't need this, but keeping it here in case we get weird visual artifacts
 	// g.clear(g.FgColor, g.BgColor)
 
@@ -1388,7 +1508,7 @@ func (g *Gui) flush() error {
 	// if GUI's size has changed, we need to redraw all views
 	if maxX != g.maxX || maxY != g.maxY {
 		for _, v := range g.views {
-			v.clearViewLines()
+			v.ClearViewLines()
 		}
 	}
 	g.maxX, g.maxY = maxX, maxY
@@ -1413,6 +1533,11 @@ func (g *Gui) flush() error {
 // actually-changed cells are emitted to the terminal.
 // Will also redraw any views that overlap tainted views
 func (g *Gui) flushContentOnly(views []*View) error {
+	// The screen must not be touched while suspended (see Suspend).
+	if g.isSuspended() {
+		return nil
+	}
+
 	for _, v := range viewsToRedrawContentOnly(views) {
 		if err := g.draw(v); err != nil {
 			return err
@@ -1427,7 +1552,7 @@ func viewsToRedrawContentOnly(views []*View) []*View {
 	redrawIndexes := set.New[int]()
 
 	for i, v := range views {
-		if !v.tainted && !redrawIndexes.Includes(i) {
+		if !v.IsTainted() && !redrawIndexes.Includes(i) {
 			continue
 		}
 
@@ -1466,10 +1591,6 @@ func (g *Gui) ForceFlushViewsContentOnly(views []*View) error {
 
 // draw manages the cursor and calls the draw function of a view.
 func (g *Gui) draw(v *View) error {
-	if g.suspended {
-		return nil
-	}
-
 	if !v.Visible || v.y1 < v.y0 || v.x1 < v.x0 {
 		return nil
 	}
@@ -1563,9 +1684,26 @@ func (g *Gui) onKey(ev *GocuiEvent) error {
 
 	case eventMouse:
 		mx, my := ev.MouseX, ev.MouseY
-		v, err := g.VisibleViewByPosition(mx, my)
-		if err != nil {
-			break
+		if g.mouseGestureCanceled {
+			if ev.Key.KeyName() == MouseRelease {
+				g.mouseGestureCanceled = false
+			}
+			return nil
+		}
+		// While the mouse is captured, all mouse events go to the view that
+		// was under the pointer when the button was pressed, even if the
+		// pointer has since left it; this is what lets drag gestures keep
+		// acting on the view they started in.
+		v := g.mouseCapture
+		if v == nil {
+			var err error
+			v, err = g.VisibleViewByPosition(mx, my)
+			if err != nil {
+				break
+			}
+		}
+		if ev.Key.KeyName() == MouseRelease {
+			g.releaseMouseCapture()
 		}
 
 		// newCx and newCy are relative to the view port, i.e. to the visible area of the view
@@ -1609,9 +1747,20 @@ func (g *Gui) onKey(ev *GocuiEvent) error {
 				break
 			}
 		}
+		if ev.Key.KeyName() == MouseLeft && ev.Key.Mod()&ModMotion == 0 {
+			g.captureMouse(v)
+		}
 
-		if !IsMouseScrollKey(ev.Key.KeyName()) {
-			v.SetCursor(newCx, newCy)
+		if !IsMouseScrollKey(ev.Key.KeyName()) && ev.Key.KeyName() != MouseRelease {
+			cursorX, cursorY := newCx, newCy
+			// A captured drag can report positions outside the view; keep the
+			// view cursor inside its bounds in that case. Handlers still get
+			// the unclamped position through the binding opts.
+			if g.mouseCapture != nil {
+				cursorX = max(0, min(cursorX, v.InnerWidth()-1))
+				cursorY = max(0, min(cursorY, v.InnerHeight()-1))
+			}
+			v.SetCursor(cursorX, cursorY)
 			if v.Editable {
 				v.TextArea.SetCursor2D(newX, newY)
 
@@ -1623,7 +1772,9 @@ func (g *Gui) onKey(ev *GocuiEvent) error {
 			}
 		}
 
-		if v.Frame && my == v.y0 {
+		// Only an actual click may activate tabs; a captured drag that
+		// crosses the tab row must not switch tabs.
+		if ev.Key.KeyName() == MouseLeft && ev.Key.Mod()&ModMotion == 0 && v.Frame && my == v.y0 {
 			if len(v.Tabs) > 0 {
 				tabIndex := v.GetClickedTabIndex(mx - v.x0)
 
@@ -1676,6 +1827,12 @@ func (g *Gui) onKey(ev *GocuiEvent) error {
 func (g *Gui) recordClickInfo(x, y int, key KeyName, v *View) bool {
 	if IsMouseScrollKey(key) {
 		g.lastClick = nil
+		return false
+	}
+	// A release ends a gesture but is not a click of its own; it must leave
+	// the click info of the press that started it alone, or no double click
+	// could ever be detected.
+	if key == MouseRelease {
 		return false
 	}
 
@@ -1841,6 +1998,14 @@ func (g *Gui) onFocus(ev *GocuiEvent) error {
 	return nil
 }
 
+// While g.suspended is true, nothing must be drawn to the screen: tcell
+// releases the screen's cell buffer when disengaging, and drawing to a
+// disengaged screen spins forever inside tcell while holding the screen lock,
+// which then blocks Resume (and with it all further input) forever. For the
+// flag to guarantee that, it must only ever be false while the screen is
+// engaged: Suspend sets it before disengaging, and Resume clears it only
+// after re-engaging.
+
 func (g *Gui) Suspend() error {
 	g.suspendedMutex.Lock()
 	defer g.suspendedMutex.Unlock()
@@ -1851,7 +2016,12 @@ func (g *Gui) Suspend() error {
 
 	g.suspended = true
 
-	return g.screen.Suspend()
+	if err := g.screen.Suspend(); err != nil {
+		g.suspended = false
+		return err
+	}
+
+	return nil
 }
 
 func (g *Gui) Resume() error {
@@ -1862,9 +2032,25 @@ func (g *Gui) Resume() error {
 		return errors.New("Cannot resume because we are not suspended")
 	}
 
+	if err := g.screen.Resume(); err != nil {
+		return err
+	}
+
 	g.suspended = false
 
-	return g.screen.Resume()
+	// Schedule a redraw of the whole screen. Nothing else guarantees one:
+	// flushes are skipped while suspended, and after re-engaging the screen
+	// the terminal shows nothing until we draw again.
+	go func() { g.gEvents <- GocuiEvent{Type: eventResize} }()
+
+	return nil
+}
+
+func (g *Gui) isSuspended() bool {
+	g.suspendedMutex.Lock()
+	defer g.suspendedMutex.Unlock()
+
+	return g.suspended
 }
 
 // matchView returns if the keybinding matches the current view (and the view's context)

@@ -49,7 +49,7 @@ func (self *BranchesHelper) ConfirmLocalDelete(branches []*models.Branch) error 
 				self.c.Contexts().Branches.CollapseRangeSelectionToTop()
 				return nil
 			})
-			self.c.RefreshFromWorker(types.RefreshOptions{Mode: types.ASYNC, Scope: []types.RefreshableView{types.BRANCHES}})
+			self.c.RefreshFromWorker(types.RefreshOptions{Scope: []types.RefreshableView{types.BRANCHES}})
 			return nil
 		})
 	})
@@ -87,7 +87,7 @@ func (self *BranchesHelper) ConfirmDeleteRemote(remoteBranches []*models.RemoteB
 				if err := self.deleteRemoteBranches(remoteBranches, task); err != nil {
 					return err
 				}
-				self.c.RefreshFromWorker(types.RefreshOptions{Mode: types.ASYNC, Scope: []types.RefreshableView{types.BRANCHES, types.REMOTES}})
+				self.c.RefreshFromWorker(types.RefreshOptions{Scope: []types.RefreshableView{types.BRANCHES, types.REMOTES}})
 				if resetRemoteBranchesSelection {
 					self.c.OnUIThread(func() error {
 						self.c.Contexts().RemoteBranches.CollapseRangeSelectionToTop()
@@ -161,7 +161,7 @@ func (self *BranchesHelper) ConfirmLocalAndRemoteDelete(branches []*models.Branc
 					self.c.Contexts().Branches.CollapseRangeSelectionToTop()
 					return nil
 				})
-				self.c.RefreshFromWorker(types.RefreshOptions{Mode: types.ASYNC, Scope: []types.RefreshableView{types.BRANCHES, types.REMOTES}})
+				self.c.RefreshFromWorker(types.RefreshOptions{Scope: []types.RefreshableView{types.BRANCHES, types.REMOTES}})
 				return nil
 			})
 		},
@@ -325,7 +325,6 @@ func (self *BranchesHelper) deleteLocalBranchesContinuation(branches []*models.B
 			return nil
 		})
 		self.c.RefreshFromWorker(types.RefreshOptions{
-			Mode:  types.ASYNC,
 			Scope: []types.RefreshableView{types.WORKTREES, types.BRANCHES, types.FILES},
 		})
 		return nil
@@ -346,7 +345,6 @@ func (self *BranchesHelper) deleteLocalAndRemoteBranchesContinuation(branches []
 			return nil
 		})
 		self.c.RefreshFromWorker(types.RefreshOptions{
-			Mode:  types.ASYNC,
 			Scope: []types.RefreshableView{types.WORKTREES, types.BRANCHES, types.REMOTES, types.FILES},
 		})
 		return nil
@@ -394,7 +392,11 @@ func (self *BranchesHelper) deleteRemoteBranches(remoteBranches []*models.Remote
 	return nil
 }
 
-func (self *BranchesHelper) PostFetchRefresh(fetchErr error, background bool) error {
+// fetchGeneration must be the repo generation from when the fetch started,
+// captured by the caller before running the fetch: the background fetch
+// doesn't block repo switching and is a network call, so the window in which
+// the user can switch repos spans the whole fetch, not just this refresh.
+func (self *BranchesHelper) PostFetchRefresh(fetchErr error, background bool, fetchGeneration int) error {
 	scope := []types.RefreshableView{
 		types.BRANCHES, types.COMMITS, types.REMOTES, types.TAGS, types.PULL_REQUESTS,
 	}
@@ -407,10 +409,15 @@ func (self *BranchesHelper) PostFetchRefresh(fetchErr error, background bool) er
 	// returns (where it would still see the previous branches).
 	self.c.RefreshFromWorker(types.RefreshOptions{
 		Scope:      scope,
-		Mode:       types.SYNC,
 		Background: background,
 		Then: func() error {
 			if fetchErr != nil {
+				return nil
+			}
+			// Then callbacks are not generation-guarded, so check explicitly:
+			// if the repo was switched since the fetch started, don't forward
+			// this repo's branches on the strength of another repo's fetch.
+			if self.c.State().GetRepoGeneration() != fetchGeneration {
 				return nil
 			}
 			err := self.AutoForwardBranches(background)
@@ -458,7 +465,7 @@ func (self *BranchesHelper) AutoForwardBranches(background bool) error {
 	self.c.LogCommand(strings.TrimRight(updateCommands, "\n"), false)
 	err := self.c.Git().Branch.UpdateBranchRefs(updateCommands)
 
-	self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.BRANCHES}, Mode: types.SYNC, Background: background})
+	self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.BRANCHES}, Background: background})
 
 	return err
 }

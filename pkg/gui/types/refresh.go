@@ -25,14 +25,6 @@ const (
 	PULL_REQUESTS
 )
 
-type RefreshMode int
-
-const (
-	SYNC     RefreshMode = iota // wait until everything is done before returning
-	ASYNC                       // return immediately, allowing each independent thing to update itself
-	BLOCK_UI                    // wrap code in an update call to ensure UI updates all at once and keybindings aren't executed till complete
-)
-
 // CommitSelectionBehavior controls which local commit is selected after the
 // commits list is reloaded by a refresh.
 type CommitSelectionBehavior int
@@ -74,7 +66,11 @@ const (
 type RefreshOptions struct {
 	Then  func() error
 	Scope []RefreshableView // e.g. []RefreshableView{COMMITS, BRANCHES}. Leave empty to refresh everything
-	Mode  RefreshMode       // one of SYNC (default), ASYNC, and BLOCK_UI
+
+	// If true, hold off on updating the UI until all scopes have finished
+	// refreshing and then apply them together in a single frame, rather than
+	// letting each scope update the UI as soon as it's done.
+	BatchUIUpdates bool
 
 	// Controls which local branch is selected after the refresh. Defaults to
 	// KeepBranchSelectionByName.
@@ -98,4 +94,19 @@ type RefreshOptions struct {
 	// fast. Background refreshes leave the suppression in place: not persisting
 	// the stat-cache is the right trade-off for unattended work.
 	Background bool
+
+	// When true, this foreground refresh does not block switching repos while
+	// it is in flight. A refresh is switch-safe by construction — its git
+	// commands run against the repo it was started for, and the generation
+	// guard drops its model/view updates if the repo changed — but a refresh
+	// triggered by a user operation still blocks switching (its tasks count
+	// towards Busy()), because the operation's follow-up work isn't covered
+	// by those guards. A refresh that merely reloads state (on focus, after a
+	// repo switch, after returning from a subprocess) has no such follow-up,
+	// so it opts in here and a repo switch during it is allowed rather than
+	// refused with a toast.
+	//
+	// Must not be combined with Then: Then is not generation-guarded, so it
+	// would run against the newly switched-to repo.
+	DontBlockRepoSwitch bool
 }
