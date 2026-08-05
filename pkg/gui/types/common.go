@@ -196,6 +196,7 @@ type CreateMenuOptions struct {
 	ColumnAlignment            []utils.Alignment
 	AllowFilteringKeybindings  bool
 	KeepConflictingKeybindings bool // if true, the keybindings that match essential bindings such as confirm or return will not be removed from menu items
+	InlineFiltering            bool // if true, printable keys filter the menu in-place without needing to press / first
 }
 
 type CreatePopupPanelOpts struct {

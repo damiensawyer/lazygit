@@ -58,6 +58,7 @@ type MenuViewModel struct {
 	columnAlignment           []utils.Alignment
 	allowFilteringKeybindings bool
 	keybindingsTakePrecedence bool
+	inlineFiltering           bool
 	onCancel                  func() error
 	*FilteredListViewModel[*types.MenuItem]
 }
@@ -130,6 +131,10 @@ func (self *MenuViewModel) SetAllowFilteringKeybindings(allow bool) {
 
 func (self *MenuViewModel) SetKeybindingsTakePrecedence(value bool) {
 	self.keybindingsTakePrecedence = value
+}
+
+func (self *MenuViewModel) SetInlineFiltering(value bool) {
+	self.inlineFiltering = value
 }
 
 // TODO: move into presentation package
@@ -209,6 +214,31 @@ func (self *MenuViewModel) GetNonModelItems() []*NonModelItem {
 
 func (self *MenuContext) GetKeybindings(opts types.KeybindingsOpts) []*types.Binding {
 	basicBindings := self.ListContextTrait.GetKeybindings(opts)
+
+	// When inline filtering is enabled (keybindings help menu), capture printable
+	// characters directly so the user can start typing to filter immediately.
+	if self.inlineFiltering {
+		basicBindings = append(basicBindings, []*types.Binding{
+			{
+				ViewName: "menu",
+				Keys:     []gocui.Key{gocui.NewKeyName(gocui.KeyEsc)},
+				Handler:  self.esc,
+			},
+			{
+				Keys:    []gocui.Key{gocui.NewKeyName(gocui.KeyBackspace)},
+				Handler: self.backspace,
+			},
+		}...)
+
+		// Add bindings for all printable ASCII characters.
+		for ch := ' '; ch <= '~'; ch++ {
+			basicBindings = append(basicBindings, &types.Binding{
+				Keys:    []gocui.Key{gocui.NewKeyRune(ch)},
+				Handler: self.charPress(ch),
+			})
+		}
+	}
+
 	menuItemsWithKeys := lo.Filter(self.menuItems, func(item *types.MenuItem, _ int) bool {
 		return len(item.Keys) > 0
 	})
@@ -234,6 +264,42 @@ func (self *MenuContext) GetKeybindings(opts types.KeybindingsOpts) []*types.Bin
 	// not open). Therefore we want the essential bindings to have higher precedence than the menu
 	// item bindings.
 	return append(basicBindings, menuItemBindings...)
+}
+
+func (self *MenuContext) charPress(ch rune) func() error {
+	return func() error {
+		filter := self.GetFilter() + string(ch)
+		self.SetFilter(filter, self.c.UserConfig().Gui.UseFuzzySearch())
+		self.SetSelection(0)
+		self.GetView().SetOriginY(0)
+		self.c.PostRefreshUpdate(self)
+		return nil
+	}
+}
+
+func (self *MenuContext) backspace() error {
+	filter := self.GetFilter()
+	if len(filter) == 0 {
+		return nil
+	}
+
+	// Remove last rune.
+	runes := []rune(filter)
+	self.SetFilter(string(runes[:len(runes)-1]), self.c.UserConfig().Gui.UseFuzzySearch())
+	self.SetSelection(0)
+	self.GetView().SetOriginY(0)
+	self.c.PostRefreshUpdate(self)
+	return nil
+}
+
+func (self *MenuContext) esc() error {
+	if self.IsFiltering() {
+		self.ClearFilter()
+		self.c.PostRefreshUpdate(self)
+		return nil
+	}
+
+	return self.OnMenuPress(nil)
 }
 
 func (self *MenuContext) OnMenuPress(selectedItem *types.MenuItem) error {

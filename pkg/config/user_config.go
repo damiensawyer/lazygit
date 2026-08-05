@@ -1021,7 +1021,7 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 				Quit:                                 Keybinding{"q"},
 				QuitAlt1:                             Keybinding{"<ctrl+c>"},
 				SuspendApp:                           Keybinding{"<ctrl+z>"},
-				Return:                               Keybinding{"<esc>"},
+				Return:                               Keybinding{"<enter>"},
 				QuitWithoutChangingDirectory:         Keybinding{"Q"},
 				TogglePanel:                          Keybinding{"<tab>"},
 				PrevItem:                             Keybinding{"<up>"},
