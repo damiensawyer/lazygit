@@ -220,8 +220,9 @@ func (self *MenuContext) GetKeybindings(opts types.KeybindingsOpts) []*types.Bin
 	if self.inlineFiltering {
 		basicBindings = append(basicBindings, []*types.Binding{
 			{
-				Keys:    []gocui.Key{gocui.NewKeyName(gocui.KeyEsc)},
-				Handler: self.esc,
+				ViewName: "menu",
+				Keys:     []gocui.Key{gocui.NewKeyName(gocui.KeyEsc)},
+				Handler:  self.esc,
 			},
 			{
 				Keys:    []gocui.Key{gocui.NewKeyName(gocui.KeyBackspace)},
