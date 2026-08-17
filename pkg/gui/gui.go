@@ -94,9 +94,9 @@ type Gui struct {
 
 	Mutexes types.Mutexes
 
-	// when you enter into a submodule we'll append the superproject's path to this array
-	// so that you can return to the superproject
-	RepoPathStack *utils.StringStack
+	// when you enter into a submodule we'll append the superproject's location to
+	// this array so that you can return to the superproject
+	RepoPathStack *utils.Stack[types.RepoLocation]
 
 	// this tells us whether our views have been initially set up
 	ViewsSetup bool
@@ -162,7 +162,7 @@ type StateAccessor struct {
 
 var _ types.IStateAccessor = new(StateAccessor)
 
-func (self *StateAccessor) GetRepoPathStack() *utils.StringStack {
+func (self *StateAccessor) GetRepoPathStack() *utils.Stack[types.RepoLocation] {
 	return self.gui.RepoPathStack
 }
 
@@ -362,8 +362,10 @@ func (gui *Gui) onSwitchToNewRepo(startArgs appTypes.StartArgs, contextKey types
 }
 
 func (gui *Gui) onNewRepo(startArgs appTypes.StartArgs, contextKey types.ContextKey) error {
-	var err error
-	gui.git, err = commands.NewGitCommand(
+	// Don't assign to gui.git until we know we have one: this also runs when
+	// switching repos, and leaving the field nil would take down the repo we
+	// were in before, which is where the error puts us back.
+	git, err := commands.NewGitCommand(
 		gui.Common,
 		gui.gitVersion,
 		gui.os,
@@ -373,6 +375,7 @@ func (gui *Gui) onNewRepo(startArgs appTypes.StartArgs, contextKey types.Context
 	if err != nil {
 		return err
 	}
+	gui.git = git
 
 	err = gui.Config.ReloadUserConfigForRepo(gui.getPerRepoConfigFiles())
 	if err != nil {
@@ -823,7 +826,7 @@ func NewGui(
 		viewBufferManagerMap: map[string]*tasks.ViewBufferManager{},
 		viewPtmxMap:          map[string]oscommands.Pty{},
 		showRecentRepos:      showRecentRepos,
-		RepoPathStack:        &utils.StringStack{},
+		RepoPathStack:        &utils.Stack[types.RepoLocation]{},
 		RepoStateMap:         map[Repo]*GuiRepoState{},
 		GuiLog:               []string{},
 
@@ -859,8 +862,8 @@ func NewGui(
 			return nil
 		},
 		func(message string, f func(gocui.Task) error) { gui.helpers.AppStatus.WithWaitingStatus(message, f) },
-		func(message string, f func(gocui.Task) error) {
-			gui.helpers.AppStatus.WithWaitingStatusBlockingInput(message, f)
+		func(opts types.WaitingStatusOpts, f func(gocui.Task) error) {
+			gui.helpers.AppStatus.WithWaitingStatusBlockingInput(opts, f)
 		},
 		func(message string, kind types.ToastKind) { gui.helpers.AppStatus.Toast(message, kind) },
 		func() string { return gui.Views.Prompt.TextArea.GetContent() },

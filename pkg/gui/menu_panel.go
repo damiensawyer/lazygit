@@ -73,8 +73,6 @@ func (gui *Gui) createMenu(opts types.CreateMenuOptions) error {
 	gui.State.Contexts.Menu.SetOnCancel(opts.OnCancel)
 	gui.State.Contexts.Menu.SetSelection(0)
 
-	gui.Views.Menu.SetOriginY(0)
-
 	gui.Views.Menu.Title = opts.Title
 	gui.Views.Menu.FgColor = theme.GocuiDefaultTextColor
 

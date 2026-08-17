@@ -87,6 +87,10 @@ while still being meaningful and self-contained.
 - **Wrap message body to 72 characters**. The subject is allowed to go up to 80
   characters, or even a little more if needed to convey a good single-line
   summary; the body should be wrapped at 72 exactly, no more, no less.
+- **End every commit message with the `Co-authored-by:` trailer** naming the
+  model that wrote it, exactly as your harness instructions spell it. Nothing
+  in `just check` catches a missing one, so it has to be part of writing the
+  message rather than something to notice afterwards.
 
 ## Iterate with `fixup!` commits
 
@@ -104,6 +108,16 @@ fixup isn't only clean autosquash — it's that the refinement lands as a
 separate, reviewable commit that the user decides when to fold in. A bare
 `--amend` rewrites the commit on the spot and skips that checkpoint. Don't
 treat "I'm only touching the tip commit" as an exception.
+
+**When the tip is the wrong place for a fixup, insert it mid-branch.**
+Committing a fixup at the tip of the branch only works while the code it
+touches still looks the same there; once later commits have rewritten that
+code — or the target has since been split — the fixup won't apply, and
+rewriting the later commits to accommodate it defeats the point. Check out the
+target, make the change, `git commit --fixup=<target>`, then
+`git rebase --onto <the fixup> <target> <branch>` to replay the rest of the
+branch. The fixup stays a separate, reviewable commit; only its position
+changes.
 
 If the changes don't map cleanly onto existing commits — say they cut
 across several of them, or restructure something at a different layer
@@ -390,11 +404,31 @@ Avoid phrasings like:
 - "cleaner than the previous approach"
 - "we used to ... but ..."
 - "after trying X, we found Y"
+- "X rather than Y", where Y is what the code did before the change
 
 The iteration story is sometimes worth preserving — but it belongs in the
 commit message, which is the durable record of *why this change was made*. The
 code comment should make sense to someone who has never seen any prior version
 and is just trying to understand the file as it currently exists.
+
+The tell is subtler than an explicit "we used to". A comment that justifies the
+code against an alternative — "run it on a worker rather than blocking the UI",
+"switch panels in `Then` rather than a moment earlier" — is history in disguise
+whenever that alternative is what the code did before the change. It reads as
+ordinary rationale, but the reader has no way to know the contrast is with a
+version that no longer exists.
+
+So the check to apply is: would you have written this comment if you were
+writing the file from scratch, with no diff in mind? If not, the sentence
+belongs in the commit message.
+
+## Don't justify routine call sites
+
+If the codebase calls a helper in twenty places without explanation, your
+twenty-first call site doesn't need one either. A comment there says "something
+here is unusual"; when nothing is, it's noise — and it invites exactly the kind
+of before/after justification the section above warns about. Look at the
+neighboring call sites before writing one: if they're bare, match them.
 
 ## Don't present "live with the bug" as an option
 

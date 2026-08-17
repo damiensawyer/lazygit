@@ -130,10 +130,11 @@ func (self *FilesController) GetKeybindings(opts types.KeybindingsOpts) []*types
 			OpensMenu:   true,
 		},
 		{
-			Keys:        opts.GetKeys(opts.Config.Files.ToggleStagedAll),
-			Handler:     self.toggleStagedAll,
-			Description: self.c.Tr.ToggleStagedAll,
-			Tooltip:     self.c.Tr.ToggleStagedAllTooltip,
+			Keys:              opts.GetKeys(opts.Config.Files.ToggleStagedAll),
+			Handler:           self.toggleStagedAll,
+			GetDisabledReason: self.require(self.anyFilesDisplayed),
+			Description:       self.c.Tr.ToggleStagedAll,
+			Tooltip:           self.c.Tr.ToggleStagedAllTooltip,
 		},
 		{
 			Keys:              opts.GetKeys(opts.Config.Universal.GoInto),
@@ -337,7 +338,7 @@ func (self *FilesController) renderSubmoduleConflict(node *filetree.FileNode) {
 // (it was resolved in an editor), in which case the caller should fall back to
 // showing the file's diff.
 func (self *FilesController) renderInlineMergeConflict(node *filetree.FileNode) bool {
-	hasConflicts, err := self.c.Helpers().MergeConflicts.SetMergeState(node.GetPath())
+	hasConflicts, err := self.c.Helpers().MergeConflicts.SetMergeState(node.File)
 	if err != nil {
 		return true
 	}
@@ -925,6 +926,17 @@ func (self *FilesController) openSubmoduleConflictMenu(file *models.File) error 
 	})
 }
 
+// The stage-all command acts on the file tree as it is displayed, so there has
+// to be something in it. This is also the case before the first files refresh
+// has come in, when there is no tree at all yet.
+func (self *FilesController) anyFilesDisplayed() *types.DisabledReason {
+	if self.context().FileTreeViewModel.Len() == 0 {
+		return &types.DisabledReason{Text: self.c.Tr.NoChangedFiles}
+	}
+
+	return nil
+}
+
 func (self *FilesController) toggleStagedAll() error {
 	if err := self.toggleStagedAllWithLock(); err != nil {
 		return err
@@ -1273,7 +1285,7 @@ func (self *FilesController) switchToMerge() error {
 		return nil
 	}
 
-	return self.c.Helpers().MergeConflicts.SwitchToMerge(file.Path)
+	return self.c.Helpers().MergeConflicts.SwitchToMerge(file)
 }
 
 func (self *FilesController) createStashMenu() error {
@@ -1517,13 +1529,20 @@ func (self *FilesController) handleStashSave(stashFunc func(message string) erro
 	self.c.Prompt(types.PromptOpts{
 		Title: self.c.Tr.StashChanges,
 		HandleConfirm: func(stashComment string) error {
-			self.c.LogAction(action)
+			return self.c.WithWaitingStatusBlockingInput(
+				types.WaitingStatusOpts{Message: self.c.Tr.StashingStatus},
+				func(gocui.Task) error {
+					self.c.LogAction(action)
 
-			if err := stashFunc(stashComment); err != nil {
-				return err
-			}
-			self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.STASH, types.FILES}})
-			return nil
+					if err := stashFunc(stashComment); err != nil {
+						return err
+					}
+					self.c.RefreshFromWorker(types.RefreshOptions{
+						BatchUIUpdates: true,
+						Scope:          []types.RefreshableView{types.STASH, types.FILES},
+					})
+					return nil
+				})
 		},
 		AllowEmptyInput: true,
 	})
