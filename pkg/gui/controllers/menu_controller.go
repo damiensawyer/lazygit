@@ -74,7 +74,11 @@ func (self *MenuController) press(selectedItem *types.MenuItem) error {
 
 func (self *MenuController) close() error {
 	if self.context().IsFiltering() {
-		self.c.Helpers().Search.Cancel()
+		// Clear the filter directly rather than via the search helper: menus
+		// can be filtered without the search prompt (e.g. the keybindings menu
+		// filters inline), in which case the helper has no state to cancel.
+		self.context().ClearFilter()
+		self.c.PostRefreshUpdate(self.context())
 		return nil
 	}
 
