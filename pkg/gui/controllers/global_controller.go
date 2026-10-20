@@ -62,19 +62,19 @@ func (self *GlobalController) GetKeybindings(opts types.KeybindingsOpts) []*type
 			Description: self.c.Tr.PrevScreenMode,
 		},
 		{
-			Keys:        opts.GetKeys(opts.Config.Universal.DecreaseHalfScreenModeSidePanelWidth),
-			Handler:     opts.Guards.NoPopupPanel(self.decreaseHalfScreenModeSidePanelWidth),
-			Description: self.c.Tr.DecreaseHalfScreenModeSidePanelWidth,
+			Keys:        opts.GetKeys(opts.Config.Universal.DecreaseSidePanelWidth),
+			Handler:     opts.Guards.NoPopupPanel(self.decreaseSidePanelWidth),
+			Description: self.c.Tr.DecreaseSidePanelWidth,
 		},
 		{
-			Keys:        opts.GetKeys(opts.Config.Universal.IncreaseHalfScreenModeSidePanelWidth),
-			Handler:     opts.Guards.NoPopupPanel(self.increaseHalfScreenModeSidePanelWidth),
-			Description: self.c.Tr.IncreaseHalfScreenModeSidePanelWidth,
+			Keys:        opts.GetKeys(opts.Config.Universal.IncreaseSidePanelWidth),
+			Handler:     opts.Guards.NoPopupPanel(self.increaseSidePanelWidth),
+			Description: self.c.Tr.IncreaseSidePanelWidth,
 		},
 		{
-			Keys:        opts.GetKeys(opts.Config.Universal.ResetHalfScreenModeSidePanelWidth),
-			Handler:     opts.Guards.NoPopupPanel(self.resetHalfScreenModeSidePanelWidth),
-			Description: self.c.Tr.ResetHalfScreenModeSidePanelWidth,
+			Keys:        opts.GetKeys(opts.Config.Universal.ResetSidePanelWidth),
+			Handler:     opts.Guards.NoPopupPanel(self.resetSidePanelWidth),
+			Description: self.c.Tr.ResetSidePanelWidth,
 		},
 		{
 			Keys:              opts.GetKeys(opts.Config.Universal.CycleDiffRenderers),
@@ -191,7 +191,7 @@ func (self *GlobalController) prevScreenMode() error {
 	return (&ScreenModeActions{c: self.c}).Prev()
 }
 
-func (self *GlobalController) decreaseHalfScreenModeSidePanelWidth() error {
+func (self *GlobalController) decreaseSidePanelWidth() error {
 	repoState := self.c.State().GetRepoState()
 	if repoState.GetScreenMode() != types.SCREEN_HALF {
 		return nil
@@ -205,13 +205,13 @@ func (self *GlobalController) decreaseHalfScreenModeSidePanelWidth() error {
 	self.c.SaveHalfScreenModeSidePanelWidth()
 	self.c.Refresh(types.RefreshOptions{})
 	self.c.Toast(utils.ResolvePlaceholderString(
-		self.c.Tr.HalfScreenModeSidePanelWidthChanged,
+		self.c.Tr.SidePanelWidthChanged,
 		map[string]string{"width": strconv.FormatFloat(current, 'f', 2, 64)},
 	))
 	return nil
 }
 
-func (self *GlobalController) increaseHalfScreenModeSidePanelWidth() error {
+func (self *GlobalController) increaseSidePanelWidth() error {
 	repoState := self.c.State().GetRepoState()
 	if repoState.GetScreenMode() != types.SCREEN_HALF {
 		return nil
@@ -225,13 +225,13 @@ func (self *GlobalController) increaseHalfScreenModeSidePanelWidth() error {
 	self.c.SaveHalfScreenModeSidePanelWidth()
 	self.c.Refresh(types.RefreshOptions{})
 	self.c.Toast(utils.ResolvePlaceholderString(
-		self.c.Tr.HalfScreenModeSidePanelWidthChanged,
+		self.c.Tr.SidePanelWidthChanged,
 		map[string]string{"width": strconv.FormatFloat(current, 'f', 2, 64)},
 	))
 	return nil
 }
 
-func (self *GlobalController) resetHalfScreenModeSidePanelWidth() error {
+func (self *GlobalController) resetSidePanelWidth() error {
 	repoState := self.c.State().GetRepoState()
 	if repoState.GetScreenMode() != types.SCREEN_HALF {
 		return nil
@@ -240,7 +240,7 @@ func (self *GlobalController) resetHalfScreenModeSidePanelWidth() error {
 	repoState.SetHalfScreenModeSidePanelWidth(0.5)
 	self.c.SaveHalfScreenModeSidePanelWidth()
 	self.c.Refresh(types.RefreshOptions{})
-	self.c.Toast(self.c.Tr.HalfScreenModeSidePanelWidthReset)
+	self.c.Toast(self.c.Tr.ResetSidePanelWidth)
 	return nil
 }
 

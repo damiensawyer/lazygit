@@ -540,27 +540,27 @@ type KeybindingUniversalConfig struct {
 	// Deprecated: add the key to `scrollUpMain` instead.
 	ScrollUpMainAlt2 Keybinding `yaml:"scrollUpMain-alt2"`
 	// Deprecated: add the key to `scrollDownMain` instead.
-	ScrollDownMainAlt2                   Keybinding `yaml:"scrollDownMain-alt2"`
-	ExecuteShellCommand                  Keybinding `yaml:"executeShellCommand"`
-	CreateRebaseOptionsMenu              Keybinding `yaml:"createRebaseOptionsMenu"`
-	Push                                 Keybinding `yaml:"pushFiles"` // 'Files' appended for legacy reasons
-	Pull                                 Keybinding `yaml:"pullFiles"` // 'Files' appended for legacy reasons
-	Refresh                              Keybinding `yaml:"refresh"`
-	CreatePatchOptionsMenu               Keybinding `yaml:"createPatchOptionsMenu"`
-	NextTab                              Keybinding `yaml:"nextTab"`
-	PrevTab                              Keybinding `yaml:"prevTab"`
-	NextScreenMode                       Keybinding `yaml:"nextScreenMode"`
-	PrevScreenMode                       Keybinding `yaml:"prevScreenMode"`
-	DecreaseHalfScreenModeSidePanelWidth Keybinding `yaml:"decreaseHalfScreenModeSidePanelWidth"`
-	IncreaseHalfScreenModeSidePanelWidth Keybinding `yaml:"increaseHalfScreenModeSidePanelWidth"`
-	ResetHalfScreenModeSidePanelWidth    Keybinding `yaml:"resetHalfScreenModeSidePanelWidth"`
-	CycleDiffRenderers                   Keybinding `yaml:"cycleDiffRenderers"`
-	CycleDiffRenderersReverse            Keybinding `yaml:"cycleDiffRenderersReverse"`
-	ToggleShowFinalVersion               Keybinding `yaml:"toggleShowFinalVersion"`
-	Undo                                 Keybinding `yaml:"undo"`
-	Redo                                 Keybinding `yaml:"redo"`
-	FilteringMenu                        Keybinding `yaml:"filteringMenu"`
-	DiffingMenu                          Keybinding `yaml:"diffingMenu"`
+	ScrollDownMainAlt2        Keybinding `yaml:"scrollDownMain-alt2"`
+	ExecuteShellCommand       Keybinding `yaml:"executeShellCommand"`
+	CreateRebaseOptionsMenu   Keybinding `yaml:"createRebaseOptionsMenu"`
+	Push                      Keybinding `yaml:"pushFiles"` // 'Files' appended for legacy reasons
+	Pull                      Keybinding `yaml:"pullFiles"` // 'Files' appended for legacy reasons
+	Refresh                   Keybinding `yaml:"refresh"`
+	CreatePatchOptionsMenu    Keybinding `yaml:"createPatchOptionsMenu"`
+	NextTab                   Keybinding `yaml:"nextTab"`
+	PrevTab                   Keybinding `yaml:"prevTab"`
+	NextScreenMode            Keybinding `yaml:"nextScreenMode"`
+	PrevScreenMode            Keybinding `yaml:"prevScreenMode"`
+	DecreaseSidePanelWidth    Keybinding `yaml:"decreaseSidePanelWidth"`
+	IncreaseSidePanelWidth    Keybinding `yaml:"increaseSidePanelWidth"`
+	ResetSidePanelWidth       Keybinding `yaml:"resetSidePanelWidth"`
+	CycleDiffRenderers        Keybinding `yaml:"cycleDiffRenderers"`
+	CycleDiffRenderersReverse Keybinding `yaml:"cycleDiffRenderersReverse"`
+	ToggleShowFinalVersion    Keybinding `yaml:"toggleShowFinalVersion"`
+	Undo                      Keybinding `yaml:"undo"`
+	Redo                      Keybinding `yaml:"redo"`
+	FilteringMenu             Keybinding `yaml:"filteringMenu"`
+	DiffingMenu               Keybinding `yaml:"diffingMenu"`
 	// Deprecated: add the key to `diffingMenu` instead.
 	DiffingMenuAlt                    Keybinding `yaml:"diffingMenu-alt"`
 	CopyToClipboard                   Keybinding `yaml:"copyToClipboard"`
@@ -1018,95 +1018,95 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 		PromptToReturnFromSubprocess: true,
 		Keybinding: KeybindingConfig{
 			Universal: KeybindingUniversalConfig{
-				Quit:                                 Keybinding{"q"},
-				QuitAlt1:                             Keybinding{"<ctrl+c>"},
-				SuspendApp:                           Keybinding{"<ctrl+z>"},
-				Return:                               Keybinding{"<esc>"},
-				QuitWithoutChangingDirectory:         Keybinding{"Q"},
-				TogglePanel:                          Keybinding{"<tab>"},
-				PrevItem:                             Keybinding{"<up>"},
-				NextItem:                             Keybinding{"<down>"},
-				PrevItemAlt:                          Keybinding{"k"},
-				NextItemAlt:                          Keybinding{"j"},
-				PrevPage:                             Keybinding{","},
-				NextPage:                             Keybinding{"."},
-				ScrollLeft:                           Keybinding{"H"},
-				ScrollRight:                          Keybinding{"L"},
-				GotoTop:                              Keybinding{"<"},
-				GotoBottom:                           Keybinding{">"},
-				GotoTopAlt:                           Keybinding{"<home>"},
-				GotoBottomAlt:                        Keybinding{"<end>"},
-				ToggleRangeSelect:                    Keybinding{"v"},
-				RangeSelectDown:                      Keybinding{"<shift+down>"},
-				RangeSelectUp:                        Keybinding{"<shift+up>"},
-				PrevBlock:                            Keybinding{"<left>"},
-				NextBlock:                            Keybinding{"<right>"},
-				PrevBlockAlt:                         Keybinding{"h"},
-				NextBlockAlt:                         Keybinding{"l"},
-				PrevBlockAlt2:                        Keybinding{"<backtab>"},
-				NextBlockAlt2:                        Keybinding{"<tab>"},
-				JumpToBlock:                          []Keybinding{{"1"}, {"2"}, {"3"}, {"4"}, {"5"}},
-				FocusMainView:                        Keybinding{"0"},
-				NextMatch:                            Keybinding{"n"},
-				PrevMatch:                            Keybinding{"N"},
-				StartSearch:                          Keybinding{"/"},
-				MoveWordLeft:                         Keybinding{platformKeyBinding(platform, map[string]string{"darwin": "<alt+left>"}, "<ctrl+left>")},
-				MoveWordRight:                        Keybinding{platformKeyBinding(platform, map[string]string{"darwin": "<alt+right>"}, "<ctrl+right>")},
-				BackspaceWord:                        Keybinding{platformKeyBinding(platform, map[string]string{"darwin": "<alt+backspace>"}, "<ctrl+backspace>")},
-				ForwardDeleteWord:                    Keybinding{platformKeyBinding(platform, map[string]string{"darwin": "<alt+delete>"}, "<ctrl+delete>")},
-				OptionMenu:                           Keybinding{"?"},
-				Select:                               Keybinding{"<space>"},
-				GoInto:                               Keybinding{"<enter>"},
-				Confirm:                              Keybinding{"<enter>"},
-				ConfirmMenu:                          Keybinding{"<enter>"},
-				ConfirmSuggestion:                    Keybinding{"<enter>"},
-				ConfirmInEditor:                      Keybinding{platformKeyBinding(platform, map[string]string{"darwin": "<meta+enter>"}, "<ctrl+enter>")},
-				ConfirmInEditorAlt:                   Keybinding{"<ctrl+s>"},
-				Remove:                               Keybinding{"d"},
-				New:                                  Keybinding{"n"},
-				NewWorktree:                          Keybinding{"w"},
-				Edit:                                 Keybinding{"e"},
-				OpenFile:                             Keybinding{"o"},
-				OpenRecentRepos:                      Keybinding{"<ctrl+r>"},
-				ScrollUpMain:                         Keybinding{"<pgup>"},
-				ScrollDownMain:                       Keybinding{"<pgdown>"},
-				ScrollUpMainAlt1:                     Keybinding{"K"},
-				ScrollDownMainAlt1:                   Keybinding{"J"},
-				ScrollUpMainAlt2:                     Keybinding{"<ctrl+u>"},
-				ScrollDownMainAlt2:                   Keybinding{"<ctrl+d>"},
-				ExecuteShellCommand:                  Keybinding{":"},
-				CreateRebaseOptionsMenu:              Keybinding{"m"},
-				Push:                                 Keybinding{"P"},
-				Pull:                                 Keybinding{"p"},
-				Refresh:                              Keybinding{"R"},
-				CreatePatchOptionsMenu:               Keybinding{"<ctrl+p>"},
-				NextTab:                              Keybinding{"]"},
-				PrevTab:                              Keybinding{"["},
-				NextScreenMode:                       Keybinding{"+"},
-				PrevScreenMode:                       Keybinding{"_"},
-				DecreaseHalfScreenModeSidePanelWidth: Keybinding{"<shift+alt+left>"},
-				IncreaseHalfScreenModeSidePanelWidth: Keybinding{"<shift+alt+right>"},
-				ResetHalfScreenModeSidePanelWidth:    Keybinding{"<shift+alt+=>"},
-				CycleDiffRenderers:                   Keybinding{"|"},
-				CycleDiffRenderersReverse:            Keybinding{"\\"},
-				ToggleShowFinalVersion:               Keybinding{"<alt+\\>"},
-				Undo:                                 Keybinding{"z"},
-				Redo:                                 Keybinding{"Z"},
-				FilteringMenu:                        Keybinding{"<ctrl+s>"},
-				DiffingMenu:                          Keybinding{"W"},
-				DiffingMenuAlt:                       Keybinding{"<ctrl+e>"},
-				CopyToClipboard:                      Keybinding{"<ctrl+o>"},
-				SubmitEditorText:                     Keybinding{"<enter>"},
-				ExtrasMenu:                           Keybinding{"@"},
-				ToggleWhitespaceInDiffView:           Keybinding{"<ctrl+w>"},
-				IncreaseContextInDiffView:            Keybinding{"}"},
-				DecreaseContextInDiffView:            Keybinding{"{"},
-				ToggleContextInDiffView:              Keybinding{"<alt+shift+]>", "<alt+]>"},
-				IncreaseRenameSimilarityThreshold:    Keybinding{")"},
-				DecreaseRenameSimilarityThreshold:    Keybinding{"("},
-				OpenDiffTool:                         Keybinding{"<ctrl+t>"},
-				BrowseAllFilesAtCommit:               Keybinding{"E"},
-				EditConfig:                           Keybinding{"<alt+shift+c>"},
+				Quit:                              Keybinding{"q"},
+				QuitAlt1:                          Keybinding{"<ctrl+c>"},
+				SuspendApp:                        Keybinding{"<ctrl+z>"},
+				Return:                            Keybinding{"<esc>"},
+				QuitWithoutChangingDirectory:      Keybinding{"Q"},
+				TogglePanel:                       Keybinding{"<tab>"},
+				PrevItem:                          Keybinding{"<up>"},
+				NextItem:                          Keybinding{"<down>"},
+				PrevItemAlt:                       Keybinding{"k"},
+				NextItemAlt:                       Keybinding{"j"},
+				PrevPage:                          Keybinding{","},
+				NextPage:                          Keybinding{"."},
+				ScrollLeft:                        Keybinding{"H"},
+				ScrollRight:                       Keybinding{"L"},
+				GotoTop:                           Keybinding{"<"},
+				GotoBottom:                        Keybinding{">"},
+				GotoTopAlt:                        Keybinding{"<home>"},
+				GotoBottomAlt:                     Keybinding{"<end>"},
+				ToggleRangeSelect:                 Keybinding{"v"},
+				RangeSelectDown:                   Keybinding{"<shift+down>"},
+				RangeSelectUp:                     Keybinding{"<shift+up>"},
+				PrevBlock:                         Keybinding{"<left>"},
+				NextBlock:                         Keybinding{"<right>"},
+				PrevBlockAlt:                      Keybinding{"h"},
+				NextBlockAlt:                      Keybinding{"l"},
+				PrevBlockAlt2:                     Keybinding{"<backtab>"},
+				NextBlockAlt2:                     Keybinding{"<tab>"},
+				JumpToBlock:                       []Keybinding{{"1"}, {"2"}, {"3"}, {"4"}, {"5"}},
+				FocusMainView:                     Keybinding{"0"},
+				NextMatch:                         Keybinding{"n"},
+				PrevMatch:                         Keybinding{"N"},
+				StartSearch:                       Keybinding{"/"},
+				MoveWordLeft:                      Keybinding{platformKeyBinding(platform, map[string]string{"darwin": "<alt+left>"}, "<ctrl+left>")},
+				MoveWordRight:                     Keybinding{platformKeyBinding(platform, map[string]string{"darwin": "<alt+right>"}, "<ctrl+right>")},
+				BackspaceWord:                     Keybinding{platformKeyBinding(platform, map[string]string{"darwin": "<alt+backspace>"}, "<ctrl+backspace>")},
+				ForwardDeleteWord:                 Keybinding{platformKeyBinding(platform, map[string]string{"darwin": "<alt+delete>"}, "<ctrl+delete>")},
+				OptionMenu:                        Keybinding{"?"},
+				Select:                            Keybinding{"<space>"},
+				GoInto:                            Keybinding{"<enter>"},
+				Confirm:                           Keybinding{"<enter>"},
+				ConfirmMenu:                       Keybinding{"<enter>"},
+				ConfirmSuggestion:                 Keybinding{"<enter>"},
+				ConfirmInEditor:                   Keybinding{platformKeyBinding(platform, map[string]string{"darwin": "<meta+enter>"}, "<ctrl+enter>")},
+				ConfirmInEditorAlt:                Keybinding{"<ctrl+s>"},
+				Remove:                            Keybinding{"d"},
+				New:                               Keybinding{"n"},
+				NewWorktree:                       Keybinding{"w"},
+				Edit:                              Keybinding{"e"},
+				OpenFile:                          Keybinding{"o"},
+				OpenRecentRepos:                   Keybinding{"<ctrl+r>"},
+				ScrollUpMain:                      Keybinding{"<pgup>"},
+				ScrollDownMain:                    Keybinding{"<pgdown>"},
+				ScrollUpMainAlt1:                  Keybinding{"K"},
+				ScrollDownMainAlt1:                Keybinding{"J"},
+				ScrollUpMainAlt2:                  Keybinding{"<ctrl+u>"},
+				ScrollDownMainAlt2:                Keybinding{"<ctrl+d>"},
+				ExecuteShellCommand:               Keybinding{":"},
+				CreateRebaseOptionsMenu:           Keybinding{"m"},
+				Push:                              Keybinding{"P"},
+				Pull:                              Keybinding{"p"},
+				Refresh:                           Keybinding{"R"},
+				CreatePatchOptionsMenu:            Keybinding{"<ctrl+p>"},
+				NextTab:                           Keybinding{"]"},
+				PrevTab:                           Keybinding{"["},
+				NextScreenMode:                    Keybinding{"+"},
+				PrevScreenMode:                    Keybinding{"_"},
+				DecreaseSidePanelWidth:            Keybinding{"<shift+alt+left>"},
+				IncreaseSidePanelWidth:            Keybinding{"<shift+alt+right>"},
+				ResetSidePanelWidth:               Keybinding{"<shift+alt+=>"},
+				CycleDiffRenderers:                Keybinding{"|"},
+				CycleDiffRenderersReverse:         Keybinding{"\\"},
+				ToggleShowFinalVersion:            Keybinding{"<alt+\\>"},
+				Undo:                              Keybinding{"z"},
+				Redo:                              Keybinding{"Z"},
+				FilteringMenu:                     Keybinding{"<ctrl+s>"},
+				DiffingMenu:                       Keybinding{"W"},
+				DiffingMenuAlt:                    Keybinding{"<ctrl+e>"},
+				CopyToClipboard:                   Keybinding{"<ctrl+o>"},
+				SubmitEditorText:                  Keybinding{"<enter>"},
+				ExtrasMenu:                        Keybinding{"@"},
+				ToggleWhitespaceInDiffView:        Keybinding{"<ctrl+w>"},
+				IncreaseContextInDiffView:         Keybinding{"}"},
+				DecreaseContextInDiffView:         Keybinding{"{"},
+				ToggleContextInDiffView:           Keybinding{"<alt+shift+]>", "<alt+]>"},
+				IncreaseRenameSimilarityThreshold: Keybinding{")"},
+				DecreaseRenameSimilarityThreshold: Keybinding{"("},
+				OpenDiffTool:                      Keybinding{"<ctrl+t>"},
+				BrowseAllFilesAtCommit:            Keybinding{"E"},
+				EditConfig:                        Keybinding{"<alt+shift+c>"},
 			},
 			Status: KeybindingStatusConfig{
 				CheckForUpdate:             Keybinding{"u"},

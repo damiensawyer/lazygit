@@ -23,9 +23,9 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` R `` | 更新 | Gitの状態を更新します（`git status`、`git branch`などをバックグラウンドで実行してパネルの内容を更新します）。これは`git fetch`を実行しません。 |
 | `` + `` | 次の画面モード（通常/半分/全画面） |  |
 | `` _ `` | 前の画面モード |  |
-| `` <alt+shift+left> `` | Decrease half screen mode side panel width |  |
-| `` <alt+shift+right> `` | Increase half screen mode side panel width |  |
-| `` <alt+shift+=> `` | Reset half screen mode side panel width |  |
+| `` <alt+shift+left> `` | Decrease side panel width |  |
+| `` <alt+shift+right> `` | Increase side panel width |  |
+| `` <alt+shift+=> `` | Reset side panel width |  |
 | `` \| `` | Cycle diff renderers | Choose the next renderer in the list of configured diff renderers. |
 | `` \ `` | Cycle diff renderers (reverse) | Choose the previous renderer in the list of configured diff renderers. |
 | `` <alt+\> `` | Toggle showing final version | Show the full contents of each changed file in the main view, rather than a diff of it. Lets you move through the file list to read the files a change set touches, as they ended up, instead of only what changed in them. |

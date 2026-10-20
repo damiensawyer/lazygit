@@ -730,9 +730,9 @@ keybinding:
     prevTab: '['
     nextScreenMode: +
     prevScreenMode: _
-    decreaseHalfScreenModeSidePanelWidth: <shift+alt+left>
-    increaseHalfScreenModeSidePanelWidth: <shift+alt+right>
-    resetHalfScreenModeSidePanelWidth: <shift+alt+=>
+    decreaseSidePanelWidth: <shift+alt+left>
+    increaseSidePanelWidth: <shift+alt+right>
+    resetSidePanelWidth: <shift+alt+=>
     cycleDiffRenderers: '|'
     cycleDiffRenderersReverse: \
     toggleShowFinalVersion: <alt+\>

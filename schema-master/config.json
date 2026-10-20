@@ -3269,7 +3269,7 @@
           ],
           "default": "_"
         },
-        "decreaseHalfScreenModeSidePanelWidth": {
+        "decreaseSidePanelWidth": {
           "oneOf": [
             {
               "type": "string"
@@ -3283,7 +3283,7 @@
           ],
           "default": "\u003cshift+alt+left\u003e"
         },
-        "increaseHalfScreenModeSidePanelWidth": {
+        "increaseSidePanelWidth": {
           "oneOf": [
             {
               "type": "string"
@@ -3297,7 +3297,7 @@
           ],
           "default": "\u003cshift+alt+right\u003e"
         },
-        "resetHalfScreenModeSidePanelWidth": {
+        "resetSidePanelWidth": {
           "oneOf": [
             {
               "type": "string"
