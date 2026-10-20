@@ -11,6 +11,7 @@ import (
 	"github.com/jesseduffield/lazygit/pkg/config"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
 	"github.com/samber/lo"
+	"github.com/stretchr/testify/assert"
 )
 
 // contentHeights builds a ContentHeightForWindow function from a map of window
@@ -916,6 +917,63 @@ func TestGetWindowDimensions(t *testing.T) {
 				fmt.Println(output)
 				t.Errorf("Expected:\n%s\n\nGot:\n%s", expected, output)
 			}
+		})
+	}
+}
+
+func TestGetMidSectionWeights(t *testing.T) {
+	getDefaultArgs := func() WindowArrangementArgs {
+		return WindowArrangementArgs{
+			Width:         75,
+			Height:        30,
+			UserConfig:    config.GetDefaultConfig(),
+			CurrentWindow: "files",
+			ScreenMode:    types.SCREEN_NORMAL,
+		}
+	}
+
+	tests := []struct {
+		name       string
+		mutateArgs func(*WindowArrangementArgs)
+		sideWeight int
+		mainWeight int
+	}{
+		{
+			name:       "side panel width from config",
+			mutateArgs: func(args *WindowArrangementArgs) {},
+			sideWeight: 40,
+			mainWeight: 80,
+		},
+		{
+			name: "runtime side panel width takes precedence over config",
+			mutateArgs: func(args *WindowArrangementArgs) {
+				args.UserConfig.Gui.SidePanelWidth = 0.8
+				args.SidePanelWidth = 0.5
+			},
+			sideWeight: 60,
+			mainWeight: 60,
+		},
+		{
+			name: "half screen mode width takes precedence over both",
+			mutateArgs: func(args *WindowArrangementArgs) {
+				args.ScreenMode = types.SCREEN_HALF
+				args.UserConfig.Gui.SidePanelWidth = 0.8
+				args.SidePanelWidth = 0.2
+				args.HalfScreenModeSidePanelWidth = 0.5
+			},
+			sideWeight: 60,
+			mainWeight: 60,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			args := getDefaultArgs()
+			test.mutateArgs(&args)
+
+			sideWeight, mainWeight := getMidSectionWeights(args)
+			assert.Equal(t, test.sideWeight, sideWeight)
+			assert.Equal(t, test.mainWeight, mainWeight)
 		})
 	}
 }

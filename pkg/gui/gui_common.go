@@ -101,6 +101,14 @@ func (self *guiCommon) SaveAppStateAndLogError() {
 	}
 }
 
+func (self *guiCommon) SaveSidePanelWidth() {
+	repoPath := filepath.Join(self.gui.git.RepoPaths.RepoGitDirPath(), "lazygit.yml")
+	value := self.gui.State.SidePanelWidth
+	if err := self.gui.Config.SaveSidePanelWidth(repoPath, value); err != nil {
+		self.gui.Log.Errorf("error when saving side panel width: %v", err)
+	}
+}
+
 func (self *guiCommon) SaveHalfScreenModeSidePanelWidth() {
 	repoPath := filepath.Join(self.gui.git.RepoPaths.RepoGitDirPath(), "lazygit.yml")
 	value := self.gui.State.HalfScreenModeSidePanelWidth

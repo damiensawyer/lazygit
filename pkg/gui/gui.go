@@ -266,6 +266,8 @@ type GuiRepoState struct {
 
 	ScreenMode types.ScreenMode
 
+	SidePanelWidth float64
+
 	HalfScreenModeSidePanelWidth float64
 
 	CurrentPopupOpts *types.CreatePopupPanelOpts
@@ -325,6 +327,14 @@ func (self *GuiRepoState) GetScreenMode() types.ScreenMode {
 
 func (self *GuiRepoState) SetScreenMode(value types.ScreenMode) {
 	self.ScreenMode = value
+}
+
+func (self *GuiRepoState) GetSidePanelWidth() float64 {
+	return self.SidePanelWidth
+}
+
+func (self *GuiRepoState) SetSidePanelWidth(value float64) {
+	self.SidePanelWidth = value
 }
 
 func (self *GuiRepoState) GetHalfScreenModeSidePanelWidth() float64 {
@@ -639,7 +649,8 @@ func (gui *Gui) resetState(startArgs appTypes.StartArgs) types.Context {
 		gui.State.ViewsSetup = false
 
 		// The repo we're switching to may have a per-repo config with different
-		// half screen mode side panel width, so update it.
+		// side panel widths, so update them.
+		gui.State.SidePanelWidth = gui.UserConfig().Gui.SidePanelWidth
 		gui.State.HalfScreenModeSidePanelWidth = gui.UserConfig().Gui.HalfScreenModeSidePanelWidth
 
 		// The repo we're switching to may have a per-repo config with a different
@@ -680,6 +691,7 @@ func (gui *Gui) resetState(startArgs appTypes.StartArgs) types.Context {
 			MarkedBaseCommit: marked_base_commit.New(),
 		},
 		ScreenMode:                   initialScreenMode,
+		SidePanelWidth:               gui.UserConfig().Gui.SidePanelWidth,
 		HalfScreenModeSidePanelWidth: gui.UserConfig().Gui.HalfScreenModeSidePanelWidth,
 		// TODO: only use contexts from context manager
 		ContextMgr:  NewContextMgr(gui, contextTree),

@@ -95,6 +95,7 @@ type IGuiCommon interface {
 	GetAppState() *config.AppState
 	SaveAppState() error
 	SaveAppStateAndLogError()
+	SaveSidePanelWidth()
 	SaveHalfScreenModeSidePanelWidth()
 
 	// Runs the given function on the UI thread (this is for things like showing a popup asking a user for input).
@@ -464,6 +465,8 @@ type IRepoStateAccessor interface {
 	SetCurrentPopupOpts(*CreatePopupPanelOpts)
 	GetScreenMode() ScreenMode
 	SetScreenMode(ScreenMode)
+	GetSidePanelWidth() float64
+	SetSidePanelWidth(float64)
 	GetHalfScreenModeSidePanelWidth() float64
 	SetHalfScreenModeSidePanelWidth(float64)
 	InSearchPrompt() bool

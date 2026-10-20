@@ -63,6 +63,10 @@ type WindowArrangementArgs struct {
 	SplitMainPanel bool
 	// The current screen mode (normal, half, full)
 	ScreenMode types.ScreenMode
+	// The side panel width ratio used in normal screen mode.
+	// Takes precedence over UserConfig.Gui.SidePanelWidth when set to a
+	// non-zero value, allowing runtime adjustment.
+	SidePanelWidth float64
 	// The side panel width ratio used in half screen mode.
 	// Takes precedence over UserConfig.Gui.HalfScreenModeSidePanelWidth when
 	// set to a non-zero value, allowing runtime adjustment.
@@ -109,6 +113,7 @@ func (self *WindowArrangementHelper) GetWindowDimensions(informationStr string, 
 		},
 		SplitMainPanel:               repoState.GetSplitMainPanel(),
 		ScreenMode:                   repoState.GetScreenMode(),
+		SidePanelWidth:               repoState.GetSidePanelWidth(),
 		HalfScreenModeSidePanelWidth: repoState.GetHalfScreenModeSidePanelWidth(),
 		AppStatus:                    appStatus,
 		InformationStr:               informationStr,
@@ -254,6 +259,9 @@ func mainSectionChildren(args WindowArrangementArgs) []*boxlayout.Box {
 
 func getMidSectionWeights(args WindowArrangementArgs) (int, int) {
 	sidePanelWidthRatio := args.UserConfig.Gui.SidePanelWidth
+	if args.SidePanelWidth != 0 {
+		sidePanelWidthRatio = args.SidePanelWidth
+	}
 	// Using 120 so that the default of 0.3333 will remain consistent with previous behavior
 	const maxColumnCount = 120
 

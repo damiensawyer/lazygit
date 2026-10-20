@@ -6,12 +6,22 @@ import (
 )
 
 var SidePanelWidth = NewIntegrationTest(NewIntegrationTestArgs{
-	Description:  "Adjusting side panel width persists the setting",
+	Description:  "Adjusting side panel width in normal and half screen modes",
 	ExtraCmdArgs: []string{},
 	Skip:         false,
 	SetupConfig:  func(cfg *config.AppConfig) {},
 	SetupRepo:    func(shell *Shell) {},
 	Run: func(t *TestDriver, keys config.KeybindingConfig) {
+		// Adjust the side panel width in normal mode (0.3333 -> 0.28)
+		t.GlobalPress(keys.Universal.DecreaseSidePanelWidth)
+		t.ExpectToast(Contains("Side panel width: 0.28"))
+
+		t.GlobalPress(keys.Universal.IncreaseSidePanelWidth)
+		t.ExpectToast(Contains("Side panel width: 0.33"))
+
+		t.GlobalPress(keys.Universal.ResetSidePanelWidth)
+		t.ExpectToast(Contains("Reset side panel width"))
+
 		// Enter half screen mode (starts at 0.5 default)
 		t.GlobalPress(keys.Universal.NextScreenMode)
 		t.Views().Status().Content(Contains("master"))

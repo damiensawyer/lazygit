@@ -191,57 +191,88 @@ func (self *GlobalController) prevScreenMode() error {
 	return (&ScreenModeActions{c: self.c}).Prev()
 }
 
-func (self *GlobalController) decreaseSidePanelWidth() error {
-	repoState := self.c.State().GetRepoState()
-	if repoState.GetScreenMode() != types.SCREEN_HALF {
-		return nil
-	}
+const (
+	minSidePanelWidth = 0.1
+	maxSidePanelWidth = 0.9
+)
 
-	current := repoState.GetHalfScreenModeSidePanelWidth() - 0.05
-	if current < 0.1 {
-		current = 0.1
-	}
-	repoState.SetHalfScreenModeSidePanelWidth(current)
-	self.c.SaveHalfScreenModeSidePanelWidth()
-	self.c.Refresh(types.RefreshOptions{})
-	self.c.Toast(utils.ResolvePlaceholderString(
-		self.c.Tr.SidePanelWidthChanged,
-		map[string]string{"width": strconv.FormatFloat(current, 'f', 2, 64)},
-	))
-	return nil
+func (self *GlobalController) decreaseSidePanelWidth() error {
+	return self.adjustSidePanelWidth(-0.05)
 }
 
 func (self *GlobalController) increaseSidePanelWidth() error {
-	repoState := self.c.State().GetRepoState()
-	if repoState.GetScreenMode() != types.SCREEN_HALF {
+	return self.adjustSidePanelWidth(0.05)
+}
+
+func (self *GlobalController) adjustSidePanelWidth(delta float64) error {
+	setting, ok := self.sidePanelWidthSetting()
+	if !ok {
 		return nil
 	}
 
-	current := repoState.GetHalfScreenModeSidePanelWidth() + 0.05
-	if current > 0.9 {
-		current = 0.9
+	width := setting.current + delta
+	if width < minSidePanelWidth {
+		width = minSidePanelWidth
 	}
-	repoState.SetHalfScreenModeSidePanelWidth(current)
-	self.c.SaveHalfScreenModeSidePanelWidth()
+	if width > maxSidePanelWidth {
+		width = maxSidePanelWidth
+	}
+
+	setting.apply(width)
 	self.c.Refresh(types.RefreshOptions{})
 	self.c.Toast(utils.ResolvePlaceholderString(
 		self.c.Tr.SidePanelWidthChanged,
-		map[string]string{"width": strconv.FormatFloat(current, 'f', 2, 64)},
+		map[string]string{"width": strconv.FormatFloat(width, 'f', 2, 64)},
 	))
 	return nil
 }
 
 func (self *GlobalController) resetSidePanelWidth() error {
-	repoState := self.c.State().GetRepoState()
-	if repoState.GetScreenMode() != types.SCREEN_HALF {
+	setting, ok := self.sidePanelWidthSetting()
+	if !ok {
 		return nil
 	}
 
-	repoState.SetHalfScreenModeSidePanelWidth(0.5)
-	self.c.SaveHalfScreenModeSidePanelWidth()
+	setting.apply(setting.resetTo)
 	self.c.Refresh(types.RefreshOptions{})
 	self.c.Toast(self.c.Tr.ResetSidePanelWidth)
 	return nil
+}
+
+// sidePanelWidthSetting describes the adjustable side panel width for the
+// current screen mode: its current value, the value to restore on reset, and
+// how to persist a new value. There is no setting in full screen mode, where
+// the focused panel takes the entire screen.
+type sidePanelWidthSetting struct {
+	current float64
+	resetTo float64
+	apply   func(float64)
+}
+
+func (self *GlobalController) sidePanelWidthSetting() (sidePanelWidthSetting, bool) {
+	repoState := self.c.State().GetRepoState()
+	switch repoState.GetScreenMode() {
+	case types.SCREEN_NORMAL:
+		return sidePanelWidthSetting{
+			current: repoState.GetSidePanelWidth(),
+			resetTo: self.c.UserConfig().Gui.SidePanelWidth,
+			apply: func(width float64) {
+				repoState.SetSidePanelWidth(width)
+				self.c.SaveSidePanelWidth()
+			},
+		}, true
+	case types.SCREEN_HALF:
+		return sidePanelWidthSetting{
+			current: repoState.GetHalfScreenModeSidePanelWidth(),
+			resetTo: 0.5,
+			apply: func(width float64) {
+				repoState.SetHalfScreenModeSidePanelWidth(width)
+				self.c.SaveHalfScreenModeSidePanelWidth()
+			},
+		}, true
+	default:
+		return sidePanelWidthSetting{}, false
+	}
 }
 
 func (self *GlobalController) cycleDiffRenderers() error {

@@ -53,6 +53,9 @@ type AppConfigurer interface {
 
 	GetAppState() *AppState
 	SaveAppState() error
+	// SaveSidePanelWidth writes sidePanelWidth to the given per-repo config
+	// file path.
+	SaveSidePanelWidth(path string, value float64) error
 	// SaveHalfScreenModeSidePanelWidth writes halfScreenModeSidePanelWidth
 	// to the given per-repo config file path.
 	SaveHalfScreenModeSidePanelWidth(path string, value float64) error
@@ -794,6 +797,12 @@ func (c *AppConfig) SaveAppState() error {
 	}
 
 	return err
+}
+
+// SaveSidePanelWidth writes the side panel width to the given per-repo
+// config file path.
+func (c *AppConfig) SaveSidePanelWidth(path string, value float64) error {
+	return saveRepoGuiValue(path, "sidePanelWidth", value)
 }
 
 // SaveHalfScreenModeSidePanelWidth writes the half screen mode side panel
