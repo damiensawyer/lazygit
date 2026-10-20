@@ -1,6 +1,8 @@
 package config
 
 import (
+	"os"
+	"path/filepath"
 	"runtime"
 	"testing"
 
@@ -818,6 +820,60 @@ func TestPagerMigration(t *testing.T) {
 				assert.Equal(t, s.expected, string(actual))
 			}
 			assert.Equal(t, s.expectedChanges, changes.ToSliceFromOldest())
+		})
+	}
+}
+
+func TestSaveRepoGuiValue(t *testing.T) {
+	tests := []struct {
+		name     string
+		existing string // empty means the file doesn't exist
+		key      string
+		value    float64
+		expected string
+	}{
+		{
+			name:     "creates the file when it doesn't exist",
+			existing: "",
+			key:      "halfScreenModeSidePanelWidth",
+			value:    0.45,
+			expected: "gui:\n  halfScreenModeSidePanelWidth: 0.45\n",
+		},
+		{
+			name:     "creates the gui section when it doesn't exist",
+			existing: "git:\n  paging:\n    useConfig: true\n",
+			key:      "halfScreenModeSidePanelWidth",
+			value:    0.45,
+			expected: "git:\n  paging:\n    useConfig: true\ngui:\n  halfScreenModeSidePanelWidth: 0.45\n",
+		},
+		{
+			name:     "replaces the value when the key already exists",
+			existing: "gui:\n  halfScreenModeSidePanelWidth: 0.5\n",
+			key:      "halfScreenModeSidePanelWidth",
+			value:    0.6,
+			expected: "gui:\n  halfScreenModeSidePanelWidth: 0.6\n",
+		},
+		{
+			name:     "preserves other keys in the gui section",
+			existing: "gui:\n  sidePanelWidth: 0.28\n  colorizeCommitReferences: true\n",
+			key:      "halfScreenModeSidePanelWidth",
+			value:    0.45,
+			expected: "gui:\n  sidePanelWidth: 0.28\n  colorizeCommitReferences: true\n  halfScreenModeSidePanelWidth: 0.45\n",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), "lazygit.yml")
+			if test.existing != "" {
+				assert.NoError(t, os.WriteFile(path, []byte(test.existing), 0o644))
+			}
+
+			assert.NoError(t, saveRepoGuiValue(path, test.key, test.value))
+
+			actual, err := os.ReadFile(path)
+			assert.NoError(t, err)
+			assert.Equal(t, test.expected, string(actual))
 		})
 	}
 }

@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -798,13 +799,58 @@ func (c *AppConfig) SaveAppState() error {
 // SaveHalfScreenModeSidePanelWidth writes the half screen mode side panel
 // width to the given per-repo config file path.
 func (c *AppConfig) SaveHalfScreenModeSidePanelWidth(path string, value float64) error {
-	type repoGui struct {
-		HalfScreenModeSidePanelWidth float64 `yaml:"halfScreenModeSidePanelWidth"`
+	return saveRepoGuiValue(path, "halfScreenModeSidePanelWidth", value)
+}
+
+// saveRepoGuiValue sets the given key in the gui section of the per-repo
+// config file at path to the given value, preserving the file's other
+// content. The file is created if it doesn't exist yet.
+func saveRepoGuiValue(path string, key string, value float64) error {
+	rootNode := &yaml.Node{Kind: yaml.DocumentNode}
+	existing, err := os.ReadFile(path)
+	if err == nil && len(existing) > 0 {
+		if err := yaml.Unmarshal(existing, rootNode); err != nil {
+			return err
+		}
+	} else if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return err
 	}
-	type repoConfig struct {
-		Gui repoGui `yaml:"gui"`
+
+	var body *yaml.Node
+	if rootNode.Kind == yaml.DocumentNode && len(rootNode.Content) > 0 {
+		body = rootNode.Content[0]
+		if body.Kind != yaml.MappingNode {
+			return errors.New("top-level element of the config file is not a mapping")
+		}
+	} else {
+		body = &yaml.Node{Kind: yaml.MappingNode}
+		rootNode.Content = []*yaml.Node{body}
 	}
-	marshalled, err := yaml.Marshal(repoConfig{Gui: repoGui{HalfScreenModeSidePanelWidth: value}})
+
+	// Get the gui section, creating it if necessary
+	_, guiNode := yaml_utils.LookupKey(body, "gui")
+	if guiNode == nil {
+		guiNode = &yaml.Node{Kind: yaml.MappingNode}
+		body.Content = append(body.Content,
+			&yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: "gui"},
+			guiNode)
+	}
+	if guiNode.Kind != yaml.MappingNode {
+		return errors.New("the gui section of the config file is not a mapping")
+	}
+
+	// Set the key, replacing any existing value
+	valueString := strconv.FormatFloat(value, 'f', -1, 64)
+	if _, valueNode := yaml_utils.LookupKey(guiNode, key); valueNode == nil {
+		guiNode.Content = append(guiNode.Content,
+			&yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: key},
+			&yaml.Node{Kind: yaml.ScalarNode, Tag: "!!float", Value: valueString})
+	} else {
+		valueNode.Value = valueString
+		valueNode.Tag = "!!float"
+	}
+
+	marshalled, err := yaml_utils.YamlMarshal(rootNode)
 	if err != nil {
 		return err
 	}
