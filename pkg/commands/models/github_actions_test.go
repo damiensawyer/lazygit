@@ -99,6 +99,21 @@ func TestElapsed(t *testing.T) {
 		{"still going", start, time.Time{}, time.Hour},
 		{"truncated to seconds", start, start.Add(1999 * time.Millisecond), time.Second},
 		{"zero length", start, start, 0},
+		{
+			"ended before it started", start, start.Add(-time.Second),
+			/* EXPECTED:
+			0,
+			ACTUAL: */
+			time.Hour,
+		},
+		{
+			"started after now", now.Add(time.Second),
+			time.Time{},
+			/* EXPECTED:
+			0,
+			ACTUAL: */
+			-time.Second,
+		},
 	}
 
 	for _, s := range scenarios {
