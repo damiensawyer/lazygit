@@ -532,6 +532,7 @@ var tests = []*components.IntegrationTest{
 	main_view.ShowTheTabSwitchedToLast,
 	main_view.StageDeletedFile,
 	main_view.StageDiffLines,
+	main_view.StageDiffLinesInAFullFileDiff,
 	main_view.StageDiffLinesOfAPathWithASpace,
 	main_view.StageDiffLinesWithCustomPrefixes,
 	main_view.StageDiffLinesWithMnemonicPrefixes,
