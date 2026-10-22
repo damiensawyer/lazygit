@@ -248,11 +248,12 @@ func (self *GithubRunsController) filterMenu() error {
 // value/label pairs, and calls onSelect with the chosen value, which is empty
 // for "any".
 func (self *GithubRunsController) selectFilterValue(title string, anyLabel string, current string, values [][2]string, onSelect func(string) error) error {
-	items := []*types.MenuItem{{
+	items := make([]*types.MenuItem, 0, 1+len(values))
+	items = append(items, &types.MenuItem{
 		Label:   anyLabel,
 		Widget:  types.MakeMenuRadioButton(current == ""),
 		OnPress: func() error { return onSelect("") },
-	}}
+	})
 	for _, value := range values {
 		items = append(items, &types.MenuItem{
 			Label:   value[1],
