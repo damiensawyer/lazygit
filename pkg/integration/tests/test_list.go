@@ -157,6 +157,7 @@ var tests = []*components.IntegrationTest{
 	commit.OverviewModeFromLogMenuAndEscape,
 	commit.OverviewModeInFilteringMode,
 	commit.OverviewModeLoadsWholeHistory,
+	commit.OverviewModeRangeSelect,
 	commit.OverviewModeRefresh,
 	commit.OverviewModeSearch,
 	commit.OverviewModeWithNoVisibleCommits,
