@@ -1755,6 +1755,9 @@
         },
         "commitMessage": {
           "$ref": "#/$defs/KeybindingCommitMessageConfig"
+        },
+        "githubActions": {
+          "$ref": "#/$defs/KeybindingGithubActionsConfig"
         }
       },
       "additionalProperties": false,
@@ -2028,6 +2031,110 @@
             }
           ],
           "default": "="
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "KeybindingGithubActionsConfig": {
+      "properties": {
+        "openInBrowser": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "o"
+        },
+        "rerun": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "r"
+        },
+        "cancelRun": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "c"
+        },
+        "filterRuns": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "f"
+        },
+        "viewWorkflows": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "w"
+        },
+        "downloadArtifacts": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "a"
+        },
+        "copyToClipboard": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "y"
         }
       },
       "additionalProperties": false,
@@ -3611,6 +3718,20 @@
             }
           ],
           "default": "\u003calt+shift+c\u003e"
+        },
+        "openGithubActions": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "\u003cctrl+a\u003e"
         }
       },
       "additionalProperties": false,

@@ -37,6 +37,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+z> `` | Suspend the application |  |
 | `` <ctrl+w> `` | 공백문자를 Diff 뷰에서 표시 여부 전환 | Toggle whether or not whitespace changes are shown in the diff view.<br><br>The default can be changed in the config file with the key 'git.ignoreWhitespaceInDiffView'. |
 | `` <alt+shift+c> `` | 설정 파일 수정 | Open file in external editor. |
+| `` <ctrl+a> `` | View GitHub Actions | Show the workflow runs of this repository on GitHub, like `gh run list` does. The list refreshes itself while it is shown. |
 | `` z `` | 되돌리기 (reflog) (실험적) | The reflog will be used to determine what git command to run to undo the last git command. This does not include changes to the working tree; only commits are taken into consideration. |
 | `` Z `` | 다시 실행 (reflog) (실험적) | The reflog will be used to determine what git command to run to redo the last git command. This does not include changes to the working tree; only commits are taken into consideration. |
 
@@ -57,12 +58,40 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` ] `` | 이전 탭 |  |
 | `` [ `` | 다음 탭 |  |
 
+## Actions
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` <enter> `` | View jobs |  |
+| `` o `` | Open in browser |  |
+| `` r `` | Re-run | Re-run all jobs or the failed jobs of the run, optionally with debug logging enabled. |
+| `` c `` | Cancel run | Cancel the run. Force cancelling also stops jobs that would otherwise keep running, e.g. because of an always() condition. |
+| `` d `` | Delete run | Delete the run along with its logs and artifacts. |
+| `` f `` | Filter runs | Only show the runs of a branch, a workflow, a commit, with a status, or triggered by an event, like the flags of `gh run list` do. |
+| `` a `` | Download artifacts | Download and unpack the files the run uploaded, like `gh run download` does. |
+| `` y `` | Copy to clipboard |  |
+| `` w `` | Workflows | Run a workflow, enable or disable it, or show only its runs, like `gh workflow` does. |
+| `` R `` | 새로고침 |  |
+| `` / `` | Filter the current view by text |  |
+
 ## Input prompt
 
 | Key | Action | Info |
 |-----|--------|-------------|
 | `` <enter> `` | 확인 |  |
 | `` <esc> `` | 닫기/취소 |  |
+
+## Jobs
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` <enter> `` | View steps |  |
+| `` o `` | Open in browser |  |
+| `` r `` | Re-run job | Re-run this job, and the jobs that depend on it, optionally with debug logging enabled. |
+| `` e `` | Open log in editor |  |
+| `` y `` | Copy to clipboard |  |
+| `` R `` | 새로고침 |  |
+| `` / `` | Filter the current view by text |  |
 
 ## Reflog
 
@@ -123,6 +152,16 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` 0 `` | Focus main view |  |
 | `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | View selected item's files |  |
+| `` / `` | Filter the current view by text |  |
+
+## Steps
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` o `` | Open in browser |  |
+| `` e `` | Open log in editor | Open the whole log of the job in your editor, e.g. to search it, starting at the selected step. |
+| `` y `` | Log of this step |  |
+| `` R `` | 새로고침 |  |
 | `` / `` | Filter the current view by text |  |
 
 ## Sub-commits

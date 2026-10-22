@@ -220,10 +220,13 @@ type CreateMenuOptions struct {
 }
 
 type CreatePopupPanelOpts struct {
-	HasLoader              bool
-	Editable               bool
-	Title                  string
-	Prompt                 string
+	HasLoader bool
+	Editable  bool
+	Title     string
+	Prompt    string
+	// Text placed on the clipboard by the popup's copy-to-clipboard
+	// keybinding. When empty, that keybinding copies the popup's whole text.
+	CopyableText           string
 	HandleConfirm          func() error
 	HandleConfirmPrompt    func(string) error
 	HandleClose            func() error
@@ -237,8 +240,11 @@ type CreatePopupPanelOpts struct {
 }
 
 type ConfirmOpts struct {
-	Title               string
-	Prompt              string
+	Title  string
+	Prompt string
+	// Text placed on the clipboard by the popup's copy-to-clipboard
+	// keybinding. When empty, that keybinding copies the popup's whole text.
+	CopyableText        string
 	HandleConfirm       func() error
 	HandleClose         func() error
 	FindSuggestionsFunc func(string) []*Suggestion
@@ -368,6 +374,8 @@ type Model struct {
 	Worktrees             []*models.Worktree
 	PullRequests          []*models.GithubPullRequest
 	PullRequestsMap       map[string]*models.GithubPullRequest
+
+	GithubRuns []*models.GithubRun
 
 	// FilteredReflogCommits are the ones that appear in the reflog panel.
 	// When in filtering mode we only include the ones that match the given path

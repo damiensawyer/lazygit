@@ -37,6 +37,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+z> `` | Suspend the application |  |
 | `` <ctrl+w> `` | 空白表示の切り替え | Toggle whether or not whitespace changes are shown in the diff view.<br><br>The default can be changed in the config file with the key 'git.ignoreWhitespaceInDiffView'. |
 | `` <alt+shift+c> `` | 設定ファイルを編集 | 外部エディタでファイルを開きます。 |
+| `` <ctrl+a> `` | View GitHub Actions | Show the workflow runs of this repository on GitHub, like `gh run list` does. The list refreshes itself while it is shown. |
 | `` z `` | 元に戻す | 最後のgitコマンドを元に戻すために実行するgitコマンドを決定するためにreflogが使用されます。これにはワーキングツリーへの変更は含まれません。コミットのみが考慮されます。 |
 | `` Z `` | やり直す | 最後のgitコマンドをやり直すために実行するgitコマンドを決定するためにreflogが使用されます。これにはワーキングツリーへの変更は含まれません。コミットのみが考慮されます。 |
 
@@ -57,12 +58,40 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` ] `` | 次のタブ |  |
 | `` [ `` | 前のタブ |  |
 
+## Actions
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` <enter> `` | View jobs |  |
+| `` o `` | Open in browser |  |
+| `` r `` | Re-run | Re-run all jobs or the failed jobs of the run, optionally with debug logging enabled. |
+| `` c `` | Cancel run | Cancel the run. Force cancelling also stops jobs that would otherwise keep running, e.g. because of an always() condition. |
+| `` d `` | Delete run | Delete the run along with its logs and artifacts. |
+| `` f `` | Filter runs | Only show the runs of a branch, a workflow, a commit, with a status, or triggered by an event, like the flags of `gh run list` do. |
+| `` a `` | Download artifacts | Download and unpack the files the run uploaded, like `gh run download` does. |
+| `` y `` | Copy to clipboard |  |
+| `` w `` | Workflows | Run a workflow, enable or disable it, or show only its runs, like `gh workflow` does. |
+| `` R `` | 更新 |  |
+| `` / `` | 現在のビューをテキストでフィルタリング |  |
+
 ## Input prompt
 
 | Key | Action | Info |
 |-----|--------|-------------|
 | `` <enter> `` | 確認 |  |
 | `` <esc> `` | 閉じる/キャンセル |  |
+
+## Jobs
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` <enter> `` | View steps |  |
+| `` o `` | Open in browser |  |
+| `` r `` | Re-run job | Re-run this job, and the jobs that depend on it, optionally with debug logging enabled. |
+| `` e `` | Open log in editor |  |
+| `` y `` | Copy to clipboard |  |
+| `` R `` | 更新 |  |
+| `` / `` | 現在のビューをテキストでフィルタリング |  |
 
 ## Repo files
 
@@ -79,6 +108,16 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` - `` | すべてのファイルを折りたたむ | ファイルツリー内のすべてのディレクトリを折りたたみます |
 | `` = `` | すべてのファイルを展開 | ファイルツリー内のすべてのディレクトリを展開します |
 | `` 0 `` | メインビューにフォーカス |  |
+| `` / `` | 現在のビューをテキストでフィルタリング |  |
+
+## Steps
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` o `` | Open in browser |  |
+| `` e `` | Open log in editor | Open the whole log of the job in your editor, e.g. to search it, starting at the selected step. |
+| `` y `` | Log of this step |  |
+| `` R `` | 更新 |  |
 | `` / `` | 現在のビューをテキストでフィルタリング |  |
 
 ## コミット

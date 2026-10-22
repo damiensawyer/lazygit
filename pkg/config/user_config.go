@@ -468,6 +468,7 @@ type KeybindingConfig struct {
 	Main           KeybindingMainConfig           `yaml:"main"`
 	Submodules     KeybindingSubmodulesConfig     `yaml:"submodules"`
 	CommitMessage  KeybindingCommitMessageConfig  `yaml:"commitMessage"`
+	GithubActions  KeybindingGithubActionsConfig  `yaml:"githubActions"`
 }
 
 // damn looks like we have some inconsistencies here with -alt and -alt1
@@ -576,6 +577,7 @@ type KeybindingUniversalConfig struct {
 	OpenDiffTool                      Keybinding `yaml:"openDiffTool"`
 	BrowseAllFilesAtCommit            Keybinding `yaml:"browseAllFilesAtCommit"`
 	EditConfig                        Keybinding `yaml:"editConfig"`
+	OpenGithubActions                 Keybinding `yaml:"openGithubActions"`
 }
 
 type KeybindingStatusConfig struct {
@@ -669,6 +671,16 @@ type KeybindingAmendAttributeConfig struct {
 type KeybindingStashConfig struct {
 	PopStash    Keybinding `yaml:"popStash"`
 	RenameStash Keybinding `yaml:"renameStash"`
+}
+
+type KeybindingGithubActionsConfig struct {
+	OpenInBrowser     Keybinding `yaml:"openInBrowser"`
+	Rerun             Keybinding `yaml:"rerun"`
+	CancelRun         Keybinding `yaml:"cancelRun"`
+	FilterRuns        Keybinding `yaml:"filterRuns"`
+	ViewWorkflows     Keybinding `yaml:"viewWorkflows"`
+	DownloadArtifacts Keybinding `yaml:"downloadArtifacts"`
+	CopyToClipboard   Keybinding `yaml:"copyToClipboard"`
 }
 
 type KeybindingCommitFilesConfig struct {
@@ -1107,6 +1119,7 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 				OpenDiffTool:                      Keybinding{"<ctrl+t>"},
 				BrowseAllFilesAtCommit:            Keybinding{"E"},
 				EditConfig:                        Keybinding{"<alt+shift+c>"},
+				OpenGithubActions:                 Keybinding{"<ctrl+a>"},
 			},
 			Status: KeybindingStatusConfig{
 				CheckForUpdate:             Keybinding{"u"},
@@ -1197,6 +1210,15 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 			},
 			CommitFiles: KeybindingCommitFilesConfig{
 				CheckoutCommitFile: Keybinding{"c"},
+			},
+			GithubActions: KeybindingGithubActionsConfig{
+				OpenInBrowser:     Keybinding{"o"},
+				Rerun:             Keybinding{"r"},
+				CancelRun:         Keybinding{"c"},
+				FilterRuns:        Keybinding{"f"},
+				ViewWorkflows:     Keybinding{"w"},
+				DownloadArtifacts: Keybinding{"a"},
+				CopyToClipboard:   Keybinding{"y"},
 			},
 			RepoFiles: KeybindingRepoFilesConfig{
 				Restore:  Keybinding{"c"},

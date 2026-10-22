@@ -10,3 +10,4 @@
 * [Searching/Filtering](./Searching.md)
 * [Stacked Branches](./Stacked_Branches.md)
 * [Browsing All Files At Commit](./Browsing_All_Files_At_Commit.md)
+* [GitHub Actions](./GitHub_Actions.md)

@@ -37,6 +37,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+z> `` | Suspend the application |  |
 | `` <ctrl+w> `` | 切換是否在差異檢視中顯示空格變更 | Toggle whether or not whitespace changes are shown in the diff view.<br><br>The default can be changed in the config file with the key 'git.ignoreWhitespaceInDiffView'. |
 | `` <alt+shift+c> `` | 編輯設定檔案 | 使用外部編輯器開啟 |
+| `` <ctrl+a> `` | View GitHub Actions | Show the workflow runs of this repository on GitHub, like `gh run list` does. The list refreshes itself while it is shown. |
 | `` z `` | 復原 | 將使用 reflog 確任 git 指令以復原。這不包括工作區更改；只考慮提交。 |
 | `` Z `` | 取消復原 | 將使用 reflog 確任 git 指令以重作。這不包括工作區更改；只考慮提交。 |
 
@@ -57,12 +58,40 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` ] `` | 下一個索引標籤 |  |
 | `` [ `` | 上一個索引標籤 |  |
 
+## Actions
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` <enter> `` | View jobs |  |
+| `` o `` | Open in browser |  |
+| `` r `` | Re-run | Re-run all jobs or the failed jobs of the run, optionally with debug logging enabled. |
+| `` c `` | Cancel run | Cancel the run. Force cancelling also stops jobs that would otherwise keep running, e.g. because of an always() condition. |
+| `` d `` | Delete run | Delete the run along with its logs and artifacts. |
+| `` f `` | Filter runs | Only show the runs of a branch, a workflow, a commit, with a status, or triggered by an event, like the flags of `gh run list` do. |
+| `` a `` | Download artifacts | Download and unpack the files the run uploaded, like `gh run download` does. |
+| `` y `` | Copy to clipboard |  |
+| `` w `` | Workflows | Run a workflow, enable or disable it, or show only its runs, like `gh workflow` does. |
+| `` R `` | 重新整理 |  |
+| `` / `` | 搜尋 |  |
+
 ## Input prompt
 
 | Key | Action | Info |
 |-----|--------|-------------|
 | `` <enter> `` | 確認 |  |
 | `` <esc> `` | 關閉/取消 |  |
+
+## Jobs
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` <enter> `` | View steps |  |
+| `` o `` | Open in browser |  |
+| `` r `` | Re-run job | Re-run this job, and the jobs that depend on it, optionally with debug logging enabled. |
+| `` e `` | Open log in editor |  |
+| `` y `` | Copy to clipboard |  |
+| `` R `` | 重新整理 |  |
+| `` / `` | 搜尋 |  |
 
 ## Repo files
 
@@ -79,6 +108,16 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` - `` | Collapse all files | Collapse all directories in the files tree |
 | `` = `` | Expand all files | Expand all directories in the file tree |
 | `` 0 `` | Focus main view |  |
+| `` / `` | 搜尋 |  |
+
+## Steps
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` o `` | Open in browser |  |
+| `` e `` | Open log in editor | Open the whole log of the job in your editor, e.g. to search it, starting at the selected step. |
+| `` y `` | Log of this step |  |
+| `` R `` | 重新整理 |  |
 | `` / `` | 搜尋 |  |
 
 ## 主面板 (補丁生成)

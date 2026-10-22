@@ -37,6 +37,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+z> `` | 挂起应用程序 |  |
 | `` <ctrl+w> `` | 切换是否在差异视图中显示空白字符差异 | 切换是否在差异视图中显示空白字符更改。<br><br>默认值可在配置文件中通过键 'git.ignoreWhitespaceInDiffView' 更改。 |
 | `` <alt+shift+c> `` | 编辑配置文件 | 使用外部编辑器打开文件 |
+| `` <ctrl+a> `` | View GitHub Actions | Show the workflow runs of this repository on GitHub, like `gh run list` does. The list refreshes itself while it is shown. |
 | `` z `` | 撤销 | Reflog将用于确定运行哪个git命令来撤消最后一个git命令。这并不包括对工作树的更改，只考虑提交。 |
 | `` Z `` | 重做 | Reflog将用于确定运行哪个git命令来重做上一个git命令。这并不包括对工作树的更改，只考虑提交。 |
 
@@ -57,6 +58,34 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` ] `` | 下一个标签 |  |
 | `` [ `` | 上一个标签 |  |
 
+## Actions
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` <enter> `` | View jobs |  |
+| `` o `` | Open in browser |  |
+| `` r `` | Re-run | Re-run all jobs or the failed jobs of the run, optionally with debug logging enabled. |
+| `` c `` | Cancel run | Cancel the run. Force cancelling also stops jobs that would otherwise keep running, e.g. because of an always() condition. |
+| `` d `` | Delete run | Delete the run along with its logs and artifacts. |
+| `` f `` | Filter runs | Only show the runs of a branch, a workflow, a commit, with a status, or triggered by an event, like the flags of `gh run list` do. |
+| `` a `` | Download artifacts | Download and unpack the files the run uploaded, like `gh run download` does. |
+| `` y `` | Copy to clipboard |  |
+| `` w `` | Workflows | Run a workflow, enable or disable it, or show only its runs, like `gh workflow` does. |
+| `` R `` | 刷新 |  |
+| `` / `` | 通过文本过滤当前视图 |  |
+
+## Jobs
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` <enter> `` | View steps |  |
+| `` o `` | Open in browser |  |
+| `` r `` | Re-run job | Re-run this job, and the jobs that depend on it, optionally with debug logging enabled. |
+| `` e `` | Open log in editor |  |
+| `` y `` | Copy to clipboard |  |
+| `` R `` | 刷新 |  |
+| `` / `` | 通过文本过滤当前视图 |  |
+
 ## Repo files
 
 | Key | Action | Info |
@@ -72,6 +101,16 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` - `` | 折叠全部文件 | 折叠文件树中的全部目录 |
 | `` = `` | 展开全部文件 | 展开文件树中的全部目录 |
 | `` 0 `` | 聚焦主视图 |  |
+| `` / `` | 通过文本过滤当前视图 |  |
+
+## Steps
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` o `` | Open in browser |  |
+| `` e `` | Open log in editor | Open the whole log of the job in your editor, e.g. to search it, starting at the selected step. |
+| `` y `` | Log of this step |  |
+| `` R `` | 刷新 |  |
 | `` / `` | 通过文本过滤当前视图 |  |
 
 ## 子提交

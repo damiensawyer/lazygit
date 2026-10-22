@@ -753,6 +753,7 @@ keybinding:
     openDiffTool: <ctrl+t>
     browseAllFilesAtCommit: E
     editConfig: <alt+shift+c>
+    openGithubActions: <ctrl+a>
   status:
     checkForUpdate: u
     recentRepos: <enter>
@@ -851,6 +852,14 @@ keybinding:
     bulkMenu: b
   commitMessage:
     commitMenu: <ctrl+o>
+  githubActions:
+    openInBrowser: o
+    rerun: r
+    cancelRun: c
+    filterRuns: f
+    viewWorkflows: w
+    downloadArtifacts: a
+    copyToClipboard: "y"
 ```
 <!-- END CONFIG YAML -->
 

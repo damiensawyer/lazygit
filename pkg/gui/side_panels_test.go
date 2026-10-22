@@ -47,4 +47,7 @@ func TestAssignSidePanelWindowsCoversTransientContexts(t *testing.T) {
 	assert.Equal(t, "worktrees", contextTree.RemoteBranches.GetWindowName())
 	assert.Equal(t, "worktrees", contextTree.SubCommits.GetWindowName())
 	assert.Equal(t, "tags", contextTree.CommitFiles.GetWindowName())
+	assert.Equal(t, "tags", contextTree.GithubRuns.GetWindowName())
+	assert.Equal(t, "tags", contextTree.GithubJobs.GetWindowName())
+	assert.Equal(t, "tags", contextTree.GithubSteps.GetWindowName())
 }

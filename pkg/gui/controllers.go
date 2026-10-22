@@ -88,6 +88,8 @@ func (gui *Gui) resetHelpersAndControllers() {
 		modeHelper,
 	)
 
+	githubLoginHelper := helpers.NewGithubLoginHelper(helperCommon)
+
 	gui.helpers = &helpers.Helpers{
 		Refs:            refsHelper,
 		Host:            helpers.NewHostHelper(helperCommon),
@@ -130,6 +132,13 @@ func (gui *Gui) resetHelpersAndControllers() {
 		Worktree:     worktreeHelper,
 		SubCommits:   helpers.NewSubCommitsHelper(helperCommon, refreshHelper),
 		FinalVersion: helpers.NewFinalVersionHelper(helperCommon),
+		GithubLogin:  githubLoginHelper,
+		GithubActions: helpers.NewGithubActionsHelper(
+			helperCommon,
+			windowHelper,
+			githubLoginHelper,
+			gui.githubTokens,
+		),
 	}
 
 	gui.CustomCommandsClient = custom_commands.NewClient(
@@ -190,6 +199,9 @@ func (gui *Gui) resetHelpersAndControllers() {
 	snakeController := controllers.NewSnakeController(common)
 	reflogCommitsController := controllers.NewReflogCommitsController(common)
 	subCommitsController := controllers.NewSubCommitsController(common)
+	githubRunsController := controllers.NewGithubRunsController(common)
+	githubJobsController := controllers.NewGithubJobsController(common)
+	githubStepsController := controllers.NewGithubStepsController(common)
 	statusController := controllers.NewStatusController(common)
 	commandLogController := controllers.NewCommandLogController(common)
 	confirmationController := controllers.NewConfirmationController(common)
@@ -225,6 +237,9 @@ func (gui *Gui) resetHelpersAndControllers() {
 		gui.State.Contexts.RepoFiles,
 		gui.State.Contexts.SubCommits,
 		gui.State.Contexts.Stash,
+		gui.State.Contexts.GithubRuns,
+		gui.State.Contexts.GithubJobs,
+		gui.State.Contexts.GithubSteps,
 	} {
 		controllers.AttachControllers(context, sideWindowControllerFactory.Create(context))
 	}
@@ -377,6 +392,18 @@ func (gui *Gui) resetHelpersAndControllers() {
 
 	controllers.AttachControllers(gui.State.Contexts.Stash,
 		stashController,
+	)
+
+	controllers.AttachControllers(gui.State.Contexts.GithubRuns,
+		githubRunsController,
+	)
+
+	controllers.AttachControllers(gui.State.Contexts.GithubJobs,
+		githubJobsController,
+	)
+
+	controllers.AttachControllers(gui.State.Contexts.GithubSteps,
+		githubStepsController,
 	)
 
 	controllers.AttachControllers(gui.State.Contexts.Menu,

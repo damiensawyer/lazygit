@@ -37,6 +37,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+z> `` | Suspender a aplicação |  |
 | `` <ctrl+w> `` | Toggle whitespace | Toggle whether or not whitespace changes are shown in the diff view.<br><br>The default can be changed in the config file with the key 'git.ignoreWhitespaceInDiffView'. |
 | `` <alt+shift+c> `` | Editar arquivo de configuração | Abrir arquivo no editor externo. |
+| `` <ctrl+a> `` | View GitHub Actions | Show the workflow runs of this repository on GitHub, like `gh run list` does. The list refreshes itself while it is shown. |
 | `` z `` | Desfazer | O reflog será usado para determinar qual comando git para executar para desfazer o último comando git. Isto não inclui mudanças na árvore de trabalho; apenas compromissos são tidos em consideração. |
 | `` Z `` | Refazer | O reflog será usado para determinar qual comando git para executar para refazer o último comando git. Isto não inclui mudanças na árvore de trabalho; apenas compromissos são tidos em consideração. |
 
@@ -56,6 +57,22 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` L `` | Scroll para a direita |  |
 | `` ] `` | Próxima aba |  |
 | `` [ `` | Aba anterior |  |
+
+## Actions
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` <enter> `` | View jobs |  |
+| `` o `` | Open in browser |  |
+| `` r `` | Re-run | Re-run all jobs or the failed jobs of the run, optionally with debug logging enabled. |
+| `` c `` | Cancel run | Cancel the run. Force cancelling also stops jobs that would otherwise keep running, e.g. because of an always() condition. |
+| `` d `` | Delete run | Delete the run along with its logs and artifacts. |
+| `` f `` | Filter runs | Only show the runs of a branch, a workflow, a commit, with a status, or triggered by an event, like the flags of `gh run list` do. |
+| `` a `` | Download artifacts | Download and unpack the files the run uploaded, like `gh run download` does. |
+| `` y `` | Copy to clipboard |  |
+| `` w `` | Workflows | Run a workflow, enable or disable it, or show only its runs, like `gh workflow` does. |
+| `` R `` | Atualizar |  |
+| `` / `` | Filtrar a visualização atual por texto |  |
 
 ## Arquivos
 
@@ -230,6 +247,18 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <enter> `` | Confirmar |  |
 | `` <esc> `` | Fechar/Cancelar |  |
 
+## Jobs
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` <enter> `` | View steps |  |
+| `` o `` | Open in browser |  |
+| `` r `` | Re-run job | Re-run this job, and the jobs that depend on it, optionally with debug logging enabled. |
+| `` e `` | Open log in editor |  |
+| `` y `` | Copy to clipboard |  |
+| `` R `` | Atualizar |  |
+| `` / `` | Filtrar a visualização atual por texto |  |
+
 ## Menu
 
 | Key | Action | Info |
@@ -393,6 +422,16 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` a `` | Mostrar/ciclo todos os logs de filiais |  |
 | `` A `` | Show/cycle all branch logs (reverse) |  |
 | `` 0 `` | Focar visualização principal |  |
+
+## Steps
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` o `` | Open in browser |  |
+| `` e `` | Open log in editor | Open the whole log of the job in your editor, e.g. to search it, starting at the selected step. |
+| `` y `` | Log of this step |  |
+| `` R `` | Atualizar |  |
+| `` / `` | Filtrar a visualização atual por texto |  |
 
 ## Sub-commits
 

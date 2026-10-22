@@ -71,6 +71,8 @@ type Gui struct {
 
 	diffRendererConfig *config.DiffRendererConfigManager
 
+	githubTokens *helpers.GithubTokens
+
 	CustomCommandsClient *custom_commands.Client
 
 	// this is a mapping of repos to gui states, so that we can restore the original
@@ -835,6 +837,7 @@ func NewGui(
 		Config:               configurer,
 		Updater:              updater,
 		statusManager:        status.NewStatusManager(),
+		githubTokens:         &helpers.GithubTokens{},
 		viewBufferManagerMap: map[string]*tasks.ViewBufferManager{},
 		viewPtmxMap:          map[string]oscommands.Pty{},
 		showRecentRepos:      showRecentRepos,

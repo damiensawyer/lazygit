@@ -134,4 +134,11 @@ func (gui *Gui) assignSidePanelWindows(contextTree *context.ContextTree) {
 	contextTree.RemoteBranches.SetWindowName(contextTree.Branches.GetWindowName())
 	contextTree.SubCommits.SetWindowName(contextTree.Branches.GetWindowName())
 	contextTree.CommitFiles.SetWindowName(contextTree.LocalCommits.GetWindowName())
+
+	// The GitHub Actions views aren't drilled into from any particular panel,
+	// so they always take over the window hosting commits, which is the
+	// biggest one in the default layout.
+	contextTree.GithubRuns.SetWindowName(contextTree.LocalCommits.GetWindowName())
+	contextTree.GithubJobs.SetWindowName(contextTree.LocalCommits.GetWindowName())
+	contextTree.GithubSteps.SetWindowName(contextTree.LocalCommits.GetWindowName())
 }

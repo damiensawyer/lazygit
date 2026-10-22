@@ -1007,6 +1007,7 @@ type TranslationSet struct {
 	Actions                                  Actions
 	Bisect                                   Bisect
 	Log                                      Log
+	GithubActions                            GithubActions
 	BreakingChangesTitle                     string
 	BreakingChangesMessage                   string
 	BreakingChangesByVersion                 map[string]string
@@ -1050,6 +1051,158 @@ type Log struct {
 	DroppingStash            string
 	PoppingStash             string
 	DeletingBranch           string
+}
+
+type GithubActions struct {
+	LoginTitle                         string
+	LoginPrompt                        string
+	LoginWithBrowser                   string
+	LoginWithToken                     string
+	LoginWithTokenTooltip              string
+	RequestingLoginCode                string
+	DeviceLoginTitle                   string
+	DeviceLoginPrompt                  string
+	WaitingForBrowserLogin             string
+	PasteTokenTitle                    string
+	CheckingToken                      string
+	LoggedIn                           string
+	LoggedInButNotStored               string
+	LoginFailed                        string
+	JobsSectionTitle                   string
+	LoadingJobs                        string
+	NoJobs                             string
+	AnnotationsSectionTitle            string
+	RunTriggered                       string
+	RunAttempt                         string
+	RunsTitle                          string
+	RunsTitleForRepo                   string
+	LoadingRuns                        string
+	NoGithubRemote                     string
+	SelectRepository                   string
+	RepoNotFound                       string
+	NoRuns                             string
+	OpenGithubActions                  string
+	OpenGithubActionsTooltip           string
+	OpenRunInBrowser                   string
+	RunMainTitle                       string
+	JobsTitle                          string
+	JobMainTitle                       string
+	StepsSectionTitle                  string
+	LogSectionTitle                    string
+	FailedStepsLogSectionTitle         string
+	LogNotAvailableYet                 string
+	LoadingLog                         string
+	RanOn                              string
+	ViewJobs                           string
+	OpenJobInBrowser                   string
+	JobsTitleForRun                    string
+	StepsTitleForJob                   string
+	StepMainTitle                      string
+	ViewSteps                          string
+	NoSteps                            string
+	NoLogForStep                       string
+	Rerun                              string
+	RerunTooltip                       string
+	RerunMenuTitle                     string
+	RerunAllJobs                       string
+	RerunFailedJobs                    string
+	RerunAllJobsWithDebug              string
+	RerunFailedJobsWithDebug           string
+	RerunJob                           string
+	RerunJobTooltip                    string
+	RerunJobMenuTitle                  string
+	RerunThisJob                       string
+	RerunThisJobWithDebug              string
+	RequestingRerun                    string
+	RerunRequested                     string
+	RunStillInProgress                 string
+	RunNotInProgress                   string
+	NoFailedJobs                       string
+	CancelRun                          string
+	CancelRunTooltip                   string
+	CancelRunMenuTitle                 string
+	ForceCancelRun                     string
+	CancellingRun                      string
+	CancelRequested                    string
+	DeleteRun                          string
+	DeleteRunTooltip                   string
+	DeleteRunTitle                     string
+	DeleteRunPrompt                    string
+	DeletingRun                        string
+	RunDeleted                         string
+	LoadingWorkflows                   string
+	FilterDescriptionWorkflow          string
+	FilterDescriptionBranch            string
+	FilterDescriptionStatus            string
+	FilterDescriptionEvent             string
+	FilterDescriptionCommit            string
+	FilterRuns                         string
+	FilterRunsTooltip                  string
+	FilterByCurrentBranch              string
+	FilterByBranch                     string
+	FilterBranchPrompt                 string
+	FilterByStatus                     string
+	FilterByWorkflow                   string
+	FilterByEvent                      string
+	FilterBySelectedCommit             string
+	NoCommitSelected                   string
+	ClearRunsFilter                    string
+	AnyStatus                          string
+	AnyWorkflow                        string
+	AnyEvent                           string
+	StatusFailure                      string
+	StatusSuccess                      string
+	StatusInProgress                   string
+	StatusQueued                       string
+	StatusCancelled                    string
+	StatusActionRequired               string
+	NotOnABranch                       string
+	NoRunsFilter                       string
+	Workflows                          string
+	WorkflowsTooltip                   string
+	WorkflowDisabled                   string
+	RunWorkflow                        string
+	RunWorkflowTooltip                 string
+	RunWorkflowRefPrompt               string
+	LoadingWorkflow                    string
+	NotDispatchable                    string
+	WorkflowInputPrompt                string
+	WorkflowInputPromptWithDescription string
+	StartingWorkflow                   string
+	WorkflowStarted                    string
+	ShowWorkflowRuns                   string
+	EnableWorkflow                     string
+	DisableWorkflow                    string
+	DisableWorkflowTooltip             string
+	EnablingWorkflow                   string
+	DisablingWorkflow                  string
+	WorkflowEnabled                    string
+	WorkflowDisabledToast              string
+	EditWorkflowFile                   string
+	WorkflowFileNotInWorktree          string
+	OpenWorkflowInBrowser              string
+	DownloadArtifacts                  string
+	DownloadArtifactsTooltip           string
+	LoadingArtifacts                   string
+	NoArtifacts                        string
+	ArtifactExpired                    string
+	ArtifactHasExpired                 string
+	DownloadAllArtifacts               string
+	DownloadArtifactPrompt             string
+	DownloadingArtifacts               string
+	ArtifactsDownloaded                string
+	OpenLogInEditor                    string
+	OpenLogInEditorTooltip             string
+	CopyToClipboard                    string
+	CopyRunUrl                         string
+	CopyJobUrl                         string
+	CopyRunId                          string
+	CopyJobId                          string
+	CopyCommitHash                     string
+	CopyBranchName                     string
+	CopyStepLog                        string
+	CopyJobLog                         string
+	CopiedToClipboard                  string
 }
 
 type Actions struct {
@@ -2374,6 +2527,157 @@ func EnglishTranslationSet() *TranslationSet {
 			DroppingStash:            "Dropping stash %s",
 			PoppingStash:             "Popping stash %s",
 			DeletingBranch:           "Deleting branch '{{.branchName}}' (was {{.hash}})",
+		},
+		GithubActions: GithubActions{
+			LoginTitle:                         "Log in to {{.host}}",
+			LoginPrompt:                        "Lazygit needs a GitHub token to show this repository's Actions. It is stored in the GitHub CLI's config, so gh will use it too.",
+			LoginWithBrowser:                   "Log in with a web browser",
+			LoginWithToken:                     "Paste an authentication token",
+			LoginWithTokenTooltip:              "Create a personal access token at https://github.com/settings/tokens. A fine-grained token needs read access to Actions and contents; to re-run, cancel and dispatch workflows it also needs write access to Actions.",
+			RequestingLoginCode:                "Requesting login code",
+			DeviceLoginTitle:                   "Log in to GitHub",
+			DeviceLoginPrompt:                  "Your one-time code is {{.code}}\n\nPress enter to copy it and open {{.url}} in your browser, then paste it there.",
+			WaitingForBrowserLogin:             "Waiting for login in browser",
+			PasteTokenTitle:                    "GitHub token for {{.host}}",
+			CheckingToken:                      "Checking token",
+			LoggedIn:                           "Logged in to GitHub as {{.username}}",
+			LoggedInButNotStored:               "Logged in to GitHub as {{.username}}, but the token couldn't be saved for next time: {{.error}}",
+			LoginFailed:                        "GitHub login failed: {{.error}}",
+			JobsSectionTitle:                   "Jobs",
+			LoadingJobs:                        "Loading jobs…",
+			NoJobs:                             "This run has no jobs",
+			AnnotationsSectionTitle:            "Annotations",
+			RunTriggered:                       "Triggered via {{.event}} by {{.actor}} {{.ago}} ago",
+			RunAttempt:                         "attempt {{.attempt}}",
+			RunsTitle:                          "Actions",
+			RunsTitleForRepo:                   "Actions · {{.repo}}",
+			LoadingRuns:                        "Loading GitHub Actions runs",
+			NoGithubRemote:                     "This repository has no GitHub remote",
+			SelectRepository:                   "Select the repository whose Actions to show",
+			RepoNotFound:                       "Repository {{.repo}} not found on GitHub, or your token has no access to it",
+			NoRuns:                             "No workflow runs",
+			OpenGithubActions:                  "View GitHub Actions",
+			OpenGithubActionsTooltip:           "Show the workflow runs of this repository on GitHub, like `gh run list` does. The list refreshes itself while it is shown.",
+			OpenRunInBrowser:                   "Open in browser",
+			RunMainTitle:                       "Run",
+			JobsTitle:                          "Jobs",
+			JobMainTitle:                       "Job",
+			StepsSectionTitle:                  "Steps",
+			LogSectionTitle:                    "Log",
+			FailedStepsLogSectionTitle:         "Log of failed steps",
+			LogNotAvailableYet:                 "The log will be available once the job has completed",
+			LoadingLog:                         "Loading log…",
+			RanOn:                              "Ran on {{.runner}} ({{.labels}})",
+			ViewJobs:                           "View jobs",
+			OpenJobInBrowser:                   "Open in browser",
+			JobsTitleForRun:                    "Jobs · {{.run}}",
+			StepsTitleForJob:                   "Steps · {{.job}}",
+			StepMainTitle:                      "Step",
+			ViewSteps:                          "View steps",
+			NoSteps:                            "This job has no steps",
+			NoLogForStep:                       "This step logged nothing",
+			Rerun:                              "Re-run",
+			RerunTooltip:                       "Re-run all jobs or the failed jobs of the run, optionally with debug logging enabled.",
+			RerunMenuTitle:                     "Re-run {{.workflow}} #{{.number}}",
+			RerunAllJobs:                       "Re-run all jobs",
+			RerunFailedJobs:                    "Re-run failed jobs",
+			RerunAllJobsWithDebug:              "Re-run all jobs with debug logging",
+			RerunFailedJobsWithDebug:           "Re-run failed jobs with debug logging",
+			RerunJob:                           "Re-run job",
+			RerunJobTooltip:                    "Re-run this job, and the jobs that depend on it, optionally with debug logging enabled.",
+			RerunJobMenuTitle:                  "Re-run {{.job}}",
+			RerunThisJob:                       "Re-run this job",
+			RerunThisJobWithDebug:              "Re-run this job with debug logging",
+			RequestingRerun:                    "Requesting re-run",
+			RerunRequested:                     "Re-run requested",
+			RunStillInProgress:                 "The run is still in progress",
+			RunNotInProgress:                   "The run has already completed",
+			NoFailedJobs:                       "The run has no failed jobs",
+			CancelRun:                          "Cancel run",
+			CancelRunTooltip:                   "Cancel the run. Force cancelling also stops jobs that would otherwise keep running, e.g. because of an always() condition.",
+			CancelRunMenuTitle:                 "Cancel {{.workflow}} #{{.number}}",
+			ForceCancelRun:                     "Force cancel run",
+			CancellingRun:                      "Cancelling run",
+			CancelRequested:                    "Cancellation requested",
+			DeleteRun:                          "Delete run",
+			DeleteRunTooltip:                   "Delete the run along with its logs and artifacts.",
+			DeleteRunTitle:                     "Delete run",
+			DeleteRunPrompt:                    "Delete {{.workflow}} #{{.number}} ({{.title}}) along with its logs and artifacts? This cannot be undone.",
+			DeletingRun:                        "Deleting run",
+			RunDeleted:                         "Run deleted",
+			LoadingWorkflows:                   "Loading workflows",
+			FilterDescriptionWorkflow:          "{{.value}}",
+			FilterDescriptionBranch:            "branch {{.value}}",
+			FilterDescriptionStatus:            "{{.value}}",
+			FilterDescriptionEvent:             "on {{.value}}",
+			FilterDescriptionCommit:            "commit {{.value}}",
+			FilterRuns:                         "Filter runs",
+			FilterRunsTooltip:                  "Only show the runs of a branch, a workflow, a commit, with a status, or triggered by an event, like the flags of `gh run list` do.",
+			FilterByCurrentBranch:              "Runs on the current branch ({{.branch}})",
+			FilterByBranch:                     "Runs on branch",
+			FilterBranchPrompt:                 "Branch",
+			FilterByStatus:                     "Runs with status",
+			FilterByWorkflow:                   "Runs of workflow",
+			FilterByEvent:                      "Runs triggered by",
+			FilterBySelectedCommit:             "Runs for the commit selected in the commits panel ({{.hash}})",
+			NoCommitSelected:                   "No commit is selected in the commits panel",
+			ClearRunsFilter:                    "Show all runs",
+			AnyStatus:                          "Any status",
+			AnyWorkflow:                        "Any workflow",
+			AnyEvent:                           "Any event",
+			StatusFailure:                      "Failed",
+			StatusSuccess:                      "Succeeded",
+			StatusInProgress:                   "In progress",
+			StatusQueued:                       "Queued",
+			StatusCancelled:                    "Cancelled",
+			StatusActionRequired:               "Waiting for approval",
+			NotOnABranch:                       "HEAD is detached, so there is no current branch",
+			NoRunsFilter:                       "The runs aren't filtered",
+			Workflows:                          "Workflows",
+			WorkflowsTooltip:                   "Run a workflow, enable or disable it, or show only its runs, like `gh workflow` does.",
+			WorkflowDisabled:                   "disabled",
+			RunWorkflow:                        "Run workflow",
+			RunWorkflowTooltip:                 "Trigger the workflow on a branch or tag of your choice, asking for its inputs, like `gh workflow run` does. Only workflows with a workflow_dispatch trigger can be run this way.",
+			RunWorkflowRefPrompt:               "Run {{.workflow}} on branch or tag",
+			LoadingWorkflow:                    "Loading workflow",
+			NotDispatchable:                    "{{.workflow}} can't be run manually: it has no workflow_dispatch trigger",
+			WorkflowInputPrompt:                "{{.name}}",
+			WorkflowInputPromptWithDescription: "{{.name}}: {{.description}}",
+			StartingWorkflow:                   "Starting workflow",
+			WorkflowStarted:                    "Workflow run requested",
+			ShowWorkflowRuns:                   "Show only its runs",
+			EnableWorkflow:                     "Enable workflow",
+			DisableWorkflow:                    "Disable workflow",
+			DisableWorkflowTooltip:             "A disabled workflow doesn't run, whatever triggers it, until it is enabled again.",
+			EnablingWorkflow:                   "Enabling workflow",
+			DisablingWorkflow:                  "Disabling workflow",
+			WorkflowEnabled:                    "Workflow enabled",
+			WorkflowDisabledToast:              "Workflow disabled",
+			EditWorkflowFile:                   "Edit workflow file",
+			WorkflowFileNotInWorktree:          "{{.path}} doesn't exist in the working tree",
+			OpenWorkflowInBrowser:              "Open in browser",
+			DownloadArtifacts:                  "Download artifacts",
+			DownloadArtifactsTooltip:           "Download and unpack the files the run uploaded, like `gh run download` does.",
+			LoadingArtifacts:                   "Loading artifacts",
+			NoArtifacts:                        "The run has no artifacts",
+			ArtifactExpired:                    "expired",
+			ArtifactHasExpired:                 "The artifact has expired",
+			DownloadAllArtifacts:               "Download all",
+			DownloadArtifactPrompt:             "Download to directory",
+			DownloadingArtifacts:               "Downloading artifacts",
+			ArtifactsDownloaded:                "Downloaded to {{.path}}",
+			OpenLogInEditor:                    "Open log in editor",
+			OpenLogInEditorTooltip:             "Open the whole log of the job in your editor, e.g. to search it, starting at the selected step.",
+			CopyToClipboard:                    "Copy to clipboard",
+			CopyRunUrl:                         "Run URL",
+			CopyJobUrl:                         "Job URL",
+			CopyRunId:                          "Run ID",
+			CopyJobId:                          "Job ID",
+			CopyCommitHash:                     "Commit hash",
+			CopyBranchName:                     "Branch name",
+			CopyStepLog:                        "Log of this step",
+			CopyJobLog:                         "Log",
+			CopiedToClipboard:                  "{{.what}} copied to clipboard",
 		},
 		BreakingChangesTitle: "Breaking Changes",
 		BreakingChangesMessage: `You are updating to a new version of lazygit which contains breaking changes. Please review the notes below and update your configuration if necessary.

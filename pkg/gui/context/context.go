@@ -23,6 +23,9 @@ const (
 	COMMIT_FILES_CONTEXT_KEY             types.ContextKey = "commitFiles"
 	REPO_FILES_CONTEXT_KEY               types.ContextKey = "repoFiles"
 	STASH_CONTEXT_KEY                    types.ContextKey = "stash"
+	GITHUB_RUNS_CONTEXT_KEY              types.ContextKey = "githubRuns"
+	GITHUB_JOBS_CONTEXT_KEY              types.ContextKey = "githubJobs"
+	GITHUB_STEPS_CONTEXT_KEY             types.ContextKey = "githubSteps"
 	NORMAL_MAIN_CONTEXT_KEY              types.ContextKey = "normal"
 	NORMAL_SECONDARY_CONTEXT_KEY         types.ContextKey = "normalSecondary"
 	STAGING_MAIN_CONTEXT_KEY             types.ContextKey = "staging"
@@ -66,6 +69,9 @@ var AllContextKeys = []types.ContextKey{
 	COMMIT_FILES_CONTEXT_KEY,
 	REPO_FILES_CONTEXT_KEY,
 	STASH_CONTEXT_KEY,
+	GITHUB_RUNS_CONTEXT_KEY,
+	GITHUB_JOBS_CONTEXT_KEY,
+	GITHUB_STEPS_CONTEXT_KEY,
 	NORMAL_MAIN_CONTEXT_KEY,
 	NORMAL_SECONDARY_CONTEXT_KEY,
 	STAGING_MAIN_CONTEXT_KEY,
@@ -102,6 +108,9 @@ type ContextTree struct {
 	ReflogCommits               *ReflogCommitsContext
 	SubCommits                  *SubCommitsContext
 	Stash                       *StashContext
+	GithubRuns                  *GithubRunsContext
+	GithubJobs                  *GithubJobsContext
+	GithubSteps                 *GithubStepsContext
 	Suggestions                 *SuggestionsContext
 	Normal                      *MainContext
 	NormalSecondary             *MainContext
@@ -146,6 +155,9 @@ func (self *ContextTree) Flatten() []types.Context {
 		self.ReflogCommits,
 		self.LocalCommits,
 		self.Stash,
+		self.GithubRuns,
+		self.GithubJobs,
+		self.GithubSteps,
 		self.Menu,
 		self.Confirmation,
 		self.Prompt,

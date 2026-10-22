@@ -163,6 +163,12 @@ func (self *GlobalController) GetKeybindings(opts types.KeybindingsOpts) []*type
 			Description: self.c.Tr.EditConfig,
 			Tooltip:     self.c.Tr.EditFileTooltip,
 		},
+		{
+			Keys:        opts.GetKeys(opts.Config.Universal.OpenGithubActions),
+			Handler:     opts.Guards.NoPopupPanel(self.c.Helpers().GithubActions.Open),
+			Description: self.c.Tr.GithubActions.OpenGithubActions,
+			Tooltip:     self.c.Tr.GithubActions.OpenGithubActionsTooltip,
+		},
 	}
 }
 
