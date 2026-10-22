@@ -52,7 +52,7 @@ func FormatGithubDuration(d time.Duration) string {
 
 func GetGithubRunListDisplayStrings(runs []*models.GithubRun, fullDescription bool, now time.Time) [][]string {
 	return lo.Map(runs, func(run *models.GithubRun, _ int) []string {
-		age := style.FgBlue.Sprint(utils.UnixToTimeAgo(run.CreatedAt.Unix()))
+		age := style.FgBlue.Sprint(utils.TimeAgo(run.CreatedAt, now))
 		// The title comes last because it's the one column that can be long.
 		if !fullDescription {
 			return []string{
@@ -168,7 +168,7 @@ func formatGithubRunMetadata(tr *i18n.TranslationSet, run *models.GithubRun, now
 	triggered := utils.ResolvePlaceholderString(tr.GithubActions.RunTriggered, map[string]string{
 		"event": run.Event,
 		"actor": run.Actor.Login,
-		"ago":   utils.UnixToTimeAgo(run.CreatedAt.Unix()),
+		"ago":   utils.TimeAgo(run.CreatedAt, now),
 	})
 	fmt.Fprintf(&b, "%s · %s", triggered, FormatGithubDuration(run.Duration(now)))
 	if run.Attempt > 1 {

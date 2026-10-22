@@ -25,7 +25,7 @@ func TestFormatGithubRunSummary(t *testing.T) {
 	oldColorLevel := color.ForceSetColorLevel(terminfo.ColorLevelNone)
 	defer color.ForceSetColorLevel(oldColorLevel)
 
-	start := time.Now().Add(-10 * time.Minute)
+	start := time.Date(2026, 1, 1, 12, 0, 0, 0, time.UTC)
 	run := &models.GithubRun{
 		Name:         "CI",
 		DisplayTitle: "Fix the flaky test",
@@ -69,7 +69,7 @@ func TestFormatGithubRunSummary(t *testing.T) {
 
 	assert.Equal(t, `X Fix the flaky test
 CI #12 · main 01234567 · .github/workflows/ci.yml
-Triggered via push by octocat 10m ago · 3m5s · attempt 2
+Triggered via push by octocat 1h ago · 3m5s · attempt 2
 https://github.com/owner/repo/actions/runs/1
 
 Jobs
