@@ -256,3 +256,142 @@ M file1
 		})
 	}
 }
+
+func TestRenderRepoFileTree(t *testing.T) {
+	scenarios := []struct {
+		name           string
+		files          []*models.TreeFile
+		showTree       bool
+		showRootItem   bool
+		collapsedPaths []string
+		startIdx       int
+		endIdx         int
+		expected       []string
+	}{
+		{
+			name:         "nothing to render",
+			files:        []*models.TreeFile{},
+			showTree:     true,
+			showRootItem: true,
+			endIdx:       10,
+			expected:     []string{},
+		},
+		{
+			name: "root item, compressed directories, submodule and collapsed directory",
+			files: []*models.TreeFile{
+				{Path: "a/b/c/file1", Mode: 0o100644},
+				{Path: "a/b/c/file2", Mode: 0o100644},
+				{Path: "collapsed/file3", Mode: 0o100644},
+				{Path: "lib/sub", Mode: 0o160000},
+				{Path: "link", Mode: 0o120000},
+				{Path: "with spaces.txt", Mode: 0o100644},
+			},
+			showTree:       true,
+			showRootItem:   true,
+			collapsedPaths: []string{"./collapsed"},
+			endIdx:         100,
+			expected: toStringSlice(
+				`
+▼ /
+  ▼ a/b/c
+    file1
+    file2
+  ▶ collapsed
+  ▼ lib
+    sub (submodule)
+  link
+  with spaces.txt
+`,
+			),
+		},
+		{
+			name: "without root item",
+			files: []*models.TreeFile{
+				{Path: "dir/sub/file1", Mode: 0o100644},
+				{Path: "dir/file2", Mode: 0o100644},
+				{Path: "日本語/ファイル.txt", Mode: 0o100644},
+			},
+			showTree:     true,
+			showRootItem: false,
+			endIdx:       100,
+			expected: toStringSlice(
+				`
+▼ dir
+  file2
+  ▼ sub
+    file1
+▼ 日本語
+  ファイル.txt
+`,
+			),
+		},
+		{
+			name: "flat view shows full paths",
+			files: []*models.TreeFile{
+				{Path: "dir/sub/file1", Mode: 0o100644},
+				{Path: "dir/file2", Mode: 0o100644},
+				{Path: "file3", Mode: 0o100644},
+			},
+			showTree:     false,
+			showRootItem: true,
+			endIdx:       100,
+			expected: toStringSlice(
+				`
+dir/file2
+dir/sub/file1
+file3
+`,
+			),
+		},
+		{
+			name: "special characters are escaped",
+			files: []*models.TreeFile{
+				{Path: "new\nline", Mode: 0o100644},
+				{Path: "tab\tbed", Mode: 0o100644},
+			},
+			showTree:     true,
+			showRootItem: true,
+			endIdx:       100,
+			expected: toStringSlice(
+				`
+▼ /
+  new\nline
+  tab\tbed
+`,
+			),
+		},
+		{
+			name: "only the requested range is rendered",
+			files: []*models.TreeFile{
+				{Path: "dir/file1", Mode: 0o100644},
+				{Path: "dir/file2", Mode: 0o100644},
+				{Path: "file3", Mode: 0o100644},
+			},
+			showTree:     true,
+			showRootItem: true,
+			startIdx:     2,
+			endIdx:       4,
+			expected: []string{
+				"    file1",
+				"    file2",
+			},
+		},
+	}
+
+	oldColorLevel := color.ForceSetColorLevel(terminfo.ColorLevelNone)
+	defer color.ForceSetColorLevel(oldColorLevel)
+
+	for _, s := range scenarios {
+		t.Run(s.name, func(t *testing.T) {
+			common := common.NewDummyCommon()
+			common.UserConfig().Gui.ShowRootItemInFileTree = s.showRootItem
+			viewModel := filetree.NewRepoFileTreeViewModel(func() []*models.TreeFile { return s.files }, common, s.showTree)
+			viewModel.SetTree()
+			for _, path := range s.collapsedPaths {
+				viewModel.ToggleCollapsed(path)
+			}
+			result := RenderRepoFileTree(viewModel, false, &config.CustomIconsConfig{}, s.startIdx, s.endIdx)
+			assert.EqualValues(t, s.expected, result)
+		})
+	}
+}
