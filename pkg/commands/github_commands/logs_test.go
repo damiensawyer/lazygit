@@ -343,3 +343,10 @@ func TestStripLogTimestamps(t *testing.T) {
 
 	assert.Equal(t, []string{"first", "no timestamp", ""}, StripLogTimestamps(log))
 }
+
+func TestStripLogTimestampsOfEmptyLog(t *testing.T) {
+	/* EXPECTED:
+	assert.Nil(t, StripLogTimestamps(""))
+	ACTUAL: */
+	assert.Equal(t, []string{""}, StripLogTimestamps(""))
+}
