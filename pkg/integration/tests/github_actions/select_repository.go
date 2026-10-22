@@ -8,15 +8,8 @@ import (
 var SelectRepository = NewIntegrationTest(NewIntegrationTestArgs{
 	Description:  "With several GitHub remotes, none of them called upstream, ask which repository's runs to show, and remember the choice",
 	ExtraCmdArgs: []string{},
-	// Keep gh from finding a token of whoever runs the test, which would make
-	// the pull requests feature ask which remote to show pull requests for
-	// before the test gets to open the GitHub Actions view: pointing GH_PATH at
-	// a gh that doesn't exist makes every token lookup come up empty.
-	ExtraEnvVars: map[string]string{
-		"GH_PATH": "no-such-gh",
-	},
-	Skip:        false,
-	SetupConfig: func(config *config.AppConfig) {},
+	Skip:         false,
+	SetupConfig:  func(config *config.AppConfig) {},
 	SetupRepo: func(shell *Shell) {
 		shell.EmptyCommit("initial commit")
 		shell.RunCommand([]string{"git", "remote", "add", "origin", "https://github.com/me/repo.git"})
