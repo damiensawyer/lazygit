@@ -79,6 +79,99 @@ func TestFileContentDetectsLanguageFromContent(t *testing.T) {
 	assert.NotEqual(t, source, FileContent("runme", source, ""))
 }
 
+// The lexer is picked from the file name alone where it can be, which includes
+// well-known names without an extension and paths in subdirectories.
+func TestFileContentChoosesLexerFromPath(t *testing.T) {
+	scenarios := []struct {
+		name   string
+		path   string
+		source string
+	}{
+		{"nested path", "pkg/sub/main.go", "func f() {}\n"},
+		{"upper-case extension", "MAIN.GO", "func f() {}\n"},
+		{"extensionless well-known name", "Dockerfile", "FROM alpine\n"},
+		{"well-known name in a subdirectory", "build/Dockerfile", "FROM alpine\n"},
+		{"Makefile", "Makefile", "all:\n\techo hi\n"},
+	}
+
+	for _, s := range scenarios {
+		t.Run(s.name, func(t *testing.T) {
+			output := FileContent(s.path, s.source, "")
+
+			assert.NotEqual(t, s.source, output, "expected the source to be highlighted")
+			assert.Equal(t, s.source, stripAnsi(output))
+		})
+	}
+}
+
+// Content sniffing is only a fallback: when the path already names a language,
+// the content doesn't get to override it.
+func TestFileContentPrefersPathOverContent(t *testing.T) {
+	source := "#!/bin/bash\necho hello\n"
+
+	assert.Equal(t, source, FileContent("notes.txt", source, ""))
+}
+
+// The configured style is validated when the config is loaded, but an unknown
+// name reaching us anyway must still render the file intact.
+func TestFileContentWithUnknownStyleKeepsText(t *testing.T) {
+	output := FileContent("main.go", goSource, "not-a-real-style")
+
+	assert.Equal(t, goSource, stripAnsi(output))
+}
+
+func TestFileContentWithNamedStyleAndEmptySource(t *testing.T) {
+	assert.Equal(t, "", FileContent("main.go", "", "monokai"))
+}
+
+func TestFileContentKeepsLongLinesIntact(t *testing.T) {
+	source := "package main\n\nvar s = \"" + strings.Repeat("a", 100_000) + "\"\n"
+
+	output := FileContent("main.go", source, "")
+
+	assert.Contains(t, output, "\x1b[92m", "expected the long string literal to be coloured")
+	assert.Equal(t, source, stripAnsi(output))
+}
+
+func TestFileContentKeepsMultiByteCharactersIntact(t *testing.T) {
+	source := "package main\n\nvar s = \"日本語\" // ünïcödé\n"
+
+	assert.Equal(t, source, stripAnsi(FileContent("main.go", source, "")))
+}
+
+// Chroma decodes its input as UTF-8, so a byte that isn't valid UTF-8 comes
+// out as a replacement character, just as the view would display it anyway.
+// What matters is that the rest of the file is still highlighted and kept.
+func TestFileContentWithInvalidUTF8(t *testing.T) {
+	source := "package main\n\n// \xff\xfe\nvar s = \"\xc3\x28\"\n"
+
+	output := FileContent("main.go", source, "")
+
+	assert.Contains(t, output, "\x1b[95m", "expected keywords to still be coloured")
+	assert.Equal(t, "package main\n\n// ��\nvar s = \"�(\"\n", stripAnsi(output))
+}
+
+// The size cap is inclusive: a file of exactly the maximum size is still
+// highlighted.
+func TestFileContentHighlightsAFileOfExactlyTheMaximumSize(t *testing.T) {
+	source := strings.Repeat("var x = 1\n", maxSizeForHighlighting/10)
+	source += strings.Repeat("\n", maxSizeForHighlighting-len(source))
+
+	assert.NotEqual(t, source, FileContent("main.go", source, ""))
+}
+
+// Every style we offer in the config has to be one we can render with.
+func TestEveryStyleNameRenders(t *testing.T) {
+	names := StyleNames()
+	assert.NotEmpty(t, names)
+	assert.IsIncreasing(t, names)
+
+	for _, name := range names {
+		assert.True(t, IsValidStyle(name), name)
+		assert.Equal(t, goSource, stripAnsi(FileContent("main.go", goSource, name)), name)
+	}
+}
+
 func TestIsValidStyle(t *testing.T) {
 	assert.True(t, IsValidStyle("monokai"))
 	assert.False(t, IsValidStyle("not-a-real-style"))
