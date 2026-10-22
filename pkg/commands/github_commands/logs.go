@@ -108,7 +108,11 @@ func StripLogTimestamps(log string) []string {
 
 // logLines splits a job log into its lines, without the line endings.
 func logLines(log string) []string {
-	lines := strings.Split(strings.TrimSuffix(strings.TrimPrefix(log, byteOrderMark), "\n"), "\n")
+	log = strings.TrimPrefix(log, byteOrderMark)
+	if log == "" {
+		return nil
+	}
+	lines := strings.Split(strings.TrimSuffix(log, "\n"), "\n")
 	for i, line := range lines {
 		lines[i] = strings.TrimSuffix(line, "\r")
 	}
