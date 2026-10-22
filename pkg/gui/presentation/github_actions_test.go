@@ -2,6 +2,7 @@ package presentation
 
 import (
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -650,4 +651,22 @@ func TestFormatGithubStepLog(t *testing.T) {
 
 	skipped := &models.GithubStep{Number: 4, Name: "Skipped", Status: "completed", Conclusion: "skipped"}
 	assert.Contains(t, FormatGithubStepLog(tr, job, skipped, log, start), "\nbuild\n\nThis step logged nothing\n")
+}
+
+func TestFormatGithubJobDetailsAndStepLogHeadersWithoutDuration(t *testing.T) {
+	withoutColors(t)
+
+	tr := i18n.EnglishTranslationSet()
+	job := &models.GithubJob{Name: "build", Status: "queued"}
+	step := &models.GithubStep{Number: 1, Name: "Skipped", Status: "completed", Conclusion: "skipped"}
+
+	details := FormatGithubJobDetails(tr, GithubJobDetailsOpts{Job: job, Now: time.Now()})
+	stepLog := FormatGithubStepLog(tr, job, step, &github_commands.JobLog{}, time.Now())
+
+	/* EXPECTED:
+	assert.True(t, strings.HasPrefix(details, "• build\n"))
+	assert.True(t, strings.HasPrefix(stepLog, "- Skipped\n"))
+	ACTUAL: */
+	assert.True(t, strings.HasPrefix(details, "• build \n"))
+	assert.True(t, strings.HasPrefix(stepLog, "- Skipped \n"))
 }
