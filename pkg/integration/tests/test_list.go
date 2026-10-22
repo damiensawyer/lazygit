@@ -177,6 +177,7 @@ var tests = []*components.IntegrationTest{
 	config.SidePanelWidth,
 	config.SidePanelWidthClamping,
 	config.SidePanelWidthFullScreenMode,
+	config.SidePanelWidthInPopup,
 	config.SidePanelWidthPersistence,
 	config.SidePanelsInPerRepoConfig,
 	conflicts.ConflictMarkerSizeNotAutoStaged,
