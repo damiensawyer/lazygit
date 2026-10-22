@@ -54,6 +54,7 @@ type Helpers struct {
 	Worktree          *WorktreeHelper
 	SubCommits        *SubCommitsHelper
 	FinalVersion      *FinalVersionHelper
+	GithubLogin       *GithubLoginHelper
 }
 
 func NewStubHelpers() *Helpers {
@@ -92,5 +93,6 @@ func NewStubHelpers() *Helpers {
 		Worktree:          &WorktreeHelper{},
 		SubCommits:        &SubCommitsHelper{},
 		FinalVersion:      &FinalVersionHelper{},
+		GithubLogin:       &GithubLoginHelper{},
 	}
 }

@@ -130,6 +130,7 @@ func (gui *Gui) resetHelpersAndControllers() {
 		Worktree:     worktreeHelper,
 		SubCommits:   helpers.NewSubCommitsHelper(helperCommon, refreshHelper),
 		FinalVersion: helpers.NewFinalVersionHelper(helperCommon),
+		GithubLogin:  helpers.NewGithubLoginHelper(helperCommon),
 	}
 
 	gui.CustomCommandsClient = custom_commands.NewClient(

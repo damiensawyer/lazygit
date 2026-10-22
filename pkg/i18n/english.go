@@ -1007,6 +1007,7 @@ type TranslationSet struct {
 	Actions                                  Actions
 	Bisect                                   Bisect
 	Log                                      Log
+	GithubActions                            GithubActions
 	BreakingChangesTitle                     string
 	BreakingChangesMessage                   string
 	BreakingChangesByVersion                 map[string]string
@@ -1050,6 +1051,23 @@ type Log struct {
 	DroppingStash            string
 	PoppingStash             string
 	DeletingBranch           string
+}
+
+type GithubActions struct {
+	LoginTitle             string
+	LoginPrompt            string
+	LoginWithBrowser       string
+	LoginWithToken         string
+	LoginWithTokenTooltip  string
+	RequestingLoginCode    string
+	DeviceLoginTitle       string
+	DeviceLoginPrompt      string
+	WaitingForBrowserLogin string
+	PasteTokenTitle        string
+	CheckingToken          string
+	LoggedIn               string
+	LoggedInButNotStored   string
+	LoginFailed            string
 }
 
 type Actions struct {
@@ -2374,6 +2392,22 @@ func EnglishTranslationSet() *TranslationSet {
 			DroppingStash:            "Dropping stash %s",
 			PoppingStash:             "Popping stash %s",
 			DeletingBranch:           "Deleting branch '{{.branchName}}' (was {{.hash}})",
+		},
+		GithubActions: GithubActions{
+			LoginTitle:             "Log in to {{.host}}",
+			LoginPrompt:            "Lazygit needs a GitHub token to show this repository's Actions. It is stored in the GitHub CLI's config, so gh will use it too.",
+			LoginWithBrowser:       "Log in with a web browser",
+			LoginWithToken:         "Paste an authentication token",
+			LoginWithTokenTooltip:  "Create a personal access token at https://github.com/settings/tokens. A fine-grained token needs read access to Actions and contents; to re-run, cancel and dispatch workflows it also needs write access to Actions.",
+			RequestingLoginCode:    "Requesting login code",
+			DeviceLoginTitle:       "Log in to GitHub",
+			DeviceLoginPrompt:      "Your one-time code is {{.code}}\n\nPress enter to copy it and open {{.url}} in your browser, then paste it there.",
+			WaitingForBrowserLogin: "Waiting for login in browser",
+			PasteTokenTitle:        "GitHub token for {{.host}}",
+			CheckingToken:          "Checking token",
+			LoggedIn:               "Logged in to GitHub as {{.username}}",
+			LoggedInButNotStored:   "Logged in to GitHub as {{.username}}, but the token couldn't be saved for next time: {{.error}}",
+			LoginFailed:            "GitHub login failed: {{.error}}",
 		},
 		BreakingChangesTitle: "Breaking Changes",
 		BreakingChangesMessage: `You are updating to a new version of lazygit which contains breaking changes. Please review the notes below and update your configuration if necessary.
