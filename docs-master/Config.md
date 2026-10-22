@@ -916,6 +916,7 @@ keybinding:
     review: r
     edit: e
     viewChecks: t
+    reviewThreads: T
     openInBrowser: o
     copyToClipboard: "y"
     filter: f

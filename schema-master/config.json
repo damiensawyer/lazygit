@@ -2840,6 +2840,20 @@
           ],
           "default": "t"
         },
+        "reviewThreads": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "T"
+        },
         "openInBrowser": {
           "oneOf": [
             {

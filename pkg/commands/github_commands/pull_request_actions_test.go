@@ -121,6 +121,22 @@ func TestPullRequestMutations(t *testing.T) {
 			}},
 		},
 		{
+			name: "reply into a pending review",
+			call: func(client *Client) error {
+				return client.ReplyToReviewThread(context.Background(), "T_1", "R_1", "Fair")
+			},
+			expectedOperation: "PullRequestReviewThreadReply",
+			expectedVariables: map[string]any{"input": map[string]any{
+				"pullRequestReviewThreadId": "T_1", "pullRequestReviewId": "R_1", "body": "Fair",
+			}},
+		},
+		{
+			name:              "resolve thread",
+			call:              func(client *Client) error { return client.ResolveReviewThread(context.Background(), "T_1") },
+			expectedOperation: "PullRequestReviewThreadResolve",
+			expectedVariables: map[string]any{"threadId": "T_1"},
+		},
+		{
 			name:              "discard pending review",
 			call:              func(client *Client) error { return client.DeletePendingReview(context.Background(), "R_1") },
 			expectedOperation: "PullRequestReviewDelete",

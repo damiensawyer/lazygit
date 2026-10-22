@@ -114,6 +114,14 @@ func (self *PullRequestsController) GetKeybindings(opts types.KeybindingsOpts) [
 			DisplayOnScreen:   true,
 		},
 		{
+			Keys:              opts.GetKeys(opts.Config.PullRequests.ReviewThreads),
+			Handler:           self.withItem(self.reviewThreads),
+			GetDisabledReason: self.require(self.singleItemSelected()),
+			Description:       tr.ReviewThreads,
+			Tooltip:           tr.ReviewThreadsTooltip,
+			OpensMenu:         true,
+		},
+		{
 			Keys:              opts.GetKeys(opts.Config.PullRequests.Edit),
 			Handler:           self.withItem(self.edit),
 			GetDisabledReason: self.require(self.singleItemSelected()),

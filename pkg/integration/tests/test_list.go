@@ -631,6 +631,7 @@ var tests = []*components.IntegrationTest{
 	pull_requests.MergePullRequestDeletingBranch,
 	pull_requests.NoGithubRemote,
 	pull_requests.NotLoggedIn,
+	pull_requests.ReplyToAndResolveReviewThread,
 	pull_requests.ReviewPullRequest,
 	pull_requests.ViewChecks,
 	pull_requests.ViewPullRequestCommits,

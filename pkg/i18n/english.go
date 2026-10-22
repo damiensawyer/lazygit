@@ -1350,6 +1350,18 @@ type PullRequests struct {
 	ReviewCommentTitle               string
 	AddingReviewComment              string
 	ReviewCommentAdded               string
+	NoReviewThreads                  string
+	ReviewThreadsTitle               string
+	Reply                            string
+	ReplyTitle                       string
+	ReplyAdded                       string
+	ReplyAddedToPendingReview        string
+	Resolve                          string
+	Unresolve                        string
+	ThreadResolved                   string
+	OpenThreadInBrowser              string
+	ReviewThreads                    string
+	ReviewThreadsTooltip             string
 }
 
 type GithubActions struct {
@@ -3128,6 +3140,18 @@ func EnglishTranslationSet() *TranslationSet {
 			ReviewCommentTitle:               "Comment on {{.path}}:{{.lines}}",
 			AddingReviewComment:              "Adding comment…",
 			ReviewCommentAdded:               "Added the comment to your pending review",
+			NoReviewThreads:                  "Nobody has commented on lines of this pull request.",
+			ReviewThreadsTitle:               "Review threads of #{{.number}}",
+			Reply:                            "Reply…",
+			ReplyTitle:                       "Reply on {{.location}}",
+			ReplyAdded:                       "Replied",
+			ReplyAddedToPendingReview:        "Added the reply to your pending review",
+			Resolve:                          "Resolve the conversation",
+			Unresolve:                        "Unresolve the conversation",
+			ThreadResolved:                   "Resolved the conversation on {{.location}}",
+			OpenThreadInBrowser:              "Open in the browser",
+			ReviewThreads:                    "Review threads",
+			ReviewThreadsTooltip:             "List the conversations about lines of the pull request, unresolved ones first, to reply to them or resolve them. To start one, select lines of the pull request's diff in the main view and press the key for commenting there.",
 		},
 		GithubActions: GithubActions{
 			LoginTitle:                         "Log in to {{.host}}",

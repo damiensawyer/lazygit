@@ -62,3 +62,27 @@ func (self *Client) AddReviewComment(ctx context.Context, reviewId string, comme
 	addPullRequestReviewThread(input: $input) { thread { id } }
 }`, map[string]any{"input": input}, nil)
 }
+
+// ReplyToReviewThread adds a reply to a review thread. With a pending review,
+// the reply goes into it, to be published along with it.
+func (self *Client) ReplyToReviewThread(ctx context.Context, threadId string, pendingReviewId string, body string) error {
+	input := map[string]any{"pullRequestReviewThreadId": threadId, "body": body}
+	if pendingReviewId != "" {
+		input["pullRequestReviewId"] = pendingReviewId
+	}
+	return self.graphQL(ctx, `mutation PullRequestReviewThreadReply($input: AddPullRequestReviewThreadReplyInput!) {
+	addPullRequestReviewThreadReply(input: $input) { comment { id } }
+}`, map[string]any{"input": input}, nil)
+}
+
+func (self *Client) ResolveReviewThread(ctx context.Context, threadId string) error {
+	return self.graphQL(ctx, `mutation PullRequestReviewThreadResolve($threadId: ID!) {
+	resolveReviewThread(input: {threadId: $threadId}) { thread { id } }
+}`, map[string]any{"threadId": threadId}, nil)
+}
+
+func (self *Client) UnresolveReviewThread(ctx context.Context, threadId string) error {
+	return self.graphQL(ctx, `mutation PullRequestReviewThreadUnresolve($threadId: ID!) {
+	unresolveReviewThread(input: {threadId: $threadId}) { thread { id } }
+}`, map[string]any{"threadId": threadId}, nil)
+}
