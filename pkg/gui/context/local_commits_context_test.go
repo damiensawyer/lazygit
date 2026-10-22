@@ -359,3 +359,35 @@ func TestOverviewDisplayIndices(t *testing.T) {
 		})
 	}
 }
+
+func TestLocalCommitsPullRequestDiffInOverviewMode(t *testing.T) {
+	hashPool := &utils.StringPool{}
+	commit := func(hash string, parent string) *models.Commit {
+		return models.NewCommit(hashPool, models.NewCommitOpts{
+			Hash: hash, Parents: []string{parent}, Status: models.StatusPushed,
+		})
+	}
+
+	top := commit("top", "hidden")
+	hidden := commit("hidden", "tagged")
+	tagged := commit("tagged", "below")
+	below := commit("below", "root")
+
+	// The overview shows top and tagged. The diff of the range between them
+	// takes in the hidden commit too, and starts after tagged's parent.
+	c := &ContextCommon{IGuiCommon: &overviewModelGuiCommon{model: &types.Model{
+		Commits:               []*models.Commit{top, tagged},
+		OverviewCommitsSource: []*models.Commit{top, hidden, tagged, below},
+		OverviewCommitIndices: []int{0, 2},
+		CheckedOutBranch:      "feature",
+		Branches:              []*models.Branch{{Name: "feature", CommitHash: "top"}},
+		PullRequestsMap:       map[string]*models.GithubPullRequest{"feature": {Number: 1}},
+	}}}
+
+	assert.Equal(t,
+		/* EXPECTED:
+		types.PullRequestDiff{Branch: "feature", Commits: []*models.Commit{top, hidden, tagged}, BaseHash: "below"},
+		ACTUAL: */
+		types.PullRequestDiff{Branch: "feature", Commits: []*models.Commit{top, tagged}},
+		localCommitsPullRequestDiff(c, 0, 1))
+}
