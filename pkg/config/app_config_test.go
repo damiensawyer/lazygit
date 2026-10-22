@@ -902,6 +902,41 @@ func TestSaveRepoGuiValue(t *testing.T) {
 			value:    0.45,
 			expected: "gui:\n  sidePanelWidth: 0.28\n  colorizeCommitReferences: true\n  halfScreenModeSidePanelWidth: 0.45\n",
 		},
+		{
+			name:     "only replaces the given key",
+			existing: "gui:\n  sidePanelWidth: 0.28\n  halfScreenModeSidePanelWidth: 0.5\n",
+			key:      "sidePanelWidth",
+			value:    0.33,
+			expected: "gui:\n  sidePanelWidth: 0.33\n  halfScreenModeSidePanelWidth: 0.5\n",
+		},
+		{
+			name:     "preserves comments",
+			existing: "# my repo config\ngui:\n  sidePanelWidth: 0.2 # narrow\n",
+			key:      "sidePanelWidth",
+			value:    0.25,
+			expected: "# my repo config\ngui:\n  sidePanelWidth: 0.25 # narrow\n",
+		},
+		{
+			name:     "treats a file with only whitespace as empty",
+			existing: "\n",
+			key:      "sidePanelWidth",
+			value:    0.4,
+			expected: "gui:\n  sidePanelWidth: 0.4\n",
+		},
+		{
+			name:     "treats a file with only a comment as empty",
+			existing: "# nothing here yet\n",
+			key:      "sidePanelWidth",
+			value:    0.4,
+			expected: "gui:\n  sidePanelWidth: 0.4\n",
+		},
+		{
+			name:     "keeps the flow style of an existing gui section",
+			existing: "gui: {}\n",
+			key:      "sidePanelWidth",
+			value:    0.3,
+			expected: "gui: {sidePanelWidth: 0.3}\n",
+		},
 	}
 
 	for _, test := range tests {
@@ -918,6 +953,86 @@ func TestSaveRepoGuiValue(t *testing.T) {
 			assert.Equal(t, test.expected, string(actual))
 		})
 	}
+}
+
+func TestSaveRepoGuiValueErrors(t *testing.T) {
+	tests := []struct {
+		name          string
+		existing      string
+		expectedError string
+	}{
+		{
+			name:          "top-level element is a sequence",
+			existing:      "- a\n",
+			expectedError: "top-level element of the config file is not a mapping",
+		},
+		{
+			name:          "gui section is a scalar",
+			existing:      "gui: 3\n",
+			expectedError: "the gui section of the config file is not a mapping",
+		},
+		{
+			name:          "file is not valid yaml",
+			existing:      "gui: [\n",
+			expectedError: "did not find expected node content",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), "lazygit.yml")
+			assert.NoError(t, os.WriteFile(path, []byte(test.existing), 0o644))
+
+			err := saveRepoGuiValue(path, "sidePanelWidth", 0.4)
+			assert.ErrorContains(t, err, test.expectedError)
+
+			// The file is left untouched
+			actual, readErr := os.ReadFile(path)
+			assert.NoError(t, readErr)
+			assert.Equal(t, test.existing, string(actual))
+		})
+	}
+
+	t.Run("path can't be read", func(t *testing.T) {
+		assert.Error(t, saveRepoGuiValue(t.TempDir(), "sidePanelWidth", 0.4))
+	})
+}
+
+func TestSaveSidePanelWidthsRoundTrip(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "lazygit.yml")
+	appConfig := &AppConfig{}
+
+	assert.NoError(t, appConfig.SaveSidePanelWidth(path, 0.2833))
+	assert.NoError(t, appConfig.SaveHalfScreenModeSidePanelWidth(path, 0.45))
+
+	actual, err := os.ReadFile(path)
+	assert.NoError(t, err)
+	assert.Equal(t, "gui:\n  sidePanelWidth: 0.2833\n  halfScreenModeSidePanelWidth: 0.45\n", string(actual))
+
+	userConfig, err := loadUserConfigWithDefaults(
+		[]*ConfigFile{{Path: path, Policy: ConfigFilePolicySkipIfMissing}}, true)
+	assert.NoError(t, err)
+	assert.Equal(t, 0.2833, userConfig.Gui.SidePanelWidth)
+	assert.Equal(t, 0.45, userConfig.Gui.HalfScreenModeSidePanelWidth)
+}
+
+func TestSavedSidePanelWidthOverridesGlobalConfig(t *testing.T) {
+	dir := t.TempDir()
+	globalPath := filepath.Join(dir, "config.yml")
+	repoPath := filepath.Join(dir, "lazygit.yml")
+	assert.NoError(t, os.WriteFile(globalPath,
+		[]byte("gui:\n  sidePanelWidth: 0.4\n  halfScreenModeSidePanelWidth: 0.6\n"), 0o644))
+
+	assert.NoError(t, (&AppConfig{}).SaveSidePanelWidth(repoPath, 0.25))
+
+	userConfig, err := loadUserConfigWithDefaults([]*ConfigFile{
+		{Path: globalPath, Policy: ConfigFilePolicyErrorIfMissing},
+		{Path: repoPath, Policy: ConfigFilePolicySkipIfMissing},
+	}, true)
+	assert.NoError(t, err)
+	assert.Equal(t, 0.25, userConfig.Gui.SidePanelWidth)
+	// Not saved per repo, so the global value still applies
+	assert.Equal(t, 0.6, userConfig.Gui.HalfScreenModeSidePanelWidth)
 }
 
 func TestBranchColorsMigration(t *testing.T) {
