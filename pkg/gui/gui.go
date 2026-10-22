@@ -654,8 +654,7 @@ func (gui *Gui) resetState(startArgs appTypes.StartArgs) types.Context {
 
 		// The repo we're switching to may have a per-repo config with different
 		// side panel widths, so update them.
-		gui.State.SidePanelWidth = gui.UserConfig().Gui.SidePanelWidth
-		gui.State.HalfScreenModeSidePanelWidth = gui.UserConfig().Gui.HalfScreenModeSidePanelWidth
+		gui.applySidePanelWidthConfig()
 
 		// The repo we're switching to may have a per-repo config with a different
 		// side panel layout, so re-apply it to this repo's contexts.
@@ -694,9 +693,7 @@ func (gui *Gui) resetState(startArgs appTypes.StartArgs) types.Context {
 			Diffing:          diffing.New(),
 			MarkedBaseCommit: marked_base_commit.New(),
 		},
-		ScreenMode:                   initialScreenMode,
-		SidePanelWidth:               gui.UserConfig().Gui.SidePanelWidth,
-		HalfScreenModeSidePanelWidth: gui.UserConfig().Gui.HalfScreenModeSidePanelWidth,
+		ScreenMode: initialScreenMode,
 		// TODO: only use contexts from context manager
 		ContextMgr:  NewContextMgr(gui, contextTree),
 		Contexts:    contextTree,
@@ -705,9 +702,17 @@ func (gui *Gui) resetState(startArgs appTypes.StartArgs) types.Context {
 
 	gui.RepoStateMap[Repo(worktreePath)] = gui.State
 
+	gui.applySidePanelWidthConfig()
 	gui.applySidePanelConfig()
 
 	return initialContext(contextTree, startArgs)
+}
+
+// applySidePanelWidthConfig sets the current repo's side panel widths to the
+// ones from the config.
+func (gui *Gui) applySidePanelWidthConfig() {
+	gui.State.SidePanelWidth = gui.UserConfig().Gui.SidePanelWidth
+	gui.State.HalfScreenModeSidePanelWidth = gui.UserConfig().Gui.HalfScreenModeSidePanelWidth
 }
 
 func (gui *Gui) loadCachedPullRequests() []*models.GithubPullRequest {
