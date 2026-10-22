@@ -358,6 +358,7 @@ var tests = []*components.IntegrationTest{
 	github_actions.FilterRunsByCommit,
 	github_actions.FilterRunsByWorkflowStatusAndEvent,
 	github_actions.GithubEnterprise,
+	github_actions.GithubEnterpriseLogin,
 	github_actions.ListNoRuns,
 	github_actions.ListRuns,
 	github_actions.OpenLogInEditor,
