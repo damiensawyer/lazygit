@@ -42,14 +42,110 @@
 
 <div align="center">
 
-A simple terminal UI for git commands
+A simple terminal UI for git commands — with GitHub Actions, a repo-files browser, and more
 <br/>
 
-[![GitHub Releases](https://img.shields.io/github/downloads/jesseduffield/lazygit/total)](https://github.com/jesseduffield/lazygit/releases) [![Go Report Card](https://goreportcard.com/badge/github.com/jesseduffield/lazygit)](https://goreportcard.com/report/github.com/jesseduffield/lazygit) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/f46416b715d74622895657935fcada21)](https://app.codacy.com/gh/jesseduffield/lazygit/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade) [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/f46416b715d74622895657935fcada21)](https://app.codacy.com/gh/jesseduffield/lazygit/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage) [![golangci-lint](https://img.shields.io/badge/linted%20by-golangci--lint-brightgreen)](https://golangci-lint.run/) [![GitHub tag](https://img.shields.io/github/v/tag/jesseduffield/lazygit?color=blue)](https://github.com/jesseduffield/lazygit/releases/latest) [![homebrew](https://img.shields.io/homebrew/v/lazygit?color=blue)](https://formulae.brew.sh/formula/lazygit)
-
-![commit_and_push](../assets/demo/commit_and_push-compressed.gif)
-
 </div>
+
+## Why this fork
+
+The upstream [lazygit](https://github.com/jesseduffield/lazygit) repository stopped accepting pull requests. This fork preserves the upstream codebase and adds features that the upstream maintainers declined to merge. It stays in sync with upstream's `master` branch — you can merge upstream changes in whenever you want.
+
+> **Note:** This repo is currently closed to PRs, but I may open it up in the future. If you have a feature or fix you'd like to see, open an issue and I'll consider it.
+
+## What's different from upstream
+
+### GitHub Actions integration
+
+Lazygit can show your repository's GitHub Actions workflow runs and do most of what `gh run` and `gh workflow` do — all from inside the TUI.
+
+**To use it:** open a repo that's pushed to GitHub and press `<Ctrl+A>`. The runs list replaces the commits panel; press `Esc` to get back.
+
+| Key | Action |
+|-----|--------|
+| `enter` | View a run's jobs |
+| `o` | Open in browser |
+| `r` | Re-run (all jobs or just failed ones) |
+| `c` | Cancel or force-cancel |
+| `d` | Delete the run |
+| `f` | Filter runs by branch, workflow, status, event, or commit |
+| `w` | Workflows: run, enable/disable, edit, or filter |
+| `a` | Download the run's artifacts |
+| `y` | Copy URL, ID, commit hash, or branch |
+| `e` | Open a job's log in your editor |
+
+The token is taken from your `gh` CLI login — if you're not logged in, lazygit offers a device-login flow (same as `gh auth login --web`) or you can paste a personal access token. The token is stored in `gh`'s `hosts.yml`, so `gh` uses it too.
+
+See [docs-master/GitHub_Actions.md](docs-master/GitHub_Actions.md) for the full reference.
+
+### Browse all files at any commit
+
+Press `E` on any commit, branch, tag, stash, reflog entry, or remote branch to open a file-tree panel that shows the **entire repository** as it existed at that point — not just the files the commit changed.
+
+| Key | Action |
+|-----|--------|
+| `enter` | Toggle a directory or focus a file's content in the main view |
+| `` ` `` | Toggle between tree and flat layout |
+| `-` / `=` | Collapse / expand all directories |
+| `/` | Filter the tree by path |
+| `c` | **Restore to worktree**: replace files in your working tree with their state at this commit |
+| `S` | **Save**: write a copy of the file(s) as they existed at this commit |
+| `y` | Copy menu: name, path, content, blob hash |
+| `o` / `e` | Open/edit the *current working tree* version |
+
+See [docs-master/Browsing_All_Files_At_Commit.md](docs-master/Browsing_All_Files_At_Commit.md) for the full reference.
+
+### Syntax-highlighted file contents
+
+File contents shown in the repo-files panel (and other file views) are syntax-highlighted, making it much easier to read code at a glance.
+
+### Full file diff view toggle
+
+When viewing a diff, press `Alt+}` to toggle between the unified diff and the full file content. This is useful when you want to see the complete file rather than just the changed lines.
+
+### Searchable keybindings menu
+
+The keybindings help menu is now searchable by typing. Just start typing and it filters to matching keybindings, making it easy to find what you're looking for without scanning the whole list.
+
+### Side panel width adjustment
+
+Adjust the width of side panels using the same shortcuts in both normal and half-screen modes. The width is persisted per-repository, so each repo can have its own preferred panel size.
+
+### Final version toggle
+
+Toggle between showing a diff and showing the final version of changed files. This is useful when you want to review the complete file content rather than just the changes.
+
+### Copy keybinding customization
+
+Confirmation popups can now choose what their copy keybinding copies — for example, a "Yes" button on a delete confirmation can copy the item's name instead of its URL.
+
+## Table of contents
+
+- [Why this fork](#why-this-fork)
+- [What's different from upstream](#whats-different-from-upstream)
+  - [GitHub Actions integration](#github-actions-integration)
+  - [Browse all files at any commit](#browse-all-files-at-any-commit)
+  - [Syntax-highlighted file contents](#syntax-highlighted-file-contents)
+  - [Full file diff view toggle](#full-file-diff-view-toggle)
+  - [Searchable keybindings menu](#searchable-keybindings-menu)
+  - [Side panel width adjustment](#side-panel-width-adjustment)
+  - [Final version toggle](#final-version-toggle)
+  - [Copy keybinding customization](#copy-keybinding-customization)
+- [Table of contents](#table-of-contents)
+- [Sponsors](#sponsors)
+- [Elevator Pitch](#elevator-pitch)
+- [Features](#features)
+- [Tutorials](#tutorials)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Contributing](#contributing)
+- [Donate](#donate)
+- [FAQ](#faq)
+- [Shameless Plug](#shameless-plug)
+- [Alternatives](#alternatives)
+
+Lazygit is not my fulltime job but it is a hefty part time job so if you want to support the project please consider [sponsoring me](https://github.com/sponsors/jesseduffield)
 
 ## Sponsors
 
@@ -66,70 +162,6 @@ A simple terminal UI for git commands
 Rant time: You've heard it before, git is _powerful_, but what good is that power when everything is so damn hard to do? Interactive rebasing requires you to edit a goddamn TODO file in your editor? _Are you kidding me?_ To stage part of a file you need to use a command line program to step through each hunk and if a hunk can't be split down any further but contains code you don't want to stage, you have to edit an arcane patch file _by hand_? _Are you KIDDING me?!_ Sometimes you get asked to stash your changes when switching branches only to realise that after you switch and unstash that there weren't even any conflicts and it would have been fine to just checkout the branch directly? _YOU HAVE GOT TO BE KIDDING ME!_
 
 If you're a mere mortal like me and you're tired of hearing how powerful git is when in your daily life it's a powerful pain in your ass, lazygit might be for you.
-
-## Table of contents
-
-- [Sponsors](#sponsors)
-- [Elevator Pitch](#elevator-pitch)
-- [Table of contents](#table-of-contents)
-- [Features](#features)
-  - [Stage individual lines](#stage-individual-lines)
-  - [Interactive Rebase](#interactive-rebase)
-  - [Cherry-pick](#cherry-pick)
-  - [Bisect](#bisect)
-  - [Nuke the working tree](#nuke-the-working-tree)
-  - [Amend an old commit](#amend-an-old-commit)
-  - [Filter](#filter)
-  - [Invoke a custom command](#invoke-a-custom-command)
-  - [Worktrees](#worktrees)
-  - [Rebase magic (custom patches)](#rebase-magic-custom-patches)
-  - [Rebase from marked base commit](#rebase-from-marked-base-commit)
-  - [Undo](#undo)
-  - [Commit graph](#commit-graph)
-  - [Compare two commits](#compare-two-commits)
-- [Tutorials](#tutorials)
-- [Installation](#installation)
-  - [Binary Releases](#binary-releases)
-  - [Dev container](#dev-container-feature)
-  - [Homebrew](#homebrew)
-  - [MacPorts](#macports)
-  - [Void Linux](#void-linux)
-  - [Scoop (Windows)](#scoop-windows)
-  - [gah (Linux and Mac OS)](#gah-linux-and-mac-os)
-  - [Arch Linux](#arch-linux)
-  - [Fedora / Amazon Linux 2023 / CentOS Stream](#fedora--amazon-linux-2023--centos-stream)
-    - [Fedora / RHEL Derivatives (Terra)](#fedora--rhel-derivatives-terra)
-  - [Solus Linux](#solus-linux)
-  - [Debian and Ubuntu](#debian-and-ubuntu)
-  - [Funtoo Linux](#funtoo-linux)
-  - [Gentoo Linux](#gentoo-linux)
-  - [openSUSE](#opensuse)
-  - [NixOS](#nixos)
-  - [Flox](#flox)
-  - [FreeBSD](#freebsd)
-  - [Termux](#termux)
-  - [Conda](#conda)
-  - [Go](#go)
-  - [Chocolatey (Windows)](#chocolatey-windows)
-  - [Winget (Windows 10 1709 or later)](#winget-windows-10-1709-or-later)
-  - [Manual](#manual)
-- [Usage](#usage)
-  - [Keybindings](#keybindings)
-  - [Changing Directory On Exit](#changing-directory-on-exit)
-  - [Undo/Redo](#undoredo)
-- [Configuration](#configuration)
-  - [Custom Diff Renderers](#custom-diff-renderers)
-  - [Custom Commands](#custom-commands)
-  - [Git flow support](#git-flow-support)
-- [Contributing](#contributing)
-  - [Debugging Locally](#debugging-locally)
-- [Donate](#donate)
-- [FAQ](#faq)
-  - [What do the commit colors represent?](#what-do-the-commit-colors-represent)
-- [Shameless Plug](#shameless-plug)
-- [Alternatives](#alternatives)
-
-Lazygit is not my fulltime job but it is a hefty part time job so if you want to support the project please consider [sponsoring me](https://github.com/sponsors/jesseduffield)
 
 ## Features
 
@@ -246,13 +278,13 @@ In the branches panel, lazygit can show which of your branches have an associate
 
 _Most of the above packages are maintained by third parties so be sure to vet them yourself and confirm that the maintainer is a trustworthy looking person who attends local sports games and gives back to their communities with barbeque fundraisers etc_
 
-### Binary Releases
+### From source
 
-For Windows, Mac OS(10.12+) or Linux, you can download a binary release [here](../../releases).
-
-### Dev container feature
-
-If you want to use lazygit in e.g. one of your GitHub Codespaces, there is a third-party [dev container feature](https://github.com/GeorgOfenbeck/features/tree/main/src/lazygit-linuxbinary) based on the binary releases mentioned above.
+```sh
+git clone https://github.com/damiensawyer/lazygit.git
+cd lazygit
+go install
+```
 
 ### Homebrew
 
@@ -261,6 +293,14 @@ It works with Linux, too.
 ```sh
 brew install lazygit
 ```
+
+### Binary Releases
+
+For Windows, Mac OS(10.12+) or Linux, you can download a binary release [here](../../releases).
+
+### Dev container feature
+
+If you want to use lazygit in e.g. one of your GitHub Codespaces, there is a third-party [dev container feature](https://github.com/GeorgOfenbeck/features/tree/main/src/lazygit-linuxbinary) based on the binary releases mentioned above.
 
 ### MacPorts
 
@@ -503,7 +543,7 @@ apt install lazygit
 Released versions are available for different platforms, see <https://anaconda.org/conda-forge/lazygit>
 
 ```sh
-conda install -c conda-forge lazygit
+conda install -c conda-forge/lazygit
 ```
 
 ### Go
