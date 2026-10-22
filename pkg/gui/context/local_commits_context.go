@@ -49,9 +49,15 @@ func (self *LocalCommitsContext) PullRequestDiff() types.PullRequestDiff {
 	_, selectionStart, selectionEnd := self.GetSelectedItems()
 	startIdx, endIdx := commitRangeShownInDiff(
 		selectionStart, selectionEnd, self.GetSelectedLineIdx(), self.GetSelectedRefRangeForDiffFiles())
-	model := self.ListContextTrait.c.Model()
+	return localCommitsPullRequestDiff(self.ListContextTrait.c, startIdx, endIdx)
+}
+
+// localCommitsPullRequestDiff is the PullRequestDiff of the commits from startIdx to
+// endIdx of the commits panel.
+func localCommitsPullRequestDiff(c *ContextCommon, startIdx int, endIdx int) types.PullRequestDiff {
+	model := c.Model()
 	return pullRequestDiff(
-		self.GetCommits(), startIdx, endIdx, model.CheckedOutBranch, model.Branches, model.PullRequestsMap)
+		model.Commits, startIdx, endIdx, model.CheckedOutBranch, model.Branches, model.PullRequestsMap)
 }
 
 // commitRangeShownInDiff returns the indices of the newest and the oldest of the commits
