@@ -1,10 +1,14 @@
 package github_commands
 
 import (
+	"archive/zip"
+	"bytes"
 	"context"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -695,4 +699,65 @@ func TestRepoFullName(t *testing.T) {
 
 func TestRestAPIBaseURLForEnterpriseWithPort(t *testing.T) {
 	assert.Equal(t, "https://git.acme.com:8443/api/v3", RestAPIBaseURL("git.acme.com:8443"))
+}
+
+func TestExtractArtifactEdgeCases(t *testing.T) {
+	var archive bytes.Buffer
+	writer := zip.NewWriter(&archive)
+	_, err := writer.Create("empty-dir/")
+	assert.NoError(t, err)
+	header := &zip.FileHeader{Name: "bin/tool", Method: zip.Deflate}
+	header.SetMode(0o755)
+	w, err := writer.CreateHeader(header)
+	assert.NoError(t, err)
+	_, _ = w.Write([]byte("echo hi"))
+	w, err = writer.Create("/absolute.txt")
+	assert.NoError(t, err)
+	_, _ = w.Write([]byte("contained"))
+	w, err = writer.Create("existing.txt")
+	assert.NoError(t, err)
+	_, _ = w.Write([]byte("new"))
+	assert.NoError(t, writer.Close())
+
+	dir := t.TempDir()
+	assert.NoError(t, os.WriteFile(filepath.Join(dir, "existing.txt"), []byte("old content that is longer"), 0o644))
+
+	assert.NoError(t, ExtractArtifact(archive.Bytes(), dir))
+
+	assert.DirExists(t, filepath.Join(dir, "empty-dir"))
+
+	info, err := os.Stat(filepath.Join(dir, "bin", "tool"))
+	assert.NoError(t, err)
+	assert.Equal(t, os.FileMode(0o755), info.Mode().Perm())
+
+	// An absolute path in the archive is taken to be relative to dir.
+	content, err := os.ReadFile(filepath.Join(dir, "absolute.txt"))
+	assert.NoError(t, err)
+	assert.Equal(t, "contained", string(content))
+
+	content, err = os.ReadFile(filepath.Join(dir, "existing.txt"))
+	assert.NoError(t, err)
+	assert.Equal(t, "new", string(content))
+}
+
+func TestExtractArtifactRejectsInvalidArchive(t *testing.T) {
+	dir := filepath.Join(t.TempDir(), "artifact")
+
+	assert.Error(t, ExtractArtifact([]byte("not a zip"), dir))
+	assert.NoDirExists(t, dir)
+}
+
+func TestExtractArtifactRefusesSiblingDirWithSamePrefix(t *testing.T) {
+	// "../artifact-evil" starts with the name of dir, but isn't inside it.
+	var archive bytes.Buffer
+	writer := zip.NewWriter(&archive)
+	_, err := writer.Create("../artifact-evil/x.txt")
+	assert.NoError(t, err)
+	assert.NoError(t, writer.Close())
+
+	parent := t.TempDir()
+	err = ExtractArtifact(archive.Bytes(), filepath.Join(parent, "artifact"))
+
+	assert.EqualError(t, err, "artifact contains an invalid path: ../artifact-evil/x.txt")
+	assert.NoDirExists(t, filepath.Join(parent, "artifact-evil"))
 }
