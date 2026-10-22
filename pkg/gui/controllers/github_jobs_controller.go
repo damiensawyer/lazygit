@@ -16,6 +16,8 @@ type GithubJobsController struct {
 	baseController
 	*ListControllerTrait[*models.GithubJob]
 	c *ControllerCommon
+
+	mainView *githubMainViewRenderer
 }
 
 var _ types.IController = &GithubJobsController{}
@@ -30,6 +32,10 @@ func NewGithubJobsController(c *ControllerCommon) *GithubJobsController {
 			c.Contexts().GithubJobs.GetSelectedItems,
 		),
 		c: c,
+		mainView: &githubMainViewRenderer{
+			c:     c,
+			title: func() string { return c.Tr.GithubActions.JobMainTitle },
+		},
 	}
 }
 
@@ -85,7 +91,7 @@ func (self *GithubJobsController) GetOnRenderToMain() func() {
 	return func() {
 		job := self.context().GetSelected()
 		if job == nil {
-			self.renderToMain(self.c.Tr.GithubActions.NoJobs)
+			self.mainView.render("", self.c.Tr.GithubActions.NoJobs)
 			return
 		}
 
@@ -98,18 +104,8 @@ func (self *GithubJobsController) GetOnRenderToMain() func() {
 				opts.Annotations = jobLog.Annotations
 			}
 		}
-		self.renderToMain(presentation.FormatGithubJobDetails(self.c.Tr, opts))
+		self.mainView.render(job.ID(), presentation.FormatGithubJobDetails(self.c.Tr, opts))
 	}
-}
-
-func (self *GithubJobsController) renderToMain(content string) {
-	self.c.RenderToMainViews(types.RefreshMainOpts{
-		Pair: self.c.MainViewPairs().Normal,
-		Main: &types.ViewUpdateOpts{
-			Title: self.c.Tr.GithubActions.JobMainTitle,
-			Task:  types.NewRenderStringTask(content),
-		},
-	})
 }
 
 func (self *GithubJobsController) openInBrowser(job *models.GithubJob) error {
