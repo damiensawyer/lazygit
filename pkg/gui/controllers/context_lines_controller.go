@@ -1,11 +1,9 @@
 package controllers
 
 import (
-	"errors"
 	"fmt"
 	"math"
 
-	"github.com/jesseduffield/lazygit/pkg/gui/context"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
 )
 
@@ -57,10 +55,6 @@ func (self *ContextLinesController) Context() types.Context {
 }
 
 func (self *ContextLinesController) Increase() error {
-	if err := self.checkCanChangeContext(); err != nil {
-		return err
-	}
-
 	if self.c.UserConfig().Git.DiffContextSize < math.MaxUint64 {
 		self.c.UserConfig().Git.DiffContextSize++
 	}
@@ -68,10 +62,6 @@ func (self *ContextLinesController) Increase() error {
 }
 
 func (self *ContextLinesController) Decrease() error {
-	if err := self.checkCanChangeContext(); err != nil {
-		return err
-	}
-
 	if self.c.UserConfig().Git.DiffContextSize > 0 {
 		self.c.UserConfig().Git.DiffContextSize--
 	}
@@ -79,73 +69,37 @@ func (self *ContextLinesController) Decrease() error {
 }
 
 func (self *ContextLinesController) Toggle() error {
-	if err := self.checkCanChangeContext(); err != nil {
-		return err
-	}
-
 	currentSize := self.c.UserConfig().Git.DiffContextSize
 	if currentSize == math.MaxUint64 {
 		// Currently showing the full file: restore previous context size.
 		saved := self.c.UserConfig().Git.DiffContextSizeSaved
-		if saved > 0 {
-			self.c.UserConfig().Git.DiffContextSize = saved
-			self.c.Toast(fmt.Sprintf(self.c.Tr.RestoreDiffContextSize, saved))
-		} else {
+		if saved == 0 {
 			// No saved value (unusual), just decrease to a reasonable default.
-			self.c.UserConfig().Git.DiffContextSize = 3
-			self.c.Toast(fmt.Sprintf(self.c.Tr.RestoreDiffContextSize, 3))
+			saved = 3
 		}
-		currentContext := self.c.Context().CurrentSide()
-		switch currentContext.GetKey() {
-		case context.PATCH_BUILDING_MAIN_CONTEXT_KEY:
-			self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.PATCH_BUILDING}})
-		case context.STAGING_MAIN_CONTEXT_KEY, context.STAGING_SECONDARY_CONTEXT_KEY:
-			self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.STAGING}})
-		default:
-			currentContext.HandleRenderToMain()
-		}
-		return nil
-	}
-
-	// Currently in normal mode: save current size and show full file.
-	// Only save the value if it's not already at max (avoids saving MaxUint64).
-	if currentSize != math.MaxUint64 {
+		self.c.UserConfig().Git.DiffContextSize = saved
+		self.c.Toast(fmt.Sprintf(self.c.Tr.RestoreDiffContextSize, saved))
+	} else {
 		self.c.UserConfig().Git.DiffContextSizeSaved = currentSize
+		self.c.UserConfig().Git.DiffContextSize = math.MaxUint64
+		self.c.Toast(self.c.Tr.FullFileDiffView)
 	}
-	self.c.UserConfig().Git.DiffContextSize = math.MaxUint64
-	self.c.Toast(self.c.Tr.FullFileDiffView)
-	currentContext := self.c.Context().CurrentSide()
-	switch currentContext.GetKey() {
-	case context.PATCH_BUILDING_MAIN_CONTEXT_KEY:
-		self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.PATCH_BUILDING}})
-	case context.STAGING_MAIN_CONTEXT_KEY, context.STAGING_SECONDARY_CONTEXT_KEY:
-		self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.STAGING}})
-	default:
-		currentContext.HandleRenderToMain()
-	}
+	self.rerender()
 	return nil
 }
 
 func (self *ContextLinesController) applyChange() error {
 	self.c.Toast(fmt.Sprintf(self.c.Tr.DiffContextSizeChanged, self.c.UserConfig().Git.DiffContextSize))
-
-	currentContext := self.c.Context().CurrentSide()
-	switch currentContext.GetKey() {
-	// we make an exception for our staging and patch building contexts because they actually need to refresh their state afterwards.
-	case context.PATCH_BUILDING_MAIN_CONTEXT_KEY:
-		self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.PATCH_BUILDING}})
-	case context.STAGING_MAIN_CONTEXT_KEY, context.STAGING_SECONDARY_CONTEXT_KEY:
-		self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.STAGING}})
-	default:
-		currentContext.HandleRenderToMain()
-	}
+	self.rerender()
 	return nil
 }
 
-func (self *ContextLinesController) checkCanChangeContext() error {
-	if self.c.Git().Patch.PatchBuilder.Active() {
-		return errors.New(self.c.Tr.CantChangeContextSizeError)
-	}
-
-	return nil
+func (self *ContextLinesController) rerender() {
+	currentContext := self.c.Context().CurrentSide()
+	// The diff is about to be rendered again with more or less context around
+	// each change, which reads as the lines you were looking at moving up or down
+	// the view; keep them where they are instead.
+	self.c.Helpers().DiffLine.PreserveDiffPositionOnRerender(self.c.Contexts().Normal.GetView())
+	self.c.Helpers().DiffLine.PreserveDiffPositionOnRerender(self.c.Contexts().NormalSecondary.GetView())
+	currentContext.HandleRenderToMain()
 }

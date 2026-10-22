@@ -8,31 +8,27 @@ const (
 	// used as a nil value when passing a context key as an arg
 	NO_CONTEXT types.ContextKey = "none"
 
-	GLOBAL_CONTEXT_KEY                   types.ContextKey = "global"
-	STATUS_CONTEXT_KEY                   types.ContextKey = "status"
-	SNAKE_CONTEXT_KEY                    types.ContextKey = "snake"
-	FILES_CONTEXT_KEY                    types.ContextKey = "files"
-	LOCAL_BRANCHES_CONTEXT_KEY           types.ContextKey = "localBranches"
-	REMOTES_CONTEXT_KEY                  types.ContextKey = "remotes"
-	WORKTREES_CONTEXT_KEY                types.ContextKey = "worktrees"
-	REMOTE_BRANCHES_CONTEXT_KEY          types.ContextKey = "remoteBranches"
-	TAGS_CONTEXT_KEY                     types.ContextKey = "tags"
-	LOCAL_COMMITS_CONTEXT_KEY            types.ContextKey = "commits"
-	REFLOG_COMMITS_CONTEXT_KEY           types.ContextKey = "reflogCommits"
-	SUB_COMMITS_CONTEXT_KEY              types.ContextKey = "subCommits"
-	COMMIT_FILES_CONTEXT_KEY             types.ContextKey = "commitFiles"
-	REPO_FILES_CONTEXT_KEY               types.ContextKey = "repoFiles"
-	STASH_CONTEXT_KEY                    types.ContextKey = "stash"
-	GITHUB_RUNS_CONTEXT_KEY              types.ContextKey = "githubRuns"
-	GITHUB_JOBS_CONTEXT_KEY              types.ContextKey = "githubJobs"
-	GITHUB_STEPS_CONTEXT_KEY             types.ContextKey = "githubSteps"
-	NORMAL_MAIN_CONTEXT_KEY              types.ContextKey = "normal"
-	NORMAL_SECONDARY_CONTEXT_KEY         types.ContextKey = "normalSecondary"
-	STAGING_MAIN_CONTEXT_KEY             types.ContextKey = "staging"
-	STAGING_SECONDARY_CONTEXT_KEY        types.ContextKey = "stagingSecondary"
-	PATCH_BUILDING_MAIN_CONTEXT_KEY      types.ContextKey = "patchBuilding"
-	PATCH_BUILDING_SECONDARY_CONTEXT_KEY types.ContextKey = "patchBuildingSecondary"
-	MERGE_CONFLICTS_CONTEXT_KEY          types.ContextKey = "mergeConflicts"
+	GLOBAL_CONTEXT_KEY           types.ContextKey = "global"
+	STATUS_CONTEXT_KEY           types.ContextKey = "status"
+	SNAKE_CONTEXT_KEY            types.ContextKey = "snake"
+	FILES_CONTEXT_KEY            types.ContextKey = "files"
+	LOCAL_BRANCHES_CONTEXT_KEY   types.ContextKey = "localBranches"
+	REMOTES_CONTEXT_KEY          types.ContextKey = "remotes"
+	WORKTREES_CONTEXT_KEY        types.ContextKey = "worktrees"
+	REMOTE_BRANCHES_CONTEXT_KEY  types.ContextKey = "remoteBranches"
+	TAGS_CONTEXT_KEY             types.ContextKey = "tags"
+	LOCAL_COMMITS_CONTEXT_KEY    types.ContextKey = "commits"
+	REFLOG_COMMITS_CONTEXT_KEY   types.ContextKey = "reflogCommits"
+	SUB_COMMITS_CONTEXT_KEY      types.ContextKey = "subCommits"
+	COMMIT_FILES_CONTEXT_KEY     types.ContextKey = "commitFiles"
+	REPO_FILES_CONTEXT_KEY       types.ContextKey = "repoFiles"
+	STASH_CONTEXT_KEY            types.ContextKey = "stash"
+	GITHUB_RUNS_CONTEXT_KEY      types.ContextKey = "githubRuns"
+	GITHUB_JOBS_CONTEXT_KEY      types.ContextKey = "githubJobs"
+	GITHUB_STEPS_CONTEXT_KEY     types.ContextKey = "githubSteps"
+	NORMAL_MAIN_CONTEXT_KEY      types.ContextKey = "normal"
+	NORMAL_SECONDARY_CONTEXT_KEY types.ContextKey = "normalSecondary"
+	MERGE_CONFLICTS_CONTEXT_KEY  types.ContextKey = "mergeConflicts"
 
 	// these shouldn't really be needed for anything but I'm giving them unique keys nonetheless
 	OPTIONS_CONTEXT_KEY        types.ContextKey = "options"
@@ -74,10 +70,6 @@ var AllContextKeys = []types.ContextKey{
 	GITHUB_STEPS_CONTEXT_KEY,
 	NORMAL_MAIN_CONTEXT_KEY,
 	NORMAL_SECONDARY_CONTEXT_KEY,
-	STAGING_MAIN_CONTEXT_KEY,
-	STAGING_SECONDARY_CONTEXT_KEY,
-	PATCH_BUILDING_MAIN_CONTEXT_KEY,
-	PATCH_BUILDING_SECONDARY_CONTEXT_KEY,
 	MERGE_CONFLICTS_CONTEXT_KEY,
 
 	MENU_CONTEXT_KEY,
@@ -91,39 +83,35 @@ var AllContextKeys = []types.ContextKey{
 }
 
 type ContextTree struct {
-	Global                      types.Context
-	Status                      types.Context
-	Snake                       types.Context
-	Files                       *WorkingTreeContext
-	Menu                        *MenuContext
-	Branches                    *BranchesContext
-	Tags                        *TagsContext
-	LocalCommits                *LocalCommitsContext
-	CommitFiles                 *CommitFilesContext
-	RepoFiles                   *RepoFilesContext
-	Remotes                     *RemotesContext
-	Worktrees                   *WorktreesContext
-	Submodules                  *SubmodulesContext
-	RemoteBranches              *RemoteBranchesContext
-	ReflogCommits               *ReflogCommitsContext
-	SubCommits                  *SubCommitsContext
-	Stash                       *StashContext
-	GithubRuns                  *GithubRunsContext
-	GithubJobs                  *GithubJobsContext
-	GithubSteps                 *GithubStepsContext
-	Suggestions                 *SuggestionsContext
-	Normal                      *MainContext
-	NormalSecondary             *MainContext
-	Staging                     *PatchExplorerContext
-	StagingSecondary            *PatchExplorerContext
-	CustomPatchBuilder          *PatchExplorerContext
-	CustomPatchBuilderSecondary types.Context
-	MergeConflicts              *MergeConflictsContext
-	Confirmation                *ConfirmationContext
-	Prompt                      *PromptContext
-	CommitMessage               *CommitMessageContext
-	CommitDescription           types.Context
-	CommandLog                  types.Context
+	Global            types.Context
+	Status            types.Context
+	Snake             types.Context
+	Files             *WorkingTreeContext
+	Menu              *MenuContext
+	Branches          *BranchesContext
+	Tags              *TagsContext
+	LocalCommits      *LocalCommitsContext
+	CommitFiles       *CommitFilesContext
+	RepoFiles         *RepoFilesContext
+	Remotes           *RemotesContext
+	Worktrees         *WorktreesContext
+	Submodules        *SubmodulesContext
+	RemoteBranches    *RemoteBranchesContext
+	ReflogCommits     *ReflogCommitsContext
+	SubCommits        *SubCommitsContext
+	Stash             *StashContext
+	GithubRuns        *GithubRunsContext
+	GithubJobs        *GithubJobsContext
+	GithubSteps       *GithubStepsContext
+	Suggestions       *SuggestionsContext
+	Normal            *MainContext
+	NormalSecondary   *MainContext
+	MergeConflicts    *MergeConflictsContext
+	Confirmation      *ConfirmationContext
+	Prompt            *PromptContext
+	CommitMessage     *CommitMessageContext
+	CommitDescription types.Context
+	CommandLog        types.Context
 
 	// display contexts
 	AppStatus     types.Context
@@ -165,10 +153,6 @@ func (self *ContextTree) Flatten() []types.Context {
 		self.CommitDescription,
 
 		self.MergeConflicts,
-		self.StagingSecondary,
-		self.Staging,
-		self.CustomPatchBuilderSecondary,
-		self.CustomPatchBuilder,
 		self.NormalSecondary,
 		self.Normal,
 

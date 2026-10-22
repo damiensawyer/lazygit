@@ -388,7 +388,8 @@ func (self *GithubActionsHelper) setRuns(runs []*models.GithubRun) {
 		}
 	}
 
-	self.c.PostRefreshUpdateKeepingScrollPosition(runsContext)
+	self.c.PostRefreshUpdateWithOptions(runsContext,
+		types.OnFocusOpts{KeepScrollPosition: true})
 }
 
 // IsShowing reports whether any of the GitHub Actions views is visible.
@@ -415,7 +416,7 @@ func (self *GithubActionsHelper) scheduleAutoRefresh() {
 	}
 	self.expectingNewRun = false
 
-	time.AfterFunc(interval, func() {
+	time.AfterFunc(interval, utils.SafeFunc(func() {
 		self.c.OnUIThreadBackground(func() error {
 			if refreshGeneration != self.refreshGeneration ||
 				repoGeneration != self.c.State().GetRepoGeneration() ||
@@ -433,7 +434,7 @@ func (self *GithubActionsHelper) scheduleAutoRefresh() {
 			})
 			return nil
 		})
-	})
+	}))
 }
 
 // reloadChangedDetails brings what is shown about the runs' jobs up to date
@@ -553,13 +554,15 @@ func (self *GithubActionsHelper) setJobs(run *models.GithubRun, jobs []*models.G
 		jobsContext.SetSelection(idx)
 	}
 
-	self.c.PostRefreshUpdateKeepingScrollPosition(jobsContext)
+	self.c.PostRefreshUpdateWithOptions(jobsContext,
+		types.OnFocusOpts{KeepScrollPosition: true})
 
 	stepsContext := self.c.Contexts().GithubSteps
 	if shownJob := stepsContext.GetJob(); shownJob != nil {
 		if job, found := lo.Find(jobs, func(job *models.GithubJob) bool { return job.JobId == shownJob.JobId }); found {
 			stepsContext.SetJob(job)
-			self.c.PostRefreshUpdateKeepingScrollPosition(stepsContext)
+			self.c.PostRefreshUpdateWithOptions(stepsContext,
+				types.OnFocusOpts{KeepScrollPosition: true})
 		}
 	}
 }

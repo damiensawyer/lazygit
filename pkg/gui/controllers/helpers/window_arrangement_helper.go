@@ -60,7 +60,7 @@ type WindowArrangementArgs struct {
 	ContentHeightForWindow func(window string) int
 	// Whether the main panel is split (as is the case e.g. when a file has both
 	// staged and unstaged changes)
-	SplitMainPanel bool
+	MainPanes types.MainPanes
 	// The current screen mode (normal, half, full)
 	ScreenMode types.ScreenMode
 	// The side panel width ratio used in normal screen mode.
@@ -95,8 +95,8 @@ func (self *WindowArrangementHelper) GetWindowDimensions(informationStr string, 
 	repoState := self.c.State().GetRepoState()
 
 	var searchPrefix string
-	if filterableContext, ok := repoState.GetSearchState().Context.(types.IFilterableContext); ok {
-		searchPrefix = filterableContext.FilterPrefix(self.c.Tr)
+	if _, ok := repoState.GetSearchState().Context.(types.IFilterableContext); ok {
+		searchPrefix = self.c.Tr.FilterPrefix
 	} else {
 		searchPrefix = self.c.Tr.SearchPrefix
 	}
@@ -111,7 +111,7 @@ func (self *WindowArrangementHelper) GetWindowDimensions(informationStr string, 
 		ContentHeightForWindow: func(window string) int {
 			return self.windowHelper.GetContextForWindow(window).TotalContentHeight()
 		},
-		SplitMainPanel:               repoState.GetSplitMainPanel(),
+		MainPanes:                    repoState.GetMainPanes(),
 		ScreenMode:                   repoState.GetScreenMode(),
 		SidePanelWidth:               repoState.GetSidePanelWidth(),
 		HalfScreenModeSidePanelWidth: repoState.GetHalfScreenModeSidePanelWidth(),
@@ -225,36 +225,27 @@ func MergeMaps[K comparable, V any](maps ...map[K]V) map[K]V {
 }
 
 func mainSectionChildren(args WindowArrangementArgs) []*boxlayout.Box {
-	// if we're not in split mode we can just show the one main panel. Likewise if
-	// the main panel is focused and we're in full-screen mode
-	if !args.SplitMainPanel || (args.ScreenMode == types.SCREEN_FULL && args.CurrentWindow == "main") {
-		return []*boxlayout.Box{
-			{
-				Window: "main",
-				Weight: 1,
-			},
+	mainPane := &boxlayout.Box{Window: "main", Weight: 1}
+	secondaryPane := &boxlayout.Box{Window: "secondary", Weight: 1}
+
+	switch args.MainPanes {
+	case types.MainPaneOnly:
+		return []*boxlayout.Box{mainPane}
+	case types.SecondaryPaneOnly:
+		return []*boxlayout.Box{secondaryPane}
+	case types.BothMainPanes:
+		// In full-screen mode the focused one takes the whole section anyway.
+		if args.ScreenMode == types.SCREEN_FULL {
+			if args.CurrentWindow == "main" {
+				return []*boxlayout.Box{mainPane}
+			}
+			if args.CurrentWindow == "secondary" {
+				return []*boxlayout.Box{secondaryPane}
+			}
 		}
 	}
 
-	if args.CurrentWindow == "secondary" && args.ScreenMode == types.SCREEN_FULL {
-		return []*boxlayout.Box{
-			{
-				Window: "secondary",
-				Weight: 1,
-			},
-		}
-	}
-
-	return []*boxlayout.Box{
-		{
-			Window: "main",
-			Weight: 1,
-		},
-		{
-			Window: "secondary",
-			Weight: 1,
-		},
-	}
+	return []*boxlayout.Box{mainPane, secondaryPane}
 }
 
 func getMidSectionWeights(args WindowArrangementArgs) (int, int) {
@@ -399,7 +390,7 @@ func infoSectionChildren(args WindowArrangementArgs) []*boxlayout.Box {
 }
 
 func splitMainPanelSideBySide(args WindowArrangementArgs) bool {
-	if !args.SplitMainPanel {
+	if args.MainPanes != types.BothMainPanes {
 		return false
 	}
 

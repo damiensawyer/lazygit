@@ -5,13 +5,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	lazycoreUtils "github.com/jesseduffield/lazycore/pkg/utils"
 	"github.com/jesseduffield/lazygit/pkg/commands/git_commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
 	"github.com/jesseduffield/lazygit/pkg/config"
 	"github.com/jesseduffield/lazygit/pkg/gocui"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
 	integrationTypes "github.com/jesseduffield/lazygit/pkg/integration/types"
+	"github.com/jesseduffield/lazygit/pkg/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,6 +28,9 @@ type fakeGuiDriver struct {
 	heldCoordinates     []coordinate
 	movedCoordinates    []coordinate
 	releasedCoordinates []coordinate
+	scrolledCoordinates []coordinate
+	onUIThread          bool
+	onUIThreadCallCount int
 }
 
 var _ integrationTypes.GuiDriver = &fakeGuiDriver{}
@@ -44,6 +47,14 @@ func (self *fakeGuiDriver) Click(x, y int) {
 	self.clickedCoordinates = append(self.clickedCoordinates, coordinate{x: x, y: y})
 }
 
+func (self *fakeGuiDriver) ClickWithModifier(x, y int, modifier gocui.Modifier) {
+	self.clickedCoordinates = append(self.clickedCoordinates, coordinate{x: x, y: y})
+}
+
+func (self *fakeGuiDriver) DoubleClick(x, y int) {
+	self.clickedCoordinates = append(self.clickedCoordinates, coordinate{x: x, y: y})
+}
+
 func (self *fakeGuiDriver) ClickAndHold(x, y int) {
 	self.heldCoordinates = append(self.heldCoordinates, coordinate{x: x, y: y})
 }
@@ -57,13 +68,17 @@ func (self *fakeGuiDriver) MouseRelease(x, y int) {
 }
 
 func (self *fakeGuiDriver) ScrollWheelDown(x, y int) {
+	self.scrolledCoordinates = append(self.scrolledCoordinates, coordinate{x: x, y: y})
 }
 
 func (self *fakeGuiDriver) RefreshInBackground() {
 }
 
 func (self *fakeGuiDriver) OnUIThreadAndWait(f func()) {
+	self.onUIThreadCallCount++
+	self.onUIThread = true
 	f()
+	self.onUIThread = false
 }
 
 func (self *fakeGuiDriver) FocusIn() {
@@ -79,6 +94,10 @@ func (self *fakeGuiDriver) Keys() config.KeybindingConfig {
 
 func (self *fakeGuiDriver) CurrentContext() types.Context {
 	return nil
+}
+
+func (self *fakeGuiDriver) CursorVisible() bool {
+	return false
 }
 
 func (self *fakeGuiDriver) ContextForView(viewName string) types.Context {
@@ -167,6 +186,47 @@ func TestSuccess(t *testing.T) {
 	assert.Equal(t, "", driver.failureMessage)
 }
 
+func TestViewDriverPointerCoordinates(t *testing.T) {
+	guiDriver := &fakeGuiDriver{}
+	testDriver := NewTestDriver(guiDriver, nil, config.KeybindingConfig{}, 0)
+	view := gocui.NewView("source", 10, 20, 30, 31, gocui.OutputNormal)
+	targetView := gocui.NewView("target", 40, 50, 60, 61, gocui.OutputNormal)
+	viewDriver := &ViewDriver{
+		getView: func() *gocui.View {
+			assert.True(t, guiDriver.onUIThread)
+			return view
+		},
+		t: testDriver,
+	}
+	targetViewDriver := &ViewDriver{
+		getView: func() *gocui.View {
+			assert.True(t, guiDriver.onUIThread)
+			return targetView
+		},
+		t: testDriver,
+	}
+
+	viewDriver.
+		Click(1, 2).
+		AltClick(2, 3).
+		ShiftClick(4, 5).
+		FocusInAndClick(3, 4).
+		DoubleClick(6, 7).
+		ClickAndHold(5, 6).
+		MouseMove(7, 8).
+		MouseMoveToBottom(9).
+		MouseMoveToView(targetViewDriver, 10, 11).
+		ScrollWheelDown()
+
+	assert.Equal(t,
+		[]coordinate{{12, 23}, {13, 24}, {15, 26}, {14, 25}, {17, 28}},
+		guiDriver.clickedCoordinates)
+	assert.Equal(t, []coordinate{{16, 27}}, guiDriver.heldCoordinates)
+	assert.Equal(t, []coordinate{{18, 29}, {20, 30}, {51, 62}}, guiDriver.movedCoordinates)
+	assert.Equal(t, []coordinate{{11, 21}}, guiDriver.scrolledCoordinates)
+	assert.Equal(t, 10, guiDriver.onUIThreadCallCount)
+}
+
 func TestFailingFixture(t *testing.T) {
 	test := NewIntegrationTest(NewIntegrationTestArgs{
 		Description: unitTestDescription,
@@ -180,7 +240,12 @@ func TestFailingFixture(t *testing.T) {
 	paths := NewPaths(t.TempDir())
 	assert.NoError(t, os.MkdirAll(paths.ActualRepo(), 0o777))
 
-	workingDir, err := createFixture(test, paths, lazycoreUtils.GetLazyRootDirectory())
+	rootDir, err := utils.FindLazygitRootDirectory()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	workingDir, err := createFixture(test, paths, rootDir)
 
 	assert.ErrorContains(t, err, "git checkout no-such-branch")
 	assert.Empty(t, workingDir)

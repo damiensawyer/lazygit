@@ -358,7 +358,7 @@ func (gui *Gui) GetInitialKeybindingsWithCustomCommands() ([]*types.Binding, []*
 	return bindings, mouseBindings
 }
 
-func (gui *Gui) resetKeybindings() error {
+func (gui *Gui) resetKeybindings() {
 	gui.g.DeleteAllKeybindings()
 
 	bindings, mouseBindings := gui.GetInitialKeybindingsWithCustomCommands()
@@ -368,9 +368,7 @@ func (gui *Gui) resetKeybindings() error {
 	}
 
 	for _, binding := range mouseBindings {
-		if err := gui.SetMouseKeybinding(binding); err != nil {
-			return err
-		}
+		gui.SetMouseKeybinding(binding)
 	}
 
 	for _, values := range gui.viewTabMap() {
@@ -380,13 +378,9 @@ func (gui *Gui) resetKeybindings() error {
 				return gui.onViewTabClick(gui.helpers.Window.WindowForView(viewName), tabIndex)
 			}
 
-			if err := gui.g.SetTabClickBinding(viewName, tabClickCallback); err != nil {
-				return err
-			}
+			gui.g.SetTabClickBinding(viewName, tabClickCallback)
 		}
 	}
-
-	return nil
 }
 
 func (gui *Gui) SetKeybinding(binding *types.Binding) {
@@ -399,8 +393,8 @@ func (gui *Gui) SetKeybinding(binding *types.Binding) {
 	}
 }
 
-func (gui *Gui) SetMouseKeybinding(binding *gocui.ViewMouseBinding) error {
-	return gui.g.SetViewClickBinding(binding)
+func (gui *Gui) SetMouseKeybinding(binding *gocui.ViewMouseBinding) {
+	gui.g.SetViewClickBinding(binding)
 }
 
 func (gui *Gui) callKeybindingHandler(binding *types.Binding) error {

@@ -16,8 +16,6 @@ const (
 	WORKTREES
 	STATUS
 	SUBMODULES
-	STAGING
-	PATCH_BUILDING
 	MERGE_CONFLICTS
 	COMMIT_FILES
 	// not actually views. Will refactor this later
@@ -71,6 +69,10 @@ type RefreshOptions struct {
 	// refreshing and then apply them together in a single frame, rather than
 	// letting each scope update the UI as soon as it's done.
 	BatchUIUpdates bool
+
+	// Set this when the refresh doesn't invalidate the main view's current
+	// content, so refreshing the side context needn't render it again.
+	SkipMainViewUpdate bool
 
 	// Controls which local branch is selected after the refresh. Defaults to
 	// KeepBranchSelectionByName.

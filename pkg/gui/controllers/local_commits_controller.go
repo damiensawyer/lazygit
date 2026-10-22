@@ -191,7 +191,8 @@ func (self *LocalCommitsController) handleCommitDrag(opts gocui.ViewMouseBinding
 
 	self.commitDrag.hasMoved = true
 	if self.updateCommitDragInsertion(opts.Y) {
-		self.c.PostRefreshUpdate(self.context())
+		self.c.PostRefreshUpdateWithOptions(self.context(),
+			types.OnFocusOpts{KeepScrollPosition: true})
 	}
 	originY := self.context().GetView().OriginY()
 	self.dragAutoscroller.Update(opts.Y - originY)
@@ -344,7 +345,9 @@ func (self *LocalCommitsController) startMovingCommitsIndicator(insertionIndex i
 func (self *LocalCommitsController) stopMovingCommitsIndicator() {
 	self.stopMovingCommitsIndicatorTicker()
 	self.context().ClearDropInsertionIndex()
-	self.c.PostRefreshUpdate(self.context())
+	self.c.PostRefreshUpdateWithOptions(
+		self.context(), types.OnFocusOpts{SkipMainViewUpdate: true},
+	)
 }
 
 func (self *LocalCommitsController) stopMovingCommitsIndicatorTicker() {
@@ -670,15 +673,11 @@ func (self *LocalCommitsController) GetKeybindings(opts types.KeybindingsOpts) [
 }
 
 func (self *LocalCommitsController) checkedOutBranchHasPR() *types.DisabledReason {
-	branch := self.c.Model().CheckedOutBranch
-	if _, ok := self.c.Model().PullRequestsMap[branch]; !ok {
-		return &types.DisabledReason{Text: self.c.Tr.NoPullRequestForBranch, ShowErrorInPanel: true}
-	}
-	return nil
+	return self.c.Helpers().Host.NoPullRequestDisabledReason(self.c.Model().CheckedOutBranch)
 }
 
 func (self *LocalCommitsController) openPRInBrowser() error {
-	pr, ok := self.c.Model().PullRequestsMap[self.c.Model().CheckedOutBranch]
+	pr, ok := self.c.Helpers().Host.PullRequestForBranch(self.c.Model().CheckedOutBranch)
 	if !ok {
 		// Should be guarded against by the DisabledReason check, but be defensive in case
 		// PullRequestsMap was updated concurrently by a background refresh
@@ -725,17 +724,30 @@ func (self *LocalCommitsController) GetOnRenderToMain() func() {
 	}
 }
 
+// secondaryPatchPanelUpdateOpts renders the custom patch being built into the pane
+// beside the diff it is being built from, as a diff of the two trees the patch is
+// materialized into. This way it is shown by whatever renders the rest of the diffs,
+// and its lines can be pointed at and taken back out of the patch.
 func secondaryPatchPanelUpdateOpts(c *ControllerCommon) *types.ViewUpdateOpts {
-	if c.Git().Patch.PatchBuilder.Active() {
-		patch := c.Git().Patch.PatchBuilder.RenderAggregatedPatch(false)
-
-		return &types.ViewUpdateOpts{
-			Task:  types.NewRenderStringWithoutScrollTask(patch),
-			Title: c.Tr.CustomPatch,
-		}
+	if !c.Git().Patch.PatchBuilder.Active() {
+		return nil
 	}
 
-	return nil
+	// A render of the same patch reuses the trees; only a change to the patch writes them
+	// again.
+	if err := c.Git().Patch.EnsureCustomPatchDiffTrees(); err != nil {
+		c.Log.Error(err)
+	}
+
+	// The same mode as the diff beside it: both panes of the pair have to agree about
+	// whether what they show can be acted on.
+	mode := c.Helpers().DiffLine.MainViewDiffMode()
+	cmdObj := c.Git().Diff.CustomPatchDiffCmdObj(c.Git().Patch.PatchBuilder.TempDir(), mode)
+
+	return &types.ViewUpdateOpts{
+		Task:  types.NewMainViewDiffTask(cmdObj.GetCmd(), mode),
+		Title: c.Tr.CustomPatch,
+	}
 }
 
 func (self *LocalCommitsController) squashDown(selectedCommits []*models.Commit, startIdx int, endIdx int) error {
@@ -1176,16 +1188,21 @@ func (self *LocalCommitsController) move(
 		if err := self.c.Git().Rebase.MoveTodos(selectedCommits, offset); err != nil {
 			return err
 		}
-		self.context().MoveSelection(offset)
-		self.context().HandleFocus(types.OnFocusOpts{})
 
 		// Block input until the refresh has landed: a quick second press must
 		// read the moved todo from the refreshed model, not grab whatever the
 		// advanced selection index points at in the stale one.
 		self.c.RefreshBlockingInput(types.RefreshOptions{
-			Scope:           []types.RefreshableView{types.REBASE_COMMITS},
-			CommitSelection: types.KeepCommitSelectionIndex,
-			Then:            onComplete,
+			Scope:              []types.RefreshableView{types.REBASE_COMMITS},
+			SkipMainViewUpdate: true,
+			Then: func() error {
+				self.context().MoveSelection(offset)
+				self.context().FocusLine(true)
+				if onComplete != nil {
+					return onComplete()
+				}
+				return nil
+			},
 		})
 		return nil
 	}
@@ -1682,7 +1699,8 @@ func (self *LocalCommitsController) openSearch() error {
 		self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.COMMITS}})
 	}
 
-	return self.c.Helpers().Search.OpenSearchPrompt(self.context())
+	self.c.Helpers().Search.OpenSearchPrompt(self.context())
+	return nil
 }
 
 // Commands that pick the rebase base from the position of the selection in

@@ -55,7 +55,7 @@ func (self *RepoFilesController) GetKeybindings(opts types.KeybindingsOpts) []*t
 			Keys:              opts.GetKeys(opts.Config.Universal.GoInto),
 			Handler:           self.withItem(self.enter),
 			GetDisabledReason: self.require(self.singleItemSelected()),
-			Description:       self.c.Tr.EnterCommitFile,
+			Description:       self.c.Tr.EnterRepoFile,
 			Tooltip:           self.c.Tr.EnterRepoFileTooltip,
 		},
 		{
@@ -481,7 +481,7 @@ func (self *RepoFilesController) mainViewTask(node *filetree.RepoFileNode, hash 
 	}
 
 	cmdObj := self.c.Git().Commit.ShowFileContentCmdObj(hash, path)
-	return types.NewRunPtyTask(cmdObj.GetCmd())
+	return types.NewRunCommandTask(cmdObj.GetCmd())
 }
 
 // shows the immediate entries of the directory (one level deep), like a file

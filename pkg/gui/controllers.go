@@ -52,8 +52,7 @@ func (gui *Gui) resetHelpersAndControllers() {
 
 	gpgHelper := helpers.NewGpgHelper(helperCommon)
 	viewHelper := helpers.NewViewHelper(helperCommon, gui.State.Contexts)
-	patchBuildingHelper := helpers.NewPatchBuildingHelper(helperCommon)
-	stagingHelper := helpers.NewStagingHelper(helperCommon)
+	customPatchHelper := helpers.NewCustomPatchHelper(helperCommon)
 	mergeConflictsHelper := helpers.NewMergeConflictsHelper(helperCommon)
 	searchHelper := helpers.NewSearchHelper(helperCommon)
 
@@ -61,13 +60,13 @@ func (gui *Gui) resetHelpersAndControllers() {
 		helperCommon,
 		refsHelper,
 		rebaseHelper,
-		patchBuildingHelper,
-		stagingHelper,
 		mergeConflictsHelper,
 		worktreeHelper,
 		searchHelper,
 	)
-	diffHelper := helpers.NewDiffHelper(helperCommon)
+	diffLineHelper := helpers.NewDiffLineHelper(helperCommon)
+	filesHelper := helpers.NewFilesHelper(helperCommon)
+	diffHelper := helpers.NewDiffHelper(helperCommon, diffLineHelper, filesHelper)
 	cherryPickHelper := helpers.NewCherryPickHelper(
 		helperCommon,
 		rebaseHelper,
@@ -77,7 +76,7 @@ func (gui *Gui) resetHelpersAndControllers() {
 	modeHelper := helpers.NewModeHelper(
 		helperCommon,
 		diffHelper,
-		patchBuildingHelper,
+		customPatchHelper,
 		cherryPickHelper,
 		rebaseHelper,
 		bisectHelper,
@@ -93,11 +92,10 @@ func (gui *Gui) resetHelpersAndControllers() {
 	gui.helpers = &helpers.Helpers{
 		Refs:            refsHelper,
 		Host:            helpers.NewHostHelper(helperCommon),
-		PatchBuilding:   patchBuildingHelper,
-		Staging:         stagingHelper,
+		CustomPatch:     customPatchHelper,
 		Bisect:          bisectHelper,
 		Suggestions:     suggestionsHelper,
-		Files:           helpers.NewFilesHelper(helperCommon),
+		Files:           filesHelper,
 		WorkingTree:     helpers.NewWorkingTreeHelper(helperCommon, refsHelper, commitsHelper, gpgHelper, rebaseHelper),
 		Tags:            helpers.NewTagsHelper(helperCommon, commitsHelper, gpgHelper),
 		BranchesHelper:  helpers.NewBranchesHelper(helperCommon, worktreeHelper),
@@ -112,6 +110,7 @@ func (gui *Gui) resetHelpersAndControllers() {
 		SuspendResume:   helpers.NewSuspendResumeHelper(helperCommon),
 		Snake:           helpers.NewSnakeHelper(helperCommon),
 		Diff:            diffHelper,
+		DiffLine:        diffLineHelper,
 		Repos:           reposHelper,
 		RecordDirectory: recordDirectoryHelper,
 		Update:          helpers.NewUpdateHelper(helperCommon, gui.Updater),
@@ -148,6 +147,9 @@ func (gui *Gui) resetHelpersAndControllers() {
 
 	common := controllers.NewControllerCommon(helperCommon, gui)
 
+	listControllerFactory := controllers.NewListControllerFactory(common)
+	menuListController := listControllerFactory.Create(gui.State.Contexts.Menu)
+
 	syncController := controllers.NewSyncController(
 		common,
 	)
@@ -166,7 +168,7 @@ func (gui *Gui) resetHelpersAndControllers() {
 
 	remoteBranchesController := controllers.NewRemoteBranchesController(common)
 
-	menuController := controllers.NewMenuController(common)
+	menuController := controllers.NewMenuController(common, menuListController)
 	localCommitsController := controllers.NewLocalCommitsController(common, syncController.HandlePull)
 	tagsController := controllers.NewTagsController(common)
 	filesController := controllers.NewFilesController(
@@ -183,19 +185,14 @@ func (gui *Gui) resetHelpersAndControllers() {
 	contextLinesController := controllers.NewContextLinesController(common)
 	renameSimilarityThresholdController := controllers.NewRenameSimilarityThresholdController(common)
 	verticalScrollControllerFactory := controllers.NewVerticalScrollControllerFactory(common)
-	viewSelectionControllerFactory := controllers.NewViewSelectionControllerFactory(common)
 
 	branchesController := controllers.NewBranchesController(common)
 	gitFlowController := controllers.NewGitFlowController(common)
 	stashController := controllers.NewStashController(common)
 	commitFilesController := controllers.NewCommitFilesController(common)
 	repoFilesController := controllers.NewRepoFilesController(common)
-	patchExplorerControllerFactory := controllers.NewPatchExplorerControllerFactory(common)
-	stagingController := controllers.NewStagingController(common, gui.State.Contexts.Staging, gui.State.Contexts.StagingSecondary, false)
-	stagingSecondaryController := controllers.NewStagingController(common, gui.State.Contexts.StagingSecondary, gui.State.Contexts.Staging, true)
 	mainViewController := controllers.NewMainViewController(common, gui.State.Contexts.Normal, gui.State.Contexts.NormalSecondary)
 	secondaryViewController := controllers.NewMainViewController(common, gui.State.Contexts.NormalSecondary, gui.State.Contexts.Normal)
-	patchBuildingController := controllers.NewPatchBuildingController(common)
 	snakeController := controllers.NewSnakeController(common)
 	reflogCommitsController := controllers.NewReflogCommitsController(common)
 	subCommitsController := controllers.NewSubCommitsController(common)
@@ -314,28 +311,6 @@ func (gui *Gui) resetHelpersAndControllers() {
 	)
 
 	// TODO: add scroll controllers for main panels (need to bring some more functionality across for that e.g. reading more from the currently displayed git command)
-	controllers.AttachControllers(gui.State.Contexts.Staging,
-		stagingController,
-		patchExplorerControllerFactory.Create(gui.State.Contexts.Staging),
-		verticalScrollControllerFactory.Create(gui.State.Contexts.Staging),
-	)
-
-	controllers.AttachControllers(gui.State.Contexts.StagingSecondary,
-		stagingSecondaryController,
-		patchExplorerControllerFactory.Create(gui.State.Contexts.StagingSecondary),
-		verticalScrollControllerFactory.Create(gui.State.Contexts.StagingSecondary),
-	)
-
-	controllers.AttachControllers(gui.State.Contexts.CustomPatchBuilder,
-		patchBuildingController,
-		patchExplorerControllerFactory.Create(gui.State.Contexts.CustomPatchBuilder),
-		verticalScrollControllerFactory.Create(gui.State.Contexts.CustomPatchBuilder),
-	)
-
-	controllers.AttachControllers(gui.State.Contexts.CustomPatchBuilderSecondary,
-		verticalScrollControllerFactory.Create(gui.State.Contexts.CustomPatchBuilderSecondary),
-	)
-
 	controllers.AttachControllers(gui.State.Contexts.MergeConflicts,
 		mergeConflictsController,
 	)
@@ -343,13 +318,11 @@ func (gui *Gui) resetHelpersAndControllers() {
 	controllers.AttachControllers(gui.State.Contexts.Normal,
 		mainViewController,
 		verticalScrollControllerFactory.Create(gui.State.Contexts.Normal),
-		viewSelectionControllerFactory.Create(gui.State.Contexts.Normal),
 	)
 
 	controllers.AttachControllers(gui.State.Contexts.NormalSecondary,
 		secondaryViewController,
 		verticalScrollControllerFactory.Create(gui.State.Contexts.NormalSecondary),
-		viewSelectionControllerFactory.Create(gui.State.Contexts.NormalSecondary),
 	)
 
 	controllers.AttachControllers(gui.State.Contexts.Files,
@@ -408,6 +381,7 @@ func (gui *Gui) resetHelpersAndControllers() {
 
 	controllers.AttachControllers(gui.State.Contexts.Menu,
 		menuController,
+		menuListController,
 	)
 
 	controllers.AttachControllers(gui.State.Contexts.CommitMessage,
@@ -461,8 +435,11 @@ func (gui *Gui) resetHelpersAndControllers() {
 	)
 
 	// this must come last so that we've got our click handlers defined against the context
-	listControllerFactory := controllers.NewListControllerFactory(common)
 	for _, context := range gui.c.Context().AllList() {
+		if context == gui.State.Contexts.Menu {
+			// already attached above, next to the menu controller that delegates to it
+			continue
+		}
 		controllers.AttachControllers(context, listControllerFactory.Create(context))
 	}
 }
