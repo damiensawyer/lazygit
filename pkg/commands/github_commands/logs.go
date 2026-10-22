@@ -106,9 +106,18 @@ func splitLogTimestamp(line string) (time.Time, string) {
 // StripLogTimestamps removes the timestamp from the start of every line of a
 // job log.
 func StripLogTimestamps(log string) []string {
+	lines := logLines(log)
+	for i, line := range lines {
+		_, lines[i] = splitLogTimestamp(line)
+	}
+	return lines
+}
+
+// logLines splits a job log into its lines, without the line endings.
+func logLines(log string) []string {
 	lines := strings.Split(strings.TrimSuffix(strings.TrimPrefix(log, byteOrderMark), "\n"), "\n")
 	for i, line := range lines {
-		_, lines[i] = splitLogTimestamp(strings.TrimSuffix(line, "\r"))
+		lines[i] = strings.TrimSuffix(line, "\r")
 	}
 	return lines
 }
