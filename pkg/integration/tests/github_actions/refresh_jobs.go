@@ -44,10 +44,7 @@ var RefreshJobs = NewIntegrationTest(NewIntegrationTestArgs{
 		t.Views().GithubJobs().
 			Press(keys.Universal.Refresh).
 			Lines(
-				/* EXPECTED:
 				Contains("✓ lint").IsSelected(),
-				ACTUAL: */
-				Contains("* lint").IsSelected(),
 			)
 	},
 })

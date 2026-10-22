@@ -107,11 +107,12 @@ func (self *GithubActionsHelper) Open() error {
 	})
 }
 
-// RefreshRuns reloads the runs, keeping the selected one selected.
+// RefreshRuns reloads the runs, keeping the selected one selected, along
+// with the jobs being shown.
 func (self *GithubActionsHelper) RefreshRuns() error {
 	return self.withClient(func() error {
 		return self.c.WithWaitingStatus(self.c.Tr.GithubActions.LoadingRuns, func(gocui.Task) error {
-			return self.loadRuns(false, func() {})
+			return self.loadRuns(false, self.reloadChangedDetails)
 		})
 	})
 }
