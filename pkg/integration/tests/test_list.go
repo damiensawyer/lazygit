@@ -345,6 +345,7 @@ var tests = []*components.IntegrationTest{
 	filter_by_path.TypeFile,
 	github_actions.CancelRun,
 	github_actions.DeleteRun,
+	github_actions.FilterRunsByBranch,
 	github_actions.ListNoRuns,
 	github_actions.ListRuns,
 	github_actions.OpenLogInEditor,
