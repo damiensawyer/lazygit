@@ -245,6 +245,13 @@ func (self *guiCommon) InDemo() bool {
 	return self.gui.integrationTest != nil && self.gui.integrationTest.IsDemo()
 }
 
+func (self *guiCommon) FakeGithubAPIURL() string {
+	if self.gui.integrationTest == nil {
+		return ""
+	}
+	return self.gui.integrationTest.FakeGithubAPIURL()
+}
+
 func (self *guiCommon) WithInlineStatus(item types.HasUrn, operation types.ItemOperation, contextKey types.ContextKey, f func(gocui.Task) error) error {
 	self.gui.helpers.InlineStatus.WithInlineStatus(helpers.InlineStatusOpts{Item: item, Operation: operation, ContextKey: contextKey}, f)
 	return nil

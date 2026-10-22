@@ -18,6 +18,9 @@ type IntegrationTest interface {
 	HeadlessDimensions() (int, int)
 	// If true, we are recording/replaying a demo
 	IsDemo() bool
+	// The base URL of a fake GitHub REST API to talk to instead of the real
+	// one, or "" if the test doesn't provide one
+	FakeGithubAPIURL() string
 }
 
 // this is the interface through which our integration tests interact with the lazygit gui

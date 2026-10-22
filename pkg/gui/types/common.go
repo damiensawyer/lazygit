@@ -161,6 +161,10 @@ type IGuiCommon interface {
 
 	// Returns true if we're in a demo recording/playback
 	InDemo() bool
+
+	// The base URL of the fake GitHub REST API that the running integration
+	// test provides, or "" if there is none
+	FakeGithubAPIURL() string
 }
 
 type IModeMgr interface {

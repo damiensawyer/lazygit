@@ -13,6 +13,10 @@ import (
 	"github.com/samber/lo"
 )
 
+// what we authenticate with to an integration test's fake API, which doesn't
+// check it
+const fakeGithubToken = "fake-github-token"
+
 // GithubTokens remembers the tokens the user logged in with during this
 // session. It outlives repo switches, unlike the helpers, so that the user
 // doesn't have to log in again in every repo; and it keeps a token that
@@ -100,13 +104,20 @@ func (self *GithubClientHelper) selectRemote(remotes []githubRemoteInfo, onSelec
 
 func (self *GithubClientHelper) withClientForRemote(remote githubRemoteInfo, f func(client *github_commands.Client) error) error {
 	host := remote.serviceInfo.WebDomain
+	repo := github_commands.Repo{
+		Host:  host,
+		Owner: remote.serviceInfo.Owner,
+		Name:  remote.serviceInfo.Repository,
+	}
+	if baseURL := self.c.FakeGithubAPIURL(); baseURL != "" {
+		repo.Token = fakeGithubToken
+		self.client = github_commands.NewClientWithBaseURL(repo, baseURL)
+		return f(self.client)
+	}
+
 	useToken := func(token string) error {
-		self.client = github_commands.NewClient(github_commands.Repo{
-			Host:  host,
-			Owner: remote.serviceInfo.Owner,
-			Name:  remote.serviceInfo.Repository,
-			Token: token,
-		})
+		repo.Token = token
+		self.client = github_commands.NewClient(repo)
 		return f(self.client)
 	}
 

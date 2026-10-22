@@ -47,6 +47,7 @@ type IntegrationTest struct {
 	width      int
 	height     int
 	isDemo     bool
+	fakeGithub *FakeGithub
 }
 
 var _ integrationTypes.IntegrationTest = &IntegrationTest{}
@@ -74,6 +75,8 @@ type NewIntegrationTestArgs struct {
 	Height int
 	// If true, this is not a test but a demo to be added to our docs
 	IsDemo bool
+	// If set, lazygit talks to this instead of to the GitHub API
+	FakeGithub *FakeGithub
 }
 
 type GitVersionRestriction struct {
@@ -145,6 +148,7 @@ func NewIntegrationTest(args NewIntegrationTestArgs) *IntegrationTest {
 		width:        args.Width,
 		height:       args.Height,
 		isDemo:       args.IsDemo,
+		fakeGithub:   args.FakeGithub,
 	}
 }
 
@@ -197,8 +201,14 @@ func (self *IntegrationTest) Run(gui integrationTypes.GuiDriver) {
 		os.Environ(),
 		func(errorMsg string) { gui.Fail(errorMsg) },
 	)
+	if self.fakeGithub != nil {
+		self.fakeGithub.start()
+		defer self.fakeGithub.stop()
+	}
+
 	keys := gui.Keys()
 	testDriver := NewTestDriver(gui, shell, keys, InputDelay())
+	testDriver.fakeGithub = self.fakeGithub
 
 	if InputDelay() > 0 {
 		// Setting caption to clear the options menu from whatever it starts with
@@ -217,6 +227,13 @@ func (self *IntegrationTest) Run(gui integrationTypes.GuiDriver) {
 		// the dev would want to see the final state if they're running in slow mode
 		testDriver.Wait(2000)
 	}
+}
+
+func (self *IntegrationTest) FakeGithubAPIURL() string {
+	if self.fakeGithub == nil {
+		return ""
+	}
+	return self.fakeGithub.URL()
 }
 
 func (self *IntegrationTest) HeadlessDimensions() (int, int) {
