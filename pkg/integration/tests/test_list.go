@@ -247,6 +247,7 @@ var tests = []*components.IntegrationTest{
 	demo.FinalVersion,
 	demo.FullFileDiff,
 	demo.InteractiveRebase,
+	demo.KeybindingsSearch,
 	demo.NukeWorkingTree,
 	demo.RebaseOnto,
 	demo.RemoveHunkFromCommit,
