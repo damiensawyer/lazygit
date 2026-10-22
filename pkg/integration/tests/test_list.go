@@ -257,6 +257,7 @@ var tests = []*components.IntegrationTest{
 	diff.IgnoreWhitespace,
 	diff.RenameSimilarityThresholdChange,
 	diff.RenderThroughAPipe,
+	diff.ShowFinalVersionOfABinaryFile,
 	diff.ShowFinalVersionOfCommitFile,
 	diff.ShowFinalVersionSkipsDirectories,
 	diff.StatFollowsAScreenModeChange,
