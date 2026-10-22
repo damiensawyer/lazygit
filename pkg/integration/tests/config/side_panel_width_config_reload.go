@@ -20,16 +20,10 @@ gui:
 		t.FocusIn()
 
 		t.GlobalPress(keys.Universal.DecreaseSidePanelWidth)
-		/* EXPECTED:
 		t.ExpectToast(Equals("Side panel width: 0.45"))
-		ACTUAL: */
-		t.ExpectToast(Equals("Side panel width: 0.28"))
 
 		t.GlobalPress(keys.Universal.NextScreenMode)
 		t.GlobalPress(keys.Universal.DecreaseSidePanelWidth)
-		/* EXPECTED:
 		t.ExpectToast(Equals("Side panel width: 0.55"))
-		ACTUAL: */
-		t.ExpectToast(Equals("Side panel width: 0.45"))
 	},
 })
