@@ -153,6 +153,7 @@ var tests = []*components.IntegrationTest{
 	commit.NewBranch,
 	commit.OverviewModeAcrossRepoSwitch,
 	commit.OverviewModeFromLogMenuAndEscape,
+	commit.OverviewModeInFilteringMode,
 	commit.PasteCommitMessage,
 	commit.PasteCommitMessageOverExisting,
 	commit.PreserveCommitMessage,
