@@ -11,6 +11,7 @@ Go wild my brothers and sisters in digital arms. If we can dream it, we can have
 
 This page covers only what this fork adds.
 
+- [Pull requests](#pull-requests)
 - [GitHub Actions](#github-actions)
 - [Browse all files at a commit (killer feature that git extensions on Windows had!)](#browse-all-files-at-a-commit)
 - [Commit overview mode](#commit-overview-mode)
@@ -19,6 +20,33 @@ This page covers only what this fork adds.
 - [Searchable keybindings menu](#searchable-keybindings-menu)
 - [Resizable side panels](#resizable-side-panels)
 - [Installation](#installation)
+
+## Pull requests
+
+Most of what `gh pr` does, without leaving lazygit, and without needing `gh` installed: the bits of `gh` that do real work (finding the token, checking out a pull request, finding the PR template, the default title and description) are ported into lazygit itself.
+
+The pull requests are a tab of the branches panel (`3`, then `]`), between local branches and remotes. The main view shows the selected one like `gh pr view` does: who wants to merge what into what, labels, assignees, reviewers and their verdicts, checks, whether it can be merged, the description, the files it changes, the conversation, and the review threads with the code they're about.
+
+| Key | Action |
+|-----|--------|
+| `<enter>` | Show its commits without checking it out (then its files, and the diff of any range of them) |
+| `<space>` | Check it out, exactly the way `gh pr checkout` does, forks included |
+| `c` / `w` | Check it out under another name, detached, reset, or in a new worktree |
+| `M` | Merge, squash or rebase it (deleting its branch, locally too, if you like), or enable auto-merge |
+| `r` | Approve, request changes, or comment; submits your pending review of line comments |
+| `C` | Comment on it |
+| `t` | Its checks, failing first; a GitHub Actions job opens right at its log, and failed jobs can be re-run |
+| `T` | Its review threads: reply, resolve, unresolve |
+| `e` | Edit the title, description, base branch, labels, assignees and reviewers |
+| `d` | Close, reopen, mark ready for review, or convert to draft |
+| `u` | Update its branch with the base branch (merge or rebase) |
+| `n` | Create a pull request for the checked out branch (pushing it first if needed) |
+| `f` | Open, closed, merged or all; yours, awaiting your review, assigned to you; by author, label, base branch or GitHub search |
+| `o` / `y` | Open it in the browser / copy its URL, number, title, branch or description |
+
+**Line comments.** In the focused diff of a pull request (enter it, focus a commit's diff, select lines with `v`), press `r` to comment on the selected lines. Comments collect in a pending review, like GitHub's "Start a review", until you submit it with `r` in the pull requests panel.
+
+Full reference: [docs-master/Pull_Requests.md](docs-master/Pull_Requests.md)
 
 ## GitHub Actions
 
@@ -55,7 +83,7 @@ Press `<ctrl+a>` in a repo that has a GitHub remote. The runs list replaces the 
 | `y` | Copy the job's URL, ID or log, or the step's log |
 | `<esc>` | Go back up a level |
 
-It uses the same token as the `gh` CLI. If you aren't logged in with `gh`, lazygit offers a browser login (the same device flow `gh auth login --web` uses) or lets you paste a personal access token. The token is saved to `gh`'s `hosts.yml`, so `gh` can use it too.
+It uses the same token as the `gh` CLI, found the way `gh auth token` finds it (environment, `hosts.yml`, system keyring), so `gh` doesn't even need to be installed. If you aren't logged in, lazygit offers a browser login (the same device flow `gh auth login --web` uses) or lets you paste a personal access token. Like `gh auth login`, it saves the token in the system keyring (or `gh`'s `hosts.yml` without one), so `gh` can use it too.
 
 Full reference: [docs-master/GitHub_Actions.md](docs-master/GitHub_Actions.md)
 
