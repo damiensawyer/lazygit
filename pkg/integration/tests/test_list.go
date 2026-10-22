@@ -345,6 +345,7 @@ var tests = []*components.IntegrationTest{
 	filter_by_path.TypeFile,
 	github_actions.ApiErrorLoadingRuns,
 	github_actions.ApiErrorRepoNotFound,
+	github_actions.ApiErrorUnauthorized,
 	github_actions.CancelRun,
 	github_actions.CopyJobAndStepToClipboard,
 	github_actions.CopyRunToClipboard,
