@@ -360,6 +360,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` u `` | Update branch | Bring the pull request's branch up to date with its base branch on GitHub, by merging the base branch into it or by rebasing it, like `gh pr update-branch` does. |
 | `` o `` | Open in browser | Open the pull request on GitHub. |
 | `` y `` | Copy to clipboard |  |
+| `` n `` | New pull request | Open a pull request for the checked out branch, without leaving lazygit, the way `gh pr create` does: choose the base branch, write the title and description (starting from the branch's commits or the repository's pull request template), and it is pushed first if needed. |
 | `` f `` | Filter pull requests | Choose which pull requests to load: open, closed, merged or all of them, and only those by an author, assigned to someone, awaiting someone's review, with a label, against a base branch, or matching a search. |
 | `` R `` | Refresh pull requests | Load the pull requests again; this logs you in to GitHub first if needed. They also reload by themselves every minute while the list is shown. |
 | `` / `` | Filtruj bieżący widok po tekście |  |

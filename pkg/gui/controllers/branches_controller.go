@@ -810,6 +810,16 @@ func (self *BranchesController) createPullRequestMenu(selectedBranch *models.Bra
 
 	menuItems = append(menuItems, menuItemsForBranch(selectedBranch)...)
 
+	if self.c.Helpers().GithubClient.HasGithubRemote() {
+		menuItems = append(menuItems, &types.MenuItem{
+			LabelColumns: []string{self.c.Tr.PullRequests.CreateHere},
+			Tooltip:      self.c.Tr.PullRequests.CreateHereTooltip,
+			OnPress: func() error {
+				return self.c.Helpers().GithubPullRequests.CreatePullRequest(selectedBranch)
+			},
+		})
+	}
+
 	return self.c.Menu(types.CreateMenuOptions{Title: fmt.Sprint(self.c.Tr.CreatePullRequestOptions), Items: menuItems})
 }
 

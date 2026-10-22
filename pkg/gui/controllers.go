@@ -139,7 +139,7 @@ func (gui *Gui) resetHelpersAndControllers() {
 			windowHelper,
 			githubClientHelper,
 		),
-		GithubPullRequests: helpers.NewGithubPullRequestsHelper(helperCommon, windowHelper, githubClientHelper, commitsHelper, filesHelper),
+		GithubPullRequests: helpers.NewGithubPullRequestsHelper(helperCommon, windowHelper, githubClientHelper, commitsHelper, filesHelper, suggestionsHelper),
 	}
 
 	gui.CustomCommandsClient = custom_commands.NewClient(

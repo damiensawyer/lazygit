@@ -1297,6 +1297,23 @@ type PullRequests struct {
 	CommentTooltip                   string
 	Review                           string
 	ReviewTooltip                    string
+	CannotCreateFromDefaultBranch    string
+	CreateBaseBranchPrompt           string
+	NoTemplate                       string
+	ChooseTemplate                   string
+	NoCommitsToCreatePullRequest     string
+	CreateTitle                      string
+	DescriptionTitle                 string
+	CreateWillPush                   string
+	CreatePullRequest                string
+	CreateDraftPullRequest           string
+	Creating                         string
+	Created                          string
+	New                              string
+	NewTooltip                       string
+	NotOnABranch                     string
+	CreateHere                       string
+	CreateHereTooltip                string
 }
 
 type GithubActions struct {
@@ -1582,6 +1599,7 @@ type Actions struct {
 	CheckOutPullRequest              string
 	MergePullRequest                 string
 	ReviewPullRequest                string
+	CreatePullRequest                string
 	StartBisect                      string
 	ResetBisect                      string
 	BisectSkip                       string
@@ -2805,6 +2823,7 @@ func EnglishTranslationSet() *TranslationSet {
 			CheckOutPullRequest:              "Check out pull request",
 			MergePullRequest:                 "Merge pull request",
 			ReviewPullRequest:                "Review pull request",
+			CreatePullRequest:                "Create pull request",
 			StartBisect:                      "Start bisect",
 			ResetBisect:                      "Reset bisect",
 			BisectSkip:                       "Bisect skip",
@@ -3020,6 +3039,23 @@ func EnglishTranslationSet() *TranslationSet {
 			CommentTooltip:                   "Add a comment to the pull request's conversation.",
 			Review:                           "Review",
 			ReviewTooltip:                    "Approve the pull request, request changes, or comment on it, submitting the line comments you collected in a pending review along with it.",
+			CannotCreateFromDefaultBranch:    "{{.branch}} is the repository's default branch; a pull request merges another branch into it.",
+			CreateBaseBranchPrompt:           "Merge {{.branch}} into",
+			NoTemplate:                       "No template",
+			ChooseTemplate:                   "Choose a pull request template",
+			NoCommitsToCreatePullRequest:     "{{.branch}} has no commits that {{.base}} doesn't have.",
+			CreateTitle:                      "Pull request: {{.branch}} into {{.base}}",
+			DescriptionTitle:                 "Description",
+			CreateWillPush:                   "{{.branch}} will be pushed to {{.remote}} first.",
+			CreatePullRequest:                "Create pull request",
+			CreateDraftPullRequest:           "Create draft pull request",
+			Creating:                         "Creating pull request…",
+			Created:                          "Created #{{.number}}",
+			New:                              "New pull request",
+			NewTooltip:                       "Open a pull request for the checked out branch, without leaving lazygit, the way `gh pr create` does: choose the base branch, write the title and description (starting from the branch's commits or the repository's pull request template), and it is pushed first if needed.",
+			NotOnABranch:                     "You're not on a branch.",
+			CreateHere:                       "Create pull request in lazygit",
+			CreateHereTooltip:                "Write and open the pull request without leaving lazygit, the way `gh pr create` does, rather than in the browser.",
 		},
 		GithubActions: GithubActions{
 			LoginTitle:                         "Log in to {{.host}}",

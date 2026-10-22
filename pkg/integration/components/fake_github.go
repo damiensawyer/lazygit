@@ -189,6 +189,10 @@ func (self *FakeGithub) handler() http.Handler {
 	mux.HandleFunc("PUT "+repo+"actions/workflows/{id}/enable", accept(http.StatusNoContent))
 	mux.HandleFunc("PUT "+repo+"actions/workflows/{id}/disable", accept(http.StatusNoContent))
 	mux.HandleFunc("DELETE "+repo+"git/refs/heads/{branch...}", accept(http.StatusNoContent))
+	mux.HandleFunc("GET /repos/{owner}/{repo}", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, map[string]any{"default_branch": "master"})
+	})
+	mux.HandleFunc("POST "+repo+"pulls", self.createPullRequest)
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, err := io.ReadAll(r.Body)
@@ -197,6 +201,8 @@ func (self *FakeGithub) handler() http.Handler {
 			return
 		}
 		self.record(r, body)
+		// for the handlers that read it too
+		r.Body = io.NopCloser(bytes.NewReader(body))
 
 		self.dataMutex.Lock()
 		defer self.dataMutex.Unlock()

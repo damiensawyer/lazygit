@@ -43,6 +43,7 @@ review threads.
 | `space` | Check the pull request out (see below) |
 | `c` | Check it out under another branch name, detached, in a new worktree, or resetting the local branch to it |
 | `w` | Check it out in a new worktree, and switch to that |
+| `n` | Create a pull request for the checked out branch (see below) |
 | `M` | Merge it: with a merge commit, by squashing, or by rebasing, as the repository allows; optionally deleting its branch, on GitHub and locally (checking out its base branch first if it's checked out). Or have GitHub merge it once its requirements are met (auto-merge), or stop it from doing that |
 | `r` | Review it: approve it, request changes, or comment, submitting your pending review along with it if you have one; or discard the pending review |
 | `C` | Comment on it |
@@ -73,6 +74,21 @@ Checking out a pull request does what `gh pr checkout` does:
 A local branch that already tracks the pull request's head branch is the
 one that is checked out and brought up to date, whatever it is called. The
 pull requests list marks the pull request that is checked out with `*`.
+
+## Creating a pull request
+
+`n` in the pull requests panel creates a pull request for the checked out
+branch the way `gh pr create` does, without going to the browser; so does
+the last entry of the menu that `O` opens in the local branches panel, for
+the selected branch. It asks which branch to merge it into (the default
+branch to begin with), and then for its title and description. These start
+out as the message of the branch's commit if it has just one, and otherwise
+as the branch's name and a list of its commits' subjects; or, if the
+repository has a pull request template, the description starts out as that,
+choosing between them if it has several. Finally it asks whether to create
+it as a draft. If the branch hasn't been pushed, or has commits that
+haven't, it is pushed first: to the remote it tracks, or if it doesn't track
+one, to `origin`, setting it up to track the branch there.
 
 ## Writing comments
 

@@ -138,6 +138,13 @@ func (self *PullRequestsController) GetKeybindings(opts types.KeybindingsOpts) [
 			DisplayOnScreen:   true,
 		},
 		{
+			Keys:              opts.GetKeys(opts.Config.Universal.New),
+			Handler:           self.createPullRequest,
+			GetDisabledReason: self.onABranch,
+			Description:       tr.New,
+			Tooltip:           tr.NewTooltip,
+		},
+		{
 			Keys:             opts.GetKeys(opts.Config.PullRequests.Filter),
 			Handler:          self.filterMenu,
 			Description:      tr.Filter,
@@ -188,6 +195,17 @@ func (self *PullRequestsController) GetOnRenderToMain() func() {
 
 func (self *PullRequestsController) context() *context.PullRequestsContext {
 	return self.c.Contexts().PullRequests
+}
+
+func (self *PullRequestsController) onABranch() *types.DisabledReason {
+	if branch := self.c.Helpers().Refs.GetCheckedOutRef(); branch == nil || branch.DetachedHead {
+		return &types.DisabledReason{Text: self.c.Tr.PullRequests.NotOnABranch}
+	}
+	return nil
+}
+
+func (self *PullRequestsController) createPullRequest() error {
+	return self.c.Helpers().GithubPullRequests.CreatePullRequest(self.c.Helpers().Refs.GetCheckedOutRef())
 }
 
 func (self *PullRequestsController) viewCommits(pr *models.GithubPullRequest) error {

@@ -55,11 +55,12 @@ type GithubPullRequestDetails struct {
 // GithubPullRequestsHelper loads the pull requests of the current repository's
 // GitHub repository and keeps them fresh while they are shown.
 type GithubPullRequestsHelper struct {
-	c             *HelperCommon
-	windowHelper  *WindowHelper
-	clientHelper  *GithubClientHelper
-	commitsHelper *CommitsHelper
-	filesHelper   *FilesHelper
+	c                 *HelperCommon
+	windowHelper      *WindowHelper
+	clientHelper      *GithubClientHelper
+	commitsHelper     *CommitsHelper
+	filesHelper       *FilesHelper
+	suggestionsHelper *SuggestionsHelper
 
 	loadState PullRequestsLoadState
 	loadErr   error
@@ -79,15 +80,17 @@ func NewGithubPullRequestsHelper(
 	clientHelper *GithubClientHelper,
 	commitsHelper *CommitsHelper,
 	filesHelper *FilesHelper,
+	suggestionsHelper *SuggestionsHelper,
 ) *GithubPullRequestsHelper {
 	return &GithubPullRequestsHelper{
-		c:              c,
-		windowHelper:   windowHelper,
-		clientHelper:   clientHelper,
-		commitsHelper:  commitsHelper,
-		filesHelper:    filesHelper,
-		details:        map[int]*GithubPullRequestDetails{},
-		detailsLoading: map[int]bool{},
+		c:                 c,
+		windowHelper:      windowHelper,
+		clientHelper:      clientHelper,
+		commitsHelper:     commitsHelper,
+		filesHelper:       filesHelper,
+		suggestionsHelper: suggestionsHelper,
+		details:           map[int]*GithubPullRequestDetails{},
+		detailsLoading:    map[int]bool{},
 	}
 }
 

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
@@ -265,4 +266,44 @@ func (self *FakeGithub) pullRequestDetailsData(pr *models.GithubPullRequest) map
 			"pullRequest":              node,
 		},
 	}
+}
+
+// createPullRequest adds the pull request a test creates to the ones the fake
+// lists, so that the test can see it show up.
+func (self *FakeGithub) createPullRequest(w http.ResponseWriter, r *http.Request) {
+	var request struct {
+		Title string `json:"title"`
+		Head  string `json:"head"`
+		Base  string `json:"base"`
+		Draft bool   `json:"draft"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	number := 1
+	for _, pr := range self.PullRequests {
+		number = max(number, pr.Number+1)
+	}
+	owner, headBranch, isFork := strings.Cut(request.Head, ":")
+	if !isFork {
+		owner, headBranch = r.PathValue("owner"), request.Head
+	}
+	url := "https://github.com/" + r.PathValue("owner") + "/" + r.PathValue("repo") + "/pull/" + strconv.Itoa(number)
+	self.PullRequests = append([]*models.GithubPullRequest{{
+		Number:              number,
+		Title:               request.Title,
+		State:               lo.Ternary(request.Draft, "DRAFT", "OPEN"),
+		Url:                 url,
+		Author:              "me",
+		BaseRefName:         request.Base,
+		HeadRefName:         headBranch,
+		HeadRepositoryOwner: models.GithubRepositoryOwner{Login: owner},
+		HeadRepositoryName:  r.PathValue("repo"),
+		IsCrossRepository:   isFork,
+	}}, self.PullRequests...)
+
+	w.WriteHeader(http.StatusCreated)
+	writeJSON(w, map[string]any{"number": number, "html_url": url})
 }
