@@ -133,7 +133,7 @@ func FormatGithubRunSummary(tr *i18n.TranslationSet, opts GithubRunSummaryOpts) 
 		b.WriteString(githubDim.Sprint(tr.GithubActions.NoJobs) + "\n")
 	default:
 		for _, job := range opts.Jobs {
-			b.WriteString(formatGithubJobLine(job, opts.Now))
+			b.WriteString(formatGithubItemLine(job.State(), job.Name, job.Duration(opts.Now)))
 			// Like gh, only spell out the steps of jobs that need attention.
 			if job.State().IsFailed() || job.State().IsActive() {
 				for i := range job.Steps {
@@ -182,9 +182,11 @@ func formatGithubRunMetadata(tr *i18n.TranslationSet, run *models.GithubRun, now
 	return b.String()
 }
 
-func formatGithubJobLine(job *models.GithubJob, now time.Time) string {
-	line := GithubActionsStateIcon(job.State()) + " " + job.Name
-	if duration := githubDurationColumn(job.State(), job.Duration(now)); duration != "" {
+// formatGithubItemLine shows a job or a step on a line of its own: its
+// state, its name, and how long it took, where that is known.
+func formatGithubItemLine(state models.GithubActionsState, name string, d time.Duration) string {
+	line := GithubActionsStateIcon(state) + " " + name
+	if duration := githubDurationColumn(state, d); duration != "" {
 		line += " " + duration
 	}
 	return line + "\n"
@@ -313,11 +315,7 @@ func FormatGithubJobDetails(tr *i18n.TranslationSet, opts GithubJobDetailsOpts) 
 	b.WriteString("\n" + style.AttrBold.Sprint(tr.GithubActions.StepsSectionTitle) + "\n")
 	for i := range job.Steps {
 		step := &job.Steps[i]
-		line := GithubActionsStateIcon(step.State()) + " " + step.Name
-		if duration := githubDurationColumn(step.State(), step.Duration(opts.Now)); duration != "" {
-			line += " " + duration
-		}
-		b.WriteString(line + "\n")
+		b.WriteString(formatGithubItemLine(step.State(), step.Name, step.Duration(opts.Now)))
 	}
 
 	if len(opts.Annotations) > 0 {
