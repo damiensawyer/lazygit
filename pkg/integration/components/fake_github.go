@@ -47,6 +47,10 @@ type FakeGithub struct {
 	PullRequests []*models.GithubPullRequest
 	// keyed by pull request number
 	PullRequestDetails map[int]*models.GithubPullRequestDetails
+	// the repository's labels
+	Labels []models.GithubLabel
+	// the logins of the users that pull requests can be assigned to
+	AssignableUsers []string
 	// responses to give instead of the canned data, keyed by method and path,
 	// e.g. "GET /repos/owner/repo/actions/runs"
 	Errors map[string]FakeGithubError
@@ -193,6 +197,21 @@ func (self *FakeGithub) handler() http.Handler {
 		writeJSON(w, map[string]any{"default_branch": "master"})
 	})
 	mux.HandleFunc("POST "+repo+"pulls", self.createPullRequest)
+	mux.HandleFunc("PATCH "+repo+"pulls/{number}", accept(http.StatusOK))
+	mux.HandleFunc("GET "+repo+"labels", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, lo.CoalesceSliceOrEmpty(self.Labels))
+	})
+	mux.HandleFunc("POST "+repo+"issues/{number}/labels", accept(http.StatusOK))
+	mux.HandleFunc("DELETE "+repo+"issues/{number}/labels/{label}", accept(http.StatusOK))
+	mux.HandleFunc("GET "+repo+"assignees", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, lo.Map(self.AssignableUsers, func(login string, _ int) models.GithubUser {
+			return models.GithubUser{Login: login}
+		}))
+	})
+	mux.HandleFunc("POST "+repo+"issues/{number}/assignees", accept(http.StatusCreated))
+	mux.HandleFunc("DELETE "+repo+"issues/{number}/assignees", accept(http.StatusOK))
+	mux.HandleFunc("POST "+repo+"pulls/{number}/requested_reviewers", accept(http.StatusCreated))
+	mux.HandleFunc("DELETE "+repo+"pulls/{number}/requested_reviewers", accept(http.StatusOK))
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, err := io.ReadAll(r.Body)

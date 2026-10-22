@@ -105,6 +105,14 @@ func (self *PullRequestsController) GetKeybindings(opts types.KeybindingsOpts) [
 			Tooltip:           tr.CommentTooltip,
 		},
 		{
+			Keys:              opts.GetKeys(opts.Config.PullRequests.Edit),
+			Handler:           self.withItem(self.edit),
+			GetDisabledReason: self.require(self.singleItemSelected()),
+			Description:       tr.Edit,
+			Tooltip:           tr.EditTooltip,
+			OpensMenu:         true,
+		},
+		{
 			Keys:              opts.GetKeys(opts.Config.PullRequests.ChangeState),
 			Handler:           self.withItem(self.changeState),
 			GetDisabledReason: self.require(self.singleItemSelected(self.notMerged)),

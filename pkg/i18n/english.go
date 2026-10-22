@@ -1314,6 +1314,24 @@ type PullRequests struct {
 	NotOnABranch                     string
 	CreateHere                       string
 	CreateHereTooltip                string
+	BaseChanged                      string
+	CannotEdit                       string
+	ChangeBase                       string
+	ChangeBasePrompt                 string
+	Edited                           string
+	EditTitle                        string
+	EditTitleAndDescription          string
+	NoLabels                         string
+	PressToRemove                    string
+	AssignMe                         string
+	AssignSomeone                    string
+	AssignSomeonePrompt              string
+	ReviewRequested                  string
+	RerequestReview                  string
+	RequestReviewFrom                string
+	RequestReviewFromPrompt          string
+	Edit                             string
+	EditTooltip                      string
 }
 
 type GithubActions struct {
@@ -3056,6 +3074,24 @@ func EnglishTranslationSet() *TranslationSet {
 			NotOnABranch:                     "You're not on a branch.",
 			CreateHere:                       "Create pull request in lazygit",
 			CreateHereTooltip:                "Write and open the pull request without leaving lazygit, the way `gh pr create` does, rather than in the browser.",
+			BaseChanged:                      "#{{.number}} now merges into {{.base}}",
+			CannotEdit:                       "You don't have permission to edit this pull request.",
+			ChangeBase:                       "Change the base branch…",
+			ChangeBasePrompt:                 "Merge {{.head}} into",
+			Edited:                           "Updated #{{.number}}",
+			EditTitle:                        "Edit #{{.number}}",
+			EditTitleAndDescription:          "Edit the title and description",
+			NoLabels:                         "The repository has no labels.",
+			PressToRemove:                    "Press to remove",
+			AssignMe:                         "Assign to me",
+			AssignSomeone:                    "Assign someone…",
+			AssignSomeonePrompt:              "Assign to (a login)",
+			ReviewRequested:                  "Requested a review from {{.reviewer}}",
+			RerequestReview:                  "Request another review from {{.reviewer}}",
+			RequestReviewFrom:                "Request a review from…",
+			RequestReviewFromPrompt:          "Request a review from (a login, or org/team)",
+			Edit:                             "Edit",
+			EditTooltip:                      "Edit the pull request's title and description, change its base branch, and add or remove labels, assignees and requested reviewers, like `gh pr edit` does.",
 		},
 		GithubActions: GithubActions{
 			LoginTitle:                         "Log in to {{.host}}",

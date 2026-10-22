@@ -623,6 +623,7 @@ var tests = []*components.IntegrationTest{
 	pull_requests.ChooseRepository,
 	pull_requests.CloseAndReopenPullRequest,
 	pull_requests.CreatePullRequest,
+	pull_requests.EditPullRequest,
 	pull_requests.FilterPullRequests,
 	pull_requests.ListPullRequests,
 	pull_requests.MergePullRequest,

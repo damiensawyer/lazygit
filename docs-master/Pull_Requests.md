@@ -47,6 +47,7 @@ review threads.
 | `M` | Merge it: with a merge commit, by squashing, or by rebasing, as the repository allows; optionally deleting its branch, on GitHub and locally (checking out its base branch first if it's checked out). Or have GitHub merge it once its requirements are met (auto-merge), or stop it from doing that |
 | `r` | Review it: approve it, request changes, or comment, submitting your pending review along with it if you have one; or discard the pending review |
 | `C` | Comment on it |
+| `e` | Edit it: its title and description, its base branch, its labels, its assignees, and whose review it requests (including asking someone who has reviewed it to review it again) |
 | `d` | Close or reopen it, mark a draft as ready for review, or convert it to a draft |
 | `u` | Bring its branch up to date with the base branch on GitHub, by merging the base branch into it or by rebasing it |
 | `o` | Open the pull request in the browser |

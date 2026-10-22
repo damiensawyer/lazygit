@@ -913,6 +913,7 @@ keybinding:
     updateBranch: u
     comment: C
     review: r
+    edit: e
     openInBrowser: o
     copyToClipboard: "y"
     filter: f

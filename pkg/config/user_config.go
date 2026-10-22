@@ -712,6 +712,7 @@ type KeybindingPullRequestsConfig struct {
 	UpdateBranch       Keybinding `yaml:"updateBranch"`
 	Comment            Keybinding `yaml:"comment"`
 	Review             Keybinding `yaml:"review"`
+	Edit               Keybinding `yaml:"edit"`
 	OpenInBrowser      Keybinding `yaml:"openInBrowser"`
 	CopyToClipboard    Keybinding `yaml:"copyToClipboard"`
 	Filter             Keybinding `yaml:"filter"`
@@ -1267,6 +1268,7 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 				UpdateBranch:       Keybinding{"u"},
 				Comment:            Keybinding{"C"},
 				Review:             Keybinding{"r"},
+				Edit:               Keybinding{"e"},
 				OpenInBrowser:      Keybinding{"o"},
 				CopyToClipboard:    Keybinding{"y"},
 				Filter:             Keybinding{"f"},
