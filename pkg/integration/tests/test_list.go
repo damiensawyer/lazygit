@@ -258,6 +258,7 @@ var tests = []*components.IntegrationTest{
 	diff.RenameSimilarityThresholdChange,
 	diff.RenderThroughAPipe,
 	diff.ShowFinalVersionOfCommitFile,
+	diff.ShowFinalVersionSkipsDirectories,
 	diff.StatFollowsAScreenModeChange,
 	diff.StatUsesTheViewWidth,
 	diff.ToggleFullFileContext,
