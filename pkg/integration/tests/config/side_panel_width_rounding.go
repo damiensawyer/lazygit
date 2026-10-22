@@ -18,9 +18,6 @@ var SidePanelWidthRounding = NewIntegrationTest(NewIntegrationTestArgs{
 		t.ExpectToast(Equals("Side panel width: 0.43"))
 
 		t.FileSystem().FileContent(".git/lazygit.yml",
-			/* EXPECTED:
 			Equals("gui:\n  sidePanelWidth: 0.4333\n"))
-			ACTUAL: */
-			Equals("gui:\n  sidePanelWidth: 0.43329999999999996\n"))
 	},
 })
