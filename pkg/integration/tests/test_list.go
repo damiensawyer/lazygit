@@ -236,6 +236,7 @@ var tests = []*components.IntegrationTest{
 	custom_commands.SuggestionsPreset,
 	demo.AmendOldCommit,
 	demo.Bisect,
+	demo.BrowseFiles,
 	demo.CherryPick,
 	demo.CommitAndPush,
 	demo.CommitGraph,
