@@ -1,0 +1,15 @@
+disableStartupPopups: true
+gui:
+  expandFocusedSidePanel: true
+  showCommandLog: false
+  nerdFontsVersion: "3"
+  showRandomTip: false
+  showBottomLine: true
+  authorColors:
+    "Yang Wen-li": "#8e3ccb"
+update:
+  method: never
+keybinding:
+  universal:
+    # Demo-only: vhs can't send <alt+\> (ESC \ is a string terminator)
+    toggleShowFinalVersion: <alt+v>
