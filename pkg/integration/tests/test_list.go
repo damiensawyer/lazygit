@@ -259,6 +259,7 @@ var tests = []*components.IntegrationTest{
 	diff.RenderThroughAPipe,
 	diff.ShowFinalVersionOfABinaryFile,
 	diff.ShowFinalVersionOfCommitFile,
+	diff.ShowFinalVersionOfStagedChanges,
 	diff.ShowFinalVersionSkipsDirectories,
 	diff.StatFollowsAScreenModeChange,
 	diff.StatUsesTheViewWidth,
