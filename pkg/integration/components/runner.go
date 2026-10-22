@@ -318,12 +318,14 @@ func getLazygitCommand(
 	return cmdObj.GetCmd(), nil
 }
 
+// The binary goes in $TMPDIR, so that test runs from several checkouts at once
+// can each set their own rather than overwrite each other's.
 func tempLazygitPath() string {
-	return filepath.Join("/tmp", "lazygit", "test_lazygit")
+	return filepath.Join(os.TempDir(), "lazygit", "test_lazygit")
 }
 
 func raceDetectorLogsPath() string {
-	return filepath.Join("/tmp", "lazygit", "race_log")
+	return filepath.Join(os.TempDir(), "lazygit", "race_log")
 }
 
 func findOrCreateDir(path string) {
