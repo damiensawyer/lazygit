@@ -416,6 +416,10 @@ func (gui *Gui) onNewRepo(startArgs appTypes.StartArgs, contextKey types.Context
 	gui.resetHelpersAndControllers()
 	gui.resetKeybindings()
 
+	// onUserConfigLoaded configured the views while the previous repo's state
+	// was still current, so their titles show that repo's modes.
+	gui.helpers.Mode.UpdateCommitsViewTitle()
+
 	gui.g.SetFocusHandler(func(Focused bool) error {
 		if Focused {
 			gui.git.Config.DropConfigCache()

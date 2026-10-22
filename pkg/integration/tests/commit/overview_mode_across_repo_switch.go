@@ -60,10 +60,7 @@ var OverviewModeAcrossRepoSwitch = NewIntegrationTest(NewIntegrationTestArgs{
 
 		t.Views().Commits().
 			Focus().
-			/* EXPECTED:
 			Title(Equals("Commits (overview)")).
-			ACTUAL: */
-			Title(Equals("Commits")).
 			Lines(
 				Contains("top"),
 				Contains("base"),
