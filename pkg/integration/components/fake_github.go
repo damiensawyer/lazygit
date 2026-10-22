@@ -24,7 +24,8 @@ import (
 // It serves the canned data below for any repository, and records the
 // requests it gets. Requests that would change something on GitHub, like
 // re-running or deleting a run, succeed but change nothing, so that what the
-// view shows afterwards only depends on what the test set up.
+// view shows afterwards only depends on what the test set up. A test can
+// change the data while it runs with TestDriver.FakeGithub().Update.
 type FakeGithub struct {
 	Runs []*models.GithubRun
 	// keyed by run ID
@@ -45,6 +46,9 @@ type FakeGithub struct {
 	// responses to give instead of the canned data, keyed by method and path,
 	// e.g. "GET /repos/owner/repo/actions/runs"
 	Errors map[string]FakeGithubError
+
+	// guards the fields above while the fake is being served
+	dataMutex sync.Mutex
 
 	mutex    sync.Mutex
 	server   *httptest.Server
@@ -187,6 +191,8 @@ func (self *FakeGithub) handler() http.Handler {
 		}
 		self.record(r, body)
 
+		self.dataMutex.Lock()
+		defer self.dataMutex.Unlock()
 		if response, found := self.Errors[r.Method+" "+r.URL.Path]; found {
 			writeError(w, response.StatusCode, response.Message)
 			return
@@ -278,6 +284,15 @@ func (self *FakeGithubDriver) ChangeRequests(matchers ...*TextMatcher) *FakeGith
 		}
 		return true, ""
 	})
+	return self
+}
+
+// Update changes the data the fake API serves, e.g. to add a run that has
+// started since the test began.
+func (self *FakeGithubDriver) Update(change func(fake *FakeGithub)) *FakeGithubDriver {
+	self.fake.dataMutex.Lock()
+	defer self.fake.dataMutex.Unlock()
+	change(self.fake)
 	return self
 }
 
