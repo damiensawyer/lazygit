@@ -594,6 +594,7 @@ var tests = []*components.IntegrationTest{
 	repo_files.OpenFileNotInWorktree,
 	repo_files.RestoreToWorktree,
 	repo_files.SaveFileAtCommit,
+	repo_files.SymlinksAndSubmodules,
 	repo_files.ToggleTreeViewAndCollapse,
 	repo_files.ViewFileAtCommit,
 	shell_commands.BasicShellCommand,
