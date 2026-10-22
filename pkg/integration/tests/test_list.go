@@ -343,6 +343,7 @@ var tests = []*components.IntegrationTest{
 	filter_by_path.SelectFilteredFileWhenEnteringCommitNoRootItem,
 	filter_by_path.ShowDiffsForRenamedFile,
 	filter_by_path.TypeFile,
+	github_actions.ListNoRuns,
 	github_actions.ListRuns,
 	github_actions.OpenWithoutGithubRemote,
 	interactive_rebase.AdvancedInteractiveRebase,
