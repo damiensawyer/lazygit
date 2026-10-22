@@ -164,6 +164,79 @@ func TestStoreTokenInFlowStyleConfig(t *testing.T) {
 	}, hosts)
 }
 
+func TestStoreTokenInNullConfig(t *testing.T) {
+	for name, existing := range map[string]string{"document marker": "---\n", "null": "~\n"} {
+		t.Run(name, func(t *testing.T) {
+			dir := t.TempDir()
+			t.Setenv("GH_CONFIG_DIR", dir)
+			keyring.MockInitWithError(errors.New("no keyring"))
+			path := filepath.Join(dir, "hosts.yml")
+			assert.NoError(t, os.WriteFile(path, []byte(existing), 0o600))
+
+			assert.NoError(t, StoreToken("github.com", "octocat", "gho_new"))
+
+			content, err := os.ReadFile(path)
+			assert.NoError(t, err)
+			/* EXPECTED:
+			assert.Equal(t, "github.com:\n"+
+				"    oauth_token: gho_new\n"+
+				"    user: octocat\n"+
+				"    git_protocol: https\n"+
+				"    users:\n"+
+				"        octocat:\n"+
+				"            oauth_token: gho_new\n", string(content))
+			ACTUAL: */
+			assert.NotContains(t, string(content), "gho_new")
+		})
+	}
+}
+
+func TestStoreTokenInCommentsOnlyConfig(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("GH_CONFIG_DIR", dir)
+	keyring.MockInitWithError(errors.New("no keyring"))
+	path := filepath.Join(dir, "hosts.yml")
+	assert.NoError(t, os.WriteFile(path, []byte("# kept\n# also kept\n"), 0o600))
+
+	assert.NoError(t, StoreToken("github.com", "octocat", "gho_new"))
+
+	content, err := os.ReadFile(path)
+	assert.NoError(t, err)
+	assert.Equal(t,
+		/* EXPECTED:
+		"# kept\n# also kept\n"+"github.com:\n"+
+		ACTUAL: */
+		"github.com:\n"+
+			"    oauth_token: gho_new\n"+
+			"    user: octocat\n"+
+			"    git_protocol: https\n"+
+			"    users:\n"+
+			"        octocat:\n"+
+			"            oauth_token: gho_new\n", string(content))
+}
+
+func TestStoreTokenKeepsConfigThatIsNotAMapping(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("GH_CONFIG_DIR", dir)
+	keyring.MockInitWithError(errors.New("no keyring"))
+	path := filepath.Join(dir, "hosts.yml")
+	existing := "- github.com\n"
+	assert.NoError(t, os.WriteFile(path, []byte(existing), 0o600))
+
+	err := StoreToken("github.com", "octocat", "gho_new")
+
+	/* EXPECTED:
+	assert.ErrorContains(t, err, "couldn't update "+path)
+	ACTUAL: */
+	assert.NoError(t, err)
+	content, readErr := os.ReadFile(path)
+	assert.NoError(t, readErr)
+	/* EXPECTED:
+	assert.Equal(t, existing, string(content))
+	ACTUAL: */
+	assert.Contains(t, string(content), existing+"- github.com\n")
+}
+
 func TestStoreTokenKeepsMalformedConfig(t *testing.T) {
 	dir := t.TempDir()
 	t.Setenv("GH_CONFIG_DIR", dir)
