@@ -357,6 +357,7 @@ var tests = []*components.IntegrationTest{
 	github_actions.RerunRun,
 	github_actions.RunWorkflow,
 	github_actions.RunWorkflowWithoutDispatchTrigger,
+	github_actions.ShowWorkflowRuns,
 	github_actions.ViewJobsAndSteps,
 	interactive_rebase.AdvancedInteractiveRebase,
 	interactive_rebase.AmendCommitWithConflict,
