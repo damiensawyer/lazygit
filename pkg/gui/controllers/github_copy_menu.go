@@ -39,6 +39,10 @@ func githubCopyMenu(c *ControllerCommon, items []githubCopyItem) error {
 // copyGithubValue copies something from the GitHub Actions views to the
 // clipboard, saying what it was.
 func copyGithubValue(c *ControllerCommon, label string, value string) error {
+	if value == "" {
+		c.ErrorToast(c.Tr.NoContentToCopyError)
+		return nil
+	}
 	if err := c.OS().CopyToClipboard(utils.Decolorise(value)); err != nil {
 		return err
 	}
@@ -49,5 +53,8 @@ func copyGithubValue(c *ControllerCommon, label string, value string) error {
 }
 
 func joinLogLines(lines []string) string {
+	if len(lines) == 0 {
+		return ""
+	}
 	return strings.Join(lines, "\n") + "\n"
 }
