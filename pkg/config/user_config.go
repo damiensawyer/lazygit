@@ -98,12 +98,12 @@ type GuiConfig struct {
 	// If true, switch to a different worktree without confirmation when checking out a branch that is checked out in that worktree
 	SkipSwitchWorktreeOnCheckoutWarning bool `yaml:"skipSwitchWorktreeOnCheckoutWarning"`
 	// Fraction of the total screen width to use for the left side section. You may want to pick a small number (e.g. 0.2) if you're using a narrow screen, so that you can see more of the main section.
-	// Number from 0 to 1.0.
-	SidePanelWidth float64 `yaml:"sidePanelWidth" jsonschema:"maximum=1,minimum=0"`
+	// Number between 0 and 1.0, exclusive.
+	SidePanelWidth float64 `yaml:"sidePanelWidth" jsonschema:"exclusiveMaximum=1,exclusiveMinimum=0"`
 	// Fraction of the total screen width to use for the left side section when in half screen mode.
 	// This overrides `sidePanelWidth` when the screen is split half and half (after pressing '+' once).
-	// Number from 0 to 1.0. Defaults to 0.5 (equal split).
-	HalfScreenModeSidePanelWidth float64 `yaml:"halfScreenModeSidePanelWidth" jsonschema:"maximum=1,minimum=0"`
+	// Number between 0 and 1.0, exclusive. Defaults to 0.5 (equal split).
+	HalfScreenModeSidePanelWidth float64 `yaml:"halfScreenModeSidePanelWidth" jsonschema:"exclusiveMaximum=1,exclusiveMinimum=0"`
 	// If true, increase the height of the focused side window; creating an accordion effect.
 	ExpandFocusedSidePanel bool `yaml:"expandFocusedSidePanel"`
 	// The weight of the expanded side panel, relative to the other panels. 2 means twice as tall as the other panels. Only relevant if `expandFocusedSidePanel` is true.
@@ -358,7 +358,7 @@ type GitConfig struct {
 	// The number of lines of context to show around each diff hunk. Can be changed from within Lazygit with the `{` and `}` keys.
 	DiffContextSize uint64 `yaml:"diffContextSize"`
 	// Saved context size for toggling with `<alt+}>`. Used internally when toggling full-file diff view.
-	DiffContextSizeSaved uint64 `yaml:"-"`
+	DiffContextSizeSaved *uint64 `yaml:"-"`
 	// The threshold for considering a file to be renamed, in percent. Can be changed from within Lazygit with the `(` and `)` keys.
 	RenameSimilarityThreshold int `yaml:"renameSimilarityThreshold" jsonschema:"minimum=0,maximum=100"`
 	// If true, do not spawn a separate process when using GPG

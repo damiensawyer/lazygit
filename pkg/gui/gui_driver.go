@@ -279,6 +279,11 @@ func (self *GuiDriver) SetCaptionPrefix(prefix string) {
 	self.waitTillIdle()
 }
 
+func (self *GuiDriver) SetKeycast(keys string) {
+	self.OnUIThreadAndWait(func() { self.gui.setKeycast(keys) })
+	self.waitTillIdle()
+}
+
 func (self *GuiDriver) NextToast() *string {
 	select {
 	case t := <-self.toastChan:

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"math"
 	"strconv"
 
 	"github.com/jesseduffield/lazygit/pkg/gui/context"
@@ -224,7 +225,10 @@ func (self *GlobalController) adjustSidePanelWidth(delta float64) error {
 		return nil
 	}
 
-	width := setting.current + delta
+	// Round away the floating point error of adding the delta, which would
+	// otherwise accumulate with every step and end up in the saved config.
+	// Four decimals keep the default width of 0.3333 intact.
+	width := math.Round((setting.current+delta)*10000) / 10000
 	if width < minSidePanelWidth {
 		width = minSidePanelWidth
 	}

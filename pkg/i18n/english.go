@@ -882,6 +882,7 @@ type TranslationSet struct {
 	CopiedToClipboard                        string
 	ErrCannotEditDirectory                   string
 	ErrCannotCopyContentOfDirectory          string
+	ErrCannotCopyContentOfSubmodule          string
 	ErrStageDirWithInlineMergeConflicts      string
 	ErrRepositoryMovedOrDeleted              string
 	ErrWorktreeMovedOrRemoved                string
@@ -1111,6 +1112,7 @@ type Log struct {
 	CopyToClipboard          string
 	Remove                   string
 	CreateFileWithContent    string
+	CreateSymlink            string
 	AppendingLineToFile      string
 	EditRebaseFromBaseCommit string
 	DroppingStash            string
@@ -2413,6 +2415,7 @@ func EnglishTranslationSet() *TranslationSet {
 		CopiedToClipboard:                        "copied to clipboard",
 		ErrCannotEditDirectory:                   "Cannot edit directories: you can only edit individual files",
 		ErrCannotCopyContentOfDirectory:          "Cannot copy content of directories: you can only copy content of individual files",
+		ErrCannotCopyContentOfSubmodule:          "Cannot copy content of a submodule",
 		ErrStageDirWithInlineMergeConflicts:      "Cannot stage/unstage directory containing files with inline merge conflicts. Please fix up the merge conflicts first",
 		ErrRepositoryMovedOrDeleted:              "Cannot find repo. It might have been moved or deleted ¯\\_(ツ)_/¯",
 		CommandLog:                               "Command log",
@@ -2432,7 +2435,7 @@ func EnglishTranslationSet() *TranslationSet {
 		ToggleContextInDiffView:                  "Toggle full file diff view",
 		ToggleContextInDiffViewTooltip:           "Toggle between showing only changed lines with context and showing the entire file.\n\nPress again to restore the previous context size.",
 		DiffContextSizeChanged:                   "Changed diff context size to %d",
-		RestoreDiffContextSize:                   "Restored context size to %d",
+		RestoreDiffContextSize:                   "Restored context size to {{.size}}",
 		FullFileDiffView:                         "Showing full file diff",
 		IncreaseRenameSimilarityThresholdTooltip: "Increase the similarity threshold for a deletion and addition pair to be treated as a rename.\n\nThe default can be changed in the config file with the key 'git.renameSimilarityThreshold'.",
 		IncreaseRenameSimilarityThreshold:        "Increase rename similarity threshold",
@@ -2758,6 +2761,7 @@ func EnglishTranslationSet() *TranslationSet {
 			CopyToClipboard:          "Copying '{{.str}}' to clipboard",
 			Remove:                   "Removing '{{.filename}}'",
 			CreateFileWithContent:    "Creating file '{{.path}}'",
+			CreateSymlink:            "Creating symlink '{{.path}}' pointing to '{{.target}}'",
 			AppendingLineToFile:      "Appending '{{.line}}' to file '{{.filename}}'",
 			EditRebaseFromBaseCommit: "Beginning interactive rebase from '{{.baseCommit}}' onto '{{.targetBranchName}}'",
 			DroppingStash:            "Dropping stash %s",

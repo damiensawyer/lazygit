@@ -92,14 +92,14 @@ gui:
   # Fraction of the total screen width to use for the left side section. You may
   # want to pick a small number (e.g. 0.2) if you're using a narrow screen, so
   # that you can see more of the main section.
-  # Number from 0 to 1.0.
+  # Number between 0 and 1.0, exclusive.
   sidePanelWidth: 0.3333
 
   # Fraction of the total screen width to use for the left side section when in
   # half screen mode.
   # This overrides `sidePanelWidth` when the screen is split half and half (after
   # pressing '+' once).
-  # Number from 0 to 1.0. Defaults to 0.5 (equal split).
+  # Number between 0 and 1.0, exclusive. Defaults to 0.5 (equal split).
   halfScreenModeSidePanelWidth: 0.5
 
   # If true, increase the height of the focused side window; creating an accordion

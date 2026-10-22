@@ -315,4 +315,10 @@ func (gui *Gui) configureViewProperties() {
 		view.Tabs = vt.tabs
 		view.TabIndex = vt.index
 	}
+
+	// Overview mode belongs to a repo, so before the first one is loaded there
+	// is no mode to show.
+	if gui.State != nil {
+		gui.helpers.Mode.UpdateCommitsViewTitle()
+	}
 }

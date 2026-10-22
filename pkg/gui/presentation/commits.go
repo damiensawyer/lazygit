@@ -206,16 +206,25 @@ func GetCommitListDisplayStrings(
 		commits, common.UserConfig().Gui.CommitHashLength, fullDescription,
 		timeFormat, shortTimeFormat, now, bisectInfo, bisectBounds)
 
+	// The marked base commit need not be among the rows rendered (it may be
+	// scrolled out of view, or hidden by the overview mode), so look it up in
+	// the whole list.
+	markedBaseCommitIdx := len(commits)
+	if markedBaseCommit == "" {
+		markedBaseCommitIdx = 0
+	} else if _, idx, found := lo.FindIndexOf(commits, func(commit *models.Commit) bool {
+		return commit.Hash() == markedBaseCommit
+	}); found {
+		markedBaseCommitIdx = idx
+	}
+
 	lines := make([][]string, 0, len(displayIndices))
 	var bisectStatus BisectStatus
-	willBeRebased := markedBaseCommit == ""
 	for _, unfilteredIdx := range displayIndices {
 		commit := commits[unfilteredIdx]
 		bisectStatus = getBisectStatus(unfilteredIdx, commit.Hash(), bisectInfo, bisectBounds)
 		isMarkedBaseCommit := commit.Hash() != "" && commit.Hash() == markedBaseCommit
-		if isMarkedBaseCommit {
-			willBeRebased = true
-		}
+		willBeRebased := unfilteredIdx >= markedBaseCommitIdx
 		lines = append(lines, displayCommit(
 			common,
 			commit,

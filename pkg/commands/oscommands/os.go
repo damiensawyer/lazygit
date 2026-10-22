@@ -175,6 +175,58 @@ func (c *OSCommand) CreateFileWithContent(path string, content string) error {
 	return nil
 }
 
+// Creates a symlink at the given path, replacing whatever non-directory
+// entry is already there, like git does when checking out a symlink.
+func (c *OSCommand) CreateSymlink(path string, target string) error {
+	msg := utils.ResolvePlaceholderString(
+		c.Tr.Log.CreateSymlink,
+		map[string]string{
+			"path":   path,
+			"target": target,
+		},
+	)
+	c.LogCommand(msg, false)
+	if err := os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil {
+		c.Log.Error(err)
+		return err
+	}
+
+	if info, err := os.Lstat(path); err == nil && !info.IsDir() {
+		if err := os.Remove(path); err != nil {
+			c.Log.Error(err)
+			return utils.WrapError(err)
+		}
+	}
+
+	if err := os.Symlink(target, path); err != nil {
+		c.Log.Error(err)
+		return utils.WrapError(err)
+	}
+
+	return nil
+}
+
+// Sets or clears the executable bits of the file at the given path, adding
+// them only where the file is readable, like git does when checking out an
+// executable.
+func (c *OSCommand) SetExecutable(path string, executable bool) error {
+	info, err := os.Stat(path)
+	if err != nil {
+		return utils.WrapError(err)
+	}
+
+	perm := info.Mode().Perm()
+	newPerm := perm &^ 0o111
+	if executable {
+		newPerm |= (perm & 0o444) >> 2
+	}
+	if newPerm == perm {
+		return nil
+	}
+
+	return utils.WrapError(os.Chmod(path, newPerm))
+}
+
 // Remove removes a file or directory at the specified path
 func (c *OSCommand) Remove(filename string) error {
 	msg := utils.ResolvePlaceholderString(

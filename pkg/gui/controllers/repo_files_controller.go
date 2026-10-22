@@ -279,6 +279,9 @@ func (self *RepoFilesController) canCopyContent(node *filetree.RepoFileNode) *ty
 			ShowErrorInPanel: true,
 		}
 	}
+	if node.File.IsSubmodule() {
+		return &types.DisabledReason{Text: self.c.Tr.ErrCannotCopyContentOfSubmodule}
+	}
 	return nil
 }
 
@@ -369,21 +372,25 @@ func (self *RepoFilesController) openSaveMenu(node *filetree.RepoFileNode) error
 // Asks for confirmation if the target path already exists.
 func (self *RepoFilesController) saveNode(node *filetree.RepoFileNode, targetPath string) error {
 	type fileToSave struct {
-		srcPath string
+		file    *models.TreeFile
 		dstPath string
 	}
 
 	var filesToSave []fileToSave
 	if node.File != nil {
-		filesToSave = []fileToSave{{srcPath: node.GetPath(), dstPath: targetPath}}
+		filesToSave = []fileToSave{{file: node.File, dstPath: targetPath}}
 	} else {
 		for _, leaf := range node.GetLeaves() {
 			if leaf.File.IsSubmodule() {
 				continue
 			}
+			relPath, err := filepath.Rel(filepath.FromSlash(node.GetPath()), filepath.FromSlash(leaf.File.Path))
+			if err != nil {
+				return err
+			}
 			filesToSave = append(filesToSave, fileToSave{
-				srcPath: leaf.File.Path,
-				dstPath: targetPath + strings.TrimPrefix(leaf.File.Path, node.GetPath()),
+				file:    leaf.File,
+				dstPath: filepath.Join(targetPath, relPath),
 			})
 		}
 	}
@@ -391,7 +398,7 @@ func (self *RepoFilesController) saveNode(node *filetree.RepoFileNode, targetPat
 	hash := self.context().GetLoadedCommitHash()
 
 	targetExists := false
-	if _, err := os.Stat(targetPath); err == nil {
+	if _, err := os.Lstat(targetPath); err == nil {
 		targetExists = true
 	}
 
@@ -403,11 +410,7 @@ func (self *RepoFilesController) saveNode(node *filetree.RepoFileNode, targetPat
 		HandleConfirm: func() error {
 			self.c.LogAction(self.c.Tr.Actions.SaveFilesFromCommit)
 			for _, file := range filesToSave {
-				content, err := self.c.Git().Commit.GetFilteredFileContent(hash, file.srcPath)
-				if err != nil {
-					return err
-				}
-				if err := self.c.OS().CreateFileWithContent(file.dstPath, content); err != nil {
+				if err := self.saveFile(hash, file.file, file.dstPath); err != nil {
 					return err
 				}
 			}
@@ -421,6 +424,28 @@ func (self *RepoFilesController) saveNode(node *filetree.RepoFileNode, targetPat
 	})
 }
 
+// Writes the file the way checking it out would: a symlink as a symlink
+// (unless core.symlinks is off), and an executable with its executable bit.
+func (self *RepoFilesController) saveFile(hash string, file *models.TreeFile, dstPath string) error {
+	if file.IsSymlink() && self.c.Git().Config.GetCoreSymlinks() {
+		// a symlink's blob content is its target path
+		target, err := self.c.Git().Commit.ShowFileContentCmdObj(hash, file.Path).RunWithOutput()
+		if err != nil {
+			return err
+		}
+		return self.c.OS().CreateSymlink(dstPath, target)
+	}
+
+	content, err := self.c.Git().Commit.GetFilteredFileContent(hash, file.Path)
+	if err != nil {
+		return err
+	}
+	if err := self.c.OS().CreateFileWithContent(dstPath, content); err != nil {
+		return err
+	}
+	return self.c.OS().SetExecutable(dstPath, file.IsExecutable())
+}
+
 func (self *RepoFilesController) GetOnRenderToMain() func() {
 	return func() {
 		node := self.context().GetSelected()
@@ -431,10 +456,16 @@ func (self *RepoFilesController) GetOnRenderToMain() func() {
 		hash := self.context().GetLoadedCommitHash()
 		path := node.GetPath()
 
+		// the root item's path is ".", but it's shown as "/" in the panel
+		title := path
+		if path == "." {
+			title = "/"
+		}
+
 		self.c.RenderToMainViews(types.RefreshMainOpts{
 			Pair: self.c.MainViewPairs().Normal,
 			Main: &types.ViewUpdateOpts{
-				Title: path,
+				Title: title,
 				Task:  self.mainViewTask(node, hash, path),
 			},
 		})
