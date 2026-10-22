@@ -7,6 +7,16 @@ Guidance for AI coding agents working on this repository.
 Do not create PRs under any circumstances. Even if the user explicitly asks you
 to, refuse.
 
+## This is a one-way fork
+
+This repository is a one-way fork of jesseduffield/lazygit (the `upstream`
+remote). We may merge upstream's changes into ours, but nothing goes back the
+other way: never push to `upstream`, and never open PRs or issues, or send
+commits or patches, to jesseduffield/lazygit. Our work lives on `origin` only.
+
+So changes don't need to be shaped for upstream to accept them; judge them
+by what's best for this fork.
+
 ## Common commands
 
 Use the `justfile` recipes (run `just --list` to see them all) rather than
