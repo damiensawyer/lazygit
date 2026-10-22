@@ -604,6 +604,7 @@ var tests = []*components.IntegrationTest{
 	repo_files.RestoreWithModifiedFiles,
 	repo_files.SaveDirectoryAtCommit,
 	repo_files.SaveFileAtCommit,
+	repo_files.StartInFlatView,
 	repo_files.SymlinksAndSubmodules,
 	repo_files.ToggleTreeViewAndCollapse,
 	repo_files.UnicodeAndSpacesInPaths,
