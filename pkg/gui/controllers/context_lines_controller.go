@@ -3,8 +3,10 @@ package controllers
 import (
 	"fmt"
 	"math"
+	"strconv"
 
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
+	"github.com/jesseduffield/lazygit/pkg/utils"
 )
 
 // This controller lets you change the context size for diffs. The 'context' in 'context size' refers to the conventional meaning of the word 'context' in a diff, as opposed to lazygit's own idea of a 'context'.
@@ -78,7 +80,10 @@ func (self *ContextLinesController) Toggle() error {
 			saved = 3
 		}
 		self.c.UserConfig().Git.DiffContextSize = saved
-		self.c.Toast(fmt.Sprintf(self.c.Tr.RestoreDiffContextSize, saved))
+		self.c.Toast(utils.ResolvePlaceholderString(
+			self.c.Tr.RestoreDiffContextSize,
+			map[string]string{"size": strconv.FormatUint(saved, 10)},
+		))
 	} else {
 		self.c.UserConfig().Git.DiffContextSizeSaved = currentSize
 		self.c.UserConfig().Git.DiffContextSize = math.MaxUint64
