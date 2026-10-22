@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/cli/go-gh/v2/pkg/auth"
-	ghconfig "github.com/cli/go-gh/v2/pkg/config"
 	"gopkg.in/yaml.v3"
 )
 
@@ -170,11 +169,12 @@ func FetchUsername(ctx context.Context, host string, token string) (string, erro
 	return user.Login, nil
 }
 
-// StoreToken saves a token in the GitHub CLI's hosts.yml, the same way
-// `gh auth login --insecure-storage` does, so that it is found next time,
-// both by us and by gh.
+// StoreToken saves a token where the GitHub CLI keeps its own, the same way
+// `gh auth login` does, so that it is found next time, both by us and by gh:
+// in the system keyring, with hosts.yml recording whose it is, or, where there
+// is no keyring to use, in hosts.yml itself.
 func StoreToken(host string, username string, token string) error {
-	path := filepath.Join(ghconfig.ConfigDir(), "hosts.yml")
+	path := hostsConfigPath()
 
 	// Read the file afresh rather than through go-gh's config package, which
 	// keeps the first version it read for the rest of the process: writing
@@ -193,13 +193,24 @@ func StoreToken(host string, username string, token string) error {
 		doc = yaml.Node{Kind: yaml.DocumentNode, Content: []*yaml.Node{{Kind: yaml.MappingNode}}}
 	}
 
+	inKeyring := storeTokenInKeyring(host, username, token)
+	// A token left in the file from before would take precedence over one in
+	// the keyring.
+	setOrRemoveToken := func(node *yaml.Node) {
+		if inKeyring {
+			removeKey(node, "oauth_token")
+		} else {
+			setScalar(node, "oauth_token", token)
+		}
+	}
+
 	hostNode := mappingEntry(doc.Content[0], host)
-	setScalar(hostNode, "oauth_token", token)
+	setOrRemoveToken(hostNode)
 	setScalar(hostNode, "user", username)
 	if mappingValue(hostNode, "git_protocol") == nil {
 		setScalar(hostNode, "git_protocol", "https")
 	}
-	setScalar(mappingEntry(mappingEntry(hostNode, "users"), username), "oauth_token", token)
+	setOrRemoveToken(mappingEntry(mappingEntry(hostNode, "users"), username))
 
 	var out bytes.Buffer
 	encoder := yaml.NewEncoder(&out)
@@ -212,6 +223,13 @@ func StoreToken(host string, username string, token string) error {
 		return err
 	}
 	return os.WriteFile(path, out.Bytes(), 0o600)
+}
+
+// storeTokenInKeyring stores a user's token in the keyring, and makes it the
+// host's active one, reporting whether that worked.
+func storeTokenInKeyring(host string, username string, token string) bool {
+	service := keyringServiceName(host)
+	return keyringSet(service, username, token) == nil && keyringSet(service, "", token) == nil
 }
 
 func mappingValue(mapping *yaml.Node, key string) *yaml.Node {
@@ -234,6 +252,15 @@ func mappingEntry(mapping *yaml.Node, key string) *yaml.Node {
 	value := &yaml.Node{Kind: yaml.MappingNode}
 	mapping.Content = append(mapping.Content, &yaml.Node{Kind: yaml.ScalarNode, Value: key}, value)
 	return value
+}
+
+func removeKey(mapping *yaml.Node, key string) {
+	for i := 0; i+1 < len(mapping.Content); i += 2 {
+		if mapping.Content[i].Value == key {
+			mapping.Content = append(mapping.Content[:i], mapping.Content[i+2:]...)
+			return
+		}
+	}
 }
 
 func setScalar(mapping *yaml.Node, key string, value string) {

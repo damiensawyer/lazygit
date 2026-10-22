@@ -100,6 +100,21 @@ func readHostsConfig() map[string]hostsConfigEntry {
 	return hosts
 }
 
+// keyringSet stores a secret in the system keyring, giving up after a while
+// like keyringGet does.
+func keyringSet(service string, user string, secret string) error {
+	ch := make(chan error, 1)
+	go utils.Safe(func() {
+		ch <- keyring.Set(service, user, secret)
+	})
+	select {
+	case err := <-ch:
+		return err
+	case <-time.After(keyringTimeout):
+		return errors.New("timeout while trying to set secret in keyring")
+	}
+}
+
 // keyringGet reads a secret from the system keyring, giving up after a while:
 // on some systems the keyring daemon can hang rather than answer.
 func keyringGet(service string, user string) (string, error) {
