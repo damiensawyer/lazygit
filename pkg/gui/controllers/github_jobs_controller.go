@@ -71,13 +71,17 @@ func (self *GithubJobsController) GetKeybindings(opts types.KeybindingsOpts) []*
 			Handler:           self.withItem(self.openLogInEditor),
 			GetDisabledReason: self.require(self.singleItemSelected(self.jobIsComplete)),
 			Description:       tr.OpenLogInEditor,
+			ShortDescription:  tr.OpenLogInEditorShort,
+			DisplayOnScreen:   true,
 		},
 		{
 			Keys:              opts.GetKeys(opts.Config.GithubActions.CopyToClipboard),
 			Handler:           self.withItem(self.copyToClipboard),
 			GetDisabledReason: self.require(self.singleItemSelected()),
 			Description:       tr.CopyToClipboard,
+			ShortDescription:  tr.CopyShort,
 			OpensMenu:         true,
+			DisplayOnScreen:   true,
 		},
 		{
 			Keys:        opts.GetKeys(opts.Config.Universal.Refresh),

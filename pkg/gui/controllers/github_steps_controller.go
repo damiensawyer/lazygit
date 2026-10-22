@@ -55,13 +55,16 @@ func (self *GithubStepsController) GetKeybindings(opts types.KeybindingsOpts) []
 			Handler:           self.withItem(self.openLogInEditor),
 			GetDisabledReason: self.require(self.singleItemSelected(self.jobIsComplete)),
 			Description:       self.c.Tr.GithubActions.OpenLogInEditor,
+			ShortDescription:  self.c.Tr.GithubActions.OpenLogInEditorShort,
 			Tooltip:           self.c.Tr.GithubActions.OpenLogInEditorTooltip,
+			DisplayOnScreen:   true,
 		},
 		{
 			Keys:              opts.GetKeys(opts.Config.GithubActions.CopyToClipboard),
 			Handler:           self.withItem(self.copyStepLog),
 			GetDisabledReason: self.require(self.singleItemSelected(self.jobIsComplete)),
 			Description:       self.c.Tr.GithubActions.CopyStepLogAction,
+			DisplayOnScreen:   true,
 		},
 		{
 			Keys:        opts.GetKeys(opts.Config.Universal.Refresh),
