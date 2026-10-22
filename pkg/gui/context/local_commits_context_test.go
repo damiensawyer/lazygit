@@ -385,9 +385,6 @@ func TestLocalCommitsPullRequestDiffInOverviewMode(t *testing.T) {
 	}}}
 
 	assert.Equal(t,
-		/* EXPECTED:
 		types.PullRequestDiff{Branch: "feature", Commits: []*models.Commit{top, hidden, tagged}, BaseHash: "below"},
-		ACTUAL: */
-		types.PullRequestDiff{Branch: "feature", Commits: []*models.Commit{top, tagged}},
 		localCommitsPullRequestDiff(c, 0, 1))
 }

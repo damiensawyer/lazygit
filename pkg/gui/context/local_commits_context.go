@@ -56,8 +56,17 @@ func (self *LocalCommitsContext) PullRequestDiff() types.PullRequestDiff {
 // endIdx of the commits panel.
 func localCommitsPullRequestDiff(c *ContextCommon, startIdx int, endIdx int) types.PullRequestDiff {
 	model := c.Model()
+	commits := model.Commits
+	// The diff of a range in overview mode takes in the commits it hides between
+	// the range's ends, so work it out from the full list.
+	if startIdx >= 0 && endIdx < len(commits) {
+		if indices := overviewDisplayIndices(c, startIdx, endIdx+1); len(indices) > 0 {
+			commits = model.OverviewCommitsSource
+			startIdx, endIdx = indices[0], indices[len(indices)-1]
+		}
+	}
 	return pullRequestDiff(
-		model.Commits, startIdx, endIdx, model.CheckedOutBranch, model.Branches, model.PullRequestsMap)
+		commits, startIdx, endIdx, model.CheckedOutBranch, model.Branches, model.PullRequestsMap)
 }
 
 // commitRangeShownInDiff returns the indices of the newest and the oldest of the commits
