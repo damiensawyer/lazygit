@@ -140,4 +140,5 @@ func (gui *Gui) assignSidePanelWindows(contextTree *context.ContextTree) {
 	// biggest one in the default layout.
 	contextTree.GithubRuns.SetWindowName(contextTree.LocalCommits.GetWindowName())
 	contextTree.GithubJobs.SetWindowName(contextTree.LocalCommits.GetWindowName())
+	contextTree.GithubSteps.SetWindowName(contextTree.LocalCommits.GetWindowName())
 }

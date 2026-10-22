@@ -35,6 +35,13 @@ func (self *GithubJobsController) GetKeybindings(opts types.KeybindingsOpts) []*
 
 	return []*types.Binding{
 		{
+			Keys:              opts.GetKeys(opts.Config.Universal.GoInto),
+			Handler:           self.withItem(self.c.Helpers().GithubActions.OpenSteps),
+			GetDisabledReason: self.require(self.singleItemSelected()),
+			Description:       tr.ViewSteps,
+			DisplayOnScreen:   true,
+		},
+		{
 			Keys:              opts.GetKeys(opts.Config.GithubActions.OpenInBrowser),
 			Handler:           self.withItem(self.openInBrowser),
 			GetDisabledReason: self.require(self.singleItemSelected()),

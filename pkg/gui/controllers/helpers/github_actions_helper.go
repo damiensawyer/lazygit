@@ -303,7 +303,7 @@ func (self *GithubActionsHelper) isShowing(context types.Context) bool {
 }
 
 func (self *GithubActionsHelper) contexts() []types.Context {
-	return []types.Context{self.c.Contexts().GithubRuns, self.c.Contexts().GithubJobs}
+	return []types.Context{self.c.Contexts().GithubRuns, self.c.Contexts().GithubJobs, self.c.Contexts().GithubSteps}
 }
 
 func (self *GithubActionsHelper) scheduleAutoRefresh() {
@@ -359,7 +359,7 @@ func (self *GithubActionsHelper) markActiveRunDetailsStale() {
 func (self *GithubActionsHelper) reloadJobsIfRunChanged() {
 	jobsContext := self.c.Contexts().GithubJobs
 	shownRun := jobsContext.GetRun()
-	if shownRun == nil || !self.isShowing(jobsContext) {
+	if shownRun == nil || !(self.isShowing(jobsContext) || self.isShowing(self.c.Contexts().GithubSteps)) {
 		return
 	}
 	run, found := lo.Find(self.c.Model().GithubRuns, func(run *models.GithubRun) bool {
@@ -425,6 +425,36 @@ func (self *GithubActionsHelper) setJobs(run *models.GithubRun, jobs []*models.G
 	}
 
 	self.c.PostRefreshUpdateKeepingScrollPosition(jobsContext)
+
+	stepsContext := self.c.Contexts().GithubSteps
+	if shownJob := stepsContext.GetJob(); shownJob != nil {
+		if job, found := lo.Find(jobs, func(job *models.GithubJob) bool { return job.JobId == shownJob.JobId }); found {
+			stepsContext.SetJob(job)
+			self.c.PostRefreshUpdateKeepingScrollPosition(stepsContext)
+		}
+	}
+}
+
+// OpenSteps shows the steps of a job in place of the jobs.
+func (self *GithubActionsHelper) OpenSteps(job *models.GithubJob) error {
+	stepsContext := self.c.Contexts().GithubSteps
+	stepsContext.SetParentContext(self.c.Contexts().GithubJobs)
+	stepsContext.GetView().TitlePrefix = self.c.Contexts().GithubJobs.GetView().TitlePrefix
+	stepsContext.ClearFilter()
+	stepsContext.SetJob(job)
+
+	// Most of the time a step is looked at because it failed.
+	_, idx, found := lo.FindIndexOf(stepsContext.GetItems(), func(step *models.GithubStep) bool {
+		return step.State().IsFailed()
+	})
+	if !found {
+		idx = 0
+	}
+	stepsContext.SetSelection(idx)
+
+	self.c.PostRefreshUpdate(stepsContext)
+	self.c.Context().Push(stepsContext, types.OnFocusOpts{})
+	return nil
 }
 
 // GetRunDetails returns the details of a run if they have been loaded, or nil
@@ -518,8 +548,12 @@ func (self *GithubActionsHelper) GetJobLog(job *models.GithubJob) *GithubJobLog 
 			self.jobLogs[job.JobId] = jobLog
 
 			jobsContext := self.c.Contexts().GithubJobs
+			stepsContext := self.c.Contexts().GithubSteps
 			if self.c.Context().IsCurrent(jobsContext) && jobsContext.GetSelectedItemId() == job.ID() {
 				jobsContext.HandleRenderToMain()
+			}
+			if self.c.Context().IsCurrent(stepsContext) && stepsContext.GetJob() != nil && stepsContext.GetJob().JobId == job.JobId {
+				stepsContext.HandleRenderToMain()
 			}
 			return nil
 		})

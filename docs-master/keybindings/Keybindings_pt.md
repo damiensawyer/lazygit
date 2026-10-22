@@ -244,6 +244,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 
 | Key | Action | Info |
 |-----|--------|-------------|
+| `` <enter> `` | View steps |  |
 | `` o `` | Open in browser |  |
 | `` R `` | Atualizar |  |
 | `` / `` | Filtrar a visualização atual por texto |  |
@@ -411,6 +412,14 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` a `` | Mostrar/ciclo todos os logs de filiais |  |
 | `` A `` | Show/cycle all branch logs (reverse) |  |
 | `` 0 `` | Focar visualização principal |  |
+
+## Steps
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` o `` | Open in browser |  |
+| `` R `` | Atualizar |  |
+| `` / `` | Filtrar a visualização atual por texto |  |
 
 ## Sub-commits
 

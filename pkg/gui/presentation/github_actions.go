@@ -85,6 +85,16 @@ func GetGithubJobListDisplayStrings(jobs []*models.GithubJob, now time.Time) [][
 	})
 }
 
+func GetGithubStepListDisplayStrings(steps []*models.GithubStep, now time.Time) [][]string {
+	return lo.Map(steps, func(step *models.GithubStep, _ int) []string {
+		return []string{
+			GithubActionsStateIcon(step.State()),
+			step.Name,
+			githubDurationColumn(step.State(), step.Duration(now)),
+		}
+	})
+}
+
 func githubDurationColumn(state models.GithubActionsState, d time.Duration) string {
 	if state == models.GithubActionsStateQueued || state == models.GithubActionsStateSkipped {
 		return ""
@@ -355,5 +365,24 @@ func formatGithubJobLog(job *models.GithubJob, log *github_commands.JobLog, only
 		b.WriteString(style.FgCyan.SetBold().Sprint("━━ "+step.Name) + "\n")
 		b.WriteString(FormatGithubLogLines(stepLog.Lines))
 	}
+	return b.String()
+}
+
+// FormatGithubStepLog shows the part of a job's log that one of its steps
+// produced.
+func FormatGithubStepLog(tr *i18n.TranslationSet, job *models.GithubJob, step *models.GithubStep, log *github_commands.JobLog, now time.Time) string {
+	var b strings.Builder
+	fmt.Fprintf(&b, "%s %s %s\n", GithubActionsStateIcon(step.State()), style.AttrBold.Sprint(step.Name),
+		githubDurationColumn(step.State(), step.Duration(now)))
+	b.WriteString(githubDim.Sprint(job.Name) + "\n\n")
+
+	stepLog, found := lo.Find(log.Steps, func(stepLog github_commands.StepLog) bool {
+		return stepLog.StepNumber == step.Number
+	})
+	if !found || len(stepLog.Lines) == 0 {
+		b.WriteString(githubDim.Sprint(tr.GithubActions.NoLogForStep) + "\n")
+		return b.String()
+	}
+	b.WriteString(FormatGithubLogLines(stepLog.Lines))
 	return b.String()
 }

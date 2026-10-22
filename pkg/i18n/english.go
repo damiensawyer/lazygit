@@ -1096,6 +1096,11 @@ type GithubActions struct {
 	ViewJobs                   string
 	OpenJobInBrowser           string
 	JobsTitleForRun            string
+	StepsTitleForJob           string
+	StepMainTitle              string
+	ViewSteps                  string
+	NoSteps                    string
+	NoLogForStep               string
 }
 
 type Actions struct {
@@ -2464,6 +2469,11 @@ func EnglishTranslationSet() *TranslationSet {
 			ViewJobs:                   "View jobs",
 			OpenJobInBrowser:           "Open in browser",
 			JobsTitleForRun:            "Jobs · {{.run}}",
+			StepsTitleForJob:           "Steps · {{.job}}",
+			StepMainTitle:              "Step",
+			ViewSteps:                  "View steps",
+			NoSteps:                    "This job has no steps",
+			NoLogForStep:               "This step logged nothing",
 		},
 		BreakingChangesTitle: "Breaking Changes",
 		BreakingChangesMessage: `You are updating to a new version of lazygit which contains breaking changes. Please review the notes below and update your configuration if necessary.

@@ -78,6 +78,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 
 | Key | Action | Info |
 |-----|--------|-------------|
+| `` <enter> `` | View steps |  |
 | `` o `` | Open in browser |  |
 | `` R `` | 새로고침 |  |
 | `` / `` | Filter the current view by text |  |
@@ -141,6 +142,14 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` 0 `` | Focus main view |  |
 | `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | View selected item's files |  |
+| `` / `` | Filter the current view by text |  |
+
+## Steps
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` o `` | Open in browser |  |
+| `` R `` | 새로고침 |  |
 | `` / `` | Filter the current view by text |  |
 
 ## Sub-commits

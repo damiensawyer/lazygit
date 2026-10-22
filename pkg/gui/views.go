@@ -41,6 +41,7 @@ func (gui *Gui) orderedViewNameMappings() []viewNameMapping {
 		{viewPtr: &gui.Views.SubCommits, name: "subCommits"},
 		{viewPtr: &gui.Views.GithubRuns, name: "githubRuns"},
 		{viewPtr: &gui.Views.GithubJobs, name: "githubJobs"},
+		{viewPtr: &gui.Views.GithubSteps, name: "githubSteps"},
 		{viewPtr: &gui.Views.CommitFiles, name: "commitFiles"},
 		{viewPtr: &gui.Views.RepoFiles, name: "repoFiles"},
 

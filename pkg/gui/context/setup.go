@@ -41,6 +41,7 @@ func NewContextTree(c *ContextCommon) *ContextTree {
 		Stash:           NewStashContext(c),
 		GithubRuns:      NewGithubRunsContext(c),
 		GithubJobs:      NewGithubJobsContext(c),
+		GithubSteps:     NewGithubStepsContext(c),
 		Suggestions:     NewSuggestionsContext(c),
 		Normal:          NewMainContext(c.Views().Main, "main", NORMAL_MAIN_CONTEXT_KEY, c),
 		NormalSecondary: NewMainContext(c.Views().Secondary, "secondary", NORMAL_SECONDARY_CONTEXT_KEY, c),

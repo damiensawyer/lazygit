@@ -190,6 +190,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 
 | Key | Action | Info |
 |-----|--------|-------------|
+| `` <enter> `` | View steps |  |
 | `` o `` | Open in browser |  |
 | `` R `` | Refresh |  |
 | `` / `` | Filter the current view by text |  |
@@ -401,6 +402,14 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` a `` | Show/cycle all branch logs |  |
 | `` A `` | Show/cycle all branch logs (reverse) |  |
 | `` 0 `` | Focus main view |  |
+
+## Steps
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` o `` | Open in browser |  |
+| `` R `` | Refresh |  |
+| `` / `` | Filter the current view by text |  |
 
 ## Sub-commits
 

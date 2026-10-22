@@ -78,6 +78,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 
 | Key | Action | Info |
 |-----|--------|-------------|
+| `` <enter> `` | View steps |  |
 | `` o `` | Open in browser |  |
 | `` R `` | 重新整理 |  |
 | `` / `` | 搜尋 |  |
@@ -97,6 +98,14 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` - `` | Collapse all files | Collapse all directories in the files tree |
 | `` = `` | Expand all files | Expand all directories in the file tree |
 | `` 0 `` | Focus main view |  |
+| `` / `` | 搜尋 |  |
+
+## Steps
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` o `` | Open in browser |  |
+| `` R `` | 重新整理 |  |
 | `` / `` | 搜尋 |  |
 
 ## 主面板 (補丁生成)

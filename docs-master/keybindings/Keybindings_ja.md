@@ -78,6 +78,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 
 | Key | Action | Info |
 |-----|--------|-------------|
+| `` <enter> `` | View steps |  |
 | `` o `` | Open in browser |  |
 | `` R `` | 更新 |  |
 | `` / `` | 現在のビューをテキストでフィルタリング |  |
@@ -97,6 +98,14 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` - `` | すべてのファイルを折りたたむ | ファイルツリー内のすべてのディレクトリを折りたたみます |
 | `` = `` | すべてのファイルを展開 | ファイルツリー内のすべてのディレクトリを展開します |
 | `` 0 `` | メインビューにフォーカス |  |
+| `` / `` | 現在のビューをテキストでフィルタリング |  |
+
+## Steps
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` o `` | Open in browser |  |
+| `` R `` | 更新 |  |
 | `` / `` | 現在のビューをテキストでフィルタリング |  |
 
 ## コミット

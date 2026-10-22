@@ -71,6 +71,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 
 | Key | Action | Info |
 |-----|--------|-------------|
+| `` <enter> `` | View steps |  |
 | `` o `` | Open in browser |  |
 | `` R `` | 刷新 |  |
 | `` / `` | 通过文本过滤当前视图 |  |
@@ -90,6 +91,14 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` - `` | 折叠全部文件 | 折叠文件树中的全部目录 |
 | `` = `` | 展开全部文件 | 展开文件树中的全部目录 |
 | `` 0 `` | 聚焦主视图 |  |
+| `` / `` | 通过文本过滤当前视图 |  |
+
+## Steps
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` o `` | Open in browser |  |
+| `` R `` | 刷新 |  |
 | `` / `` | 通过文本过滤当前视图 |  |
 
 ## 子提交
