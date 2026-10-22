@@ -704,9 +704,12 @@ type KeybindingGithubActionsConfig struct {
 }
 
 type KeybindingPullRequestsConfig struct {
-	OpenInBrowser   Keybinding `yaml:"openInBrowser"`
-	CopyToClipboard Keybinding `yaml:"copyToClipboard"`
-	Filter          Keybinding `yaml:"filter"`
+	CheckOut           Keybinding `yaml:"checkOut"`
+	CheckOutOptions    Keybinding `yaml:"checkOutOptions"`
+	CheckOutInWorktree Keybinding `yaml:"checkOutInWorktree"`
+	OpenInBrowser      Keybinding `yaml:"openInBrowser"`
+	CopyToClipboard    Keybinding `yaml:"copyToClipboard"`
+	Filter             Keybinding `yaml:"filter"`
 }
 
 type KeybindingCommitFilesConfig struct {
@@ -1251,9 +1254,12 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 				CopyToClipboard:   Keybinding{"y"},
 			},
 			PullRequests: KeybindingPullRequestsConfig{
-				OpenInBrowser:   Keybinding{"o"},
-				CopyToClipboard: Keybinding{"y"},
-				Filter:          Keybinding{"f"},
+				CheckOut:           Keybinding{"<space>"},
+				CheckOutOptions:    Keybinding{"c"},
+				CheckOutInWorktree: Keybinding{"w"},
+				OpenInBrowser:      Keybinding{"o"},
+				CopyToClipboard:    Keybinding{"y"},
+				Filter:             Keybinding{"f"},
 			},
 			RepoFiles: KeybindingRepoFilesConfig{
 				Restore:  Keybinding{"c"},

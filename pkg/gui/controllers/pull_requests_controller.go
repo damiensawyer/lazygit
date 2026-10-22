@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"slices"
+	"strings"
 	"time"
 
 	"github.com/jesseduffield/lazygit/pkg/commands/github_commands"
@@ -12,6 +13,7 @@ import (
 	"github.com/jesseduffield/lazygit/pkg/gui/presentation"
 	"github.com/jesseduffield/lazygit/pkg/gui/style"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
+	"github.com/jesseduffield/lazygit/pkg/utils"
 	"github.com/samber/lo"
 )
 
@@ -46,6 +48,29 @@ func (self *PullRequestsController) GetKeybindings(opts types.KeybindingsOpts) [
 	tr := self.c.Tr.PullRequests
 
 	return []*types.Binding{
+		{
+			Keys:              opts.GetKeys(opts.Config.PullRequests.CheckOut),
+			Handler:           self.withItem(self.checkOut),
+			GetDisabledReason: self.require(self.singleItemSelected()),
+			Description:       tr.CheckOut,
+			Tooltip:           tr.CheckOutTooltip,
+			DisplayOnScreen:   true,
+		},
+		{
+			Keys:              opts.GetKeys(opts.Config.PullRequests.CheckOutOptions),
+			Handler:           self.withItem(self.checkOutOptions),
+			GetDisabledReason: self.require(self.singleItemSelected()),
+			Description:       tr.CheckOutOptions,
+			Tooltip:           tr.CheckOutOptionsTooltip,
+			OpensMenu:         true,
+		},
+		{
+			Keys:              opts.GetKeys(opts.Config.PullRequests.CheckOutInWorktree),
+			Handler:           self.withItem(self.checkOutInWorktree),
+			GetDisabledReason: self.require(self.singleItemSelected()),
+			Description:       tr.CheckOutInWorktree,
+			OpensMenu:         true,
+		},
 		{
 			Keys:              opts.GetKeys(opts.Config.PullRequests.OpenInBrowser),
 			Handler:           self.withItem(self.openInBrowser),
@@ -114,6 +139,63 @@ func (self *PullRequestsController) GetOnRenderToMain() func() {
 
 func (self *PullRequestsController) context() *context.PullRequestsContext {
 	return self.c.Contexts().PullRequests
+}
+
+func (self *PullRequestsController) checkOut(pr *models.GithubPullRequest) error {
+	return self.c.Helpers().GithubPullRequests.CheckOut(pr, helpers.PullRequestCheckoutOpts{})
+}
+
+func (self *PullRequestsController) checkOutInWorktree(pr *models.GithubPullRequest) error {
+	return self.c.Helpers().GithubPullRequests.CheckOutInWorktree(pr, self.c.Helpers().Worktree, helpers.PullRequestCheckoutOpts{})
+}
+
+func (self *PullRequestsController) checkOutOptions(pr *models.GithubPullRequest) error {
+	tr := self.c.Tr.PullRequests
+	helper := self.c.Helpers().GithubPullRequests
+	return self.c.Menu(types.CreateMenuOptions{
+		Title: utils.ResolvePlaceholderString(tr.CheckOutOptionsTitle, map[string]string{"number": fmt.Sprint(pr.Number)}),
+		Items: []*types.MenuItem{
+			{
+				Label: tr.CheckOut,
+				OnPress: func() error {
+					return helper.CheckOut(pr, helpers.PullRequestCheckoutOpts{})
+				},
+			},
+			{
+				Label: tr.CheckOutAsBranch,
+				OnPress: func() error {
+					self.c.Prompt(types.PromptOpts{
+						Title:          tr.CheckOutAsBranchPrompt,
+						InitialContent: pr.HeadRefName,
+						HandleConfirm: func(name string) error {
+							return helper.CheckOut(pr, helpers.PullRequestCheckoutOpts{BranchName: strings.TrimSpace(name)})
+						},
+					})
+					return nil
+				},
+			},
+			{
+				Label: tr.CheckOutDetached,
+				OnPress: func() error {
+					return helper.CheckOut(pr, helpers.PullRequestCheckoutOpts{Detach: true})
+				},
+			},
+			{
+				Label:     tr.CheckOutInWorktree,
+				OpensMenu: true,
+				OnPress: func() error {
+					return self.checkOutInWorktree(pr)
+				},
+			},
+			{
+				Label:   tr.CheckOutForce,
+				Tooltip: tr.CheckOutForceTooltip,
+				OnPress: func() error {
+					return helper.CheckOut(pr, helpers.PullRequestCheckoutOpts{Force: true})
+				},
+			},
+		},
+	})
 }
 
 func (self *PullRequestsController) openInBrowser(pr *models.GithubPullRequest) error {

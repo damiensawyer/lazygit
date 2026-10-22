@@ -79,3 +79,14 @@ func widgetDetails() *models.GithubPullRequestDetails {
 		}},
 	}
 }
+
+// setupRepoWithGithubRemote gives the repo an origin remote that looks like
+// github.com/owner/repo to lazygit, but whose URL git rewrites to a bare repo
+// next to it, so that it can be fetched from.
+func setupRepoWithGithubRemote(shell *Shell) {
+	shell.EmptyCommit("initial commit")
+	shell.Clone("origin")
+	shell.RunCommand([]string{"git", "remote", "add", "origin", "https://github.com/owner/repo.git"})
+	shell.SetConfig("url.../origin.insteadOf", "https://github.com/owner/repo.git")
+	shell.RunCommand([]string{"git", "fetch", "origin"})
+}

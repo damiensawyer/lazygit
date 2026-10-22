@@ -1206,6 +1206,21 @@ type PullRequests struct {
 	FilterDescriptionBase            string
 	FilterDescriptionSearch          string
 	NoFilter                         string
+	CheckingOut                      string
+	CheckedOut                       string
+	CheckedOutDetached               string
+	WorktreeLocationPrompt           string
+	CheckOut                         string
+	CheckOutTooltip                  string
+	CheckOutOptions                  string
+	CheckOutOptionsTooltip           string
+	CheckOutAsBranch                 string
+	CheckOutAsBranchPrompt           string
+	CheckOutDetached                 string
+	CheckOutInWorktree               string
+	CheckOutForce                    string
+	CheckOutForceTooltip             string
+	CheckOutOptionsTitle             string
 }
 
 type GithubActions struct {
@@ -1486,6 +1501,7 @@ type Actions struct {
 	OpenMergeTool                    string
 	OpenCommitInBrowser              string
 	OpenPullRequest                  string
+	CheckOutPullRequest              string
 	StartBisect                      string
 	ResetBisect                      string
 	BisectSkip                       string
@@ -2705,6 +2721,7 @@ func EnglishTranslationSet() *TranslationSet {
 			OpenMergeTool:                    "Open merge tool",
 			OpenCommitInBrowser:              "Open commit in browser",
 			OpenPullRequest:                  "Open pull request in browser",
+			CheckOutPullRequest:              "Check out pull request",
 			StartBisect:                      "Start bisect",
 			ResetBisect:                      "Reset bisect",
 			BisectSkip:                       "Bisect skip",
@@ -2830,6 +2847,21 @@ func EnglishTranslationSet() *TranslationSet {
 			FilterDescriptionBase:            "into {{.value}}",
 			FilterDescriptionSearch:          `matching "{{.value}}"`,
 			NoFilter:                         "All open pull requests are shown already.",
+			CheckingOut:                      "Checking out pull request…",
+			CheckedOut:                       "Checked out #{{.number}} as {{.branch}}",
+			CheckedOutDetached:               "Checked out #{{.number}} at a detached HEAD",
+			WorktreeLocationPrompt:           "Where to check out #{{.number}}?",
+			CheckOut:                         "Check out",
+			CheckOutTooltip:                  "Check out the pull request the way `gh pr checkout` does: on a local branch named like its head branch (fast-forwarding it if it exists), set up to pull new commits of the pull request, and, where maintainers may push to it, to push to it. A pull request from a fork without a remote of its own is fetched from the base repository.",
+			CheckOutOptions:                  "Check out",
+			CheckOutOptionsTooltip:           "Check the pull request out under another branch name, detached, in a new worktree, or reset the local branch to it rather than only fast-forwarding it.",
+			CheckOutAsBranch:                 "Check out as a branch named…",
+			CheckOutAsBranchPrompt:           "Local branch name",
+			CheckOutDetached:                 "Check out detached",
+			CheckOutInWorktree:               "Check out in a new worktree",
+			CheckOutForce:                    "Check out, resetting the local branch to the pull request",
+			CheckOutForceTooltip:             "Like checking it out, but if the local branch has diverged from the pull request, reset it to the pull request rather than failing. Commits only on the local branch are lost.",
+			CheckOutOptionsTitle:             "Check out #{{.number}}",
 		},
 		GithubActions: GithubActions{
 			LoginTitle:                         "Log in to {{.host}}",

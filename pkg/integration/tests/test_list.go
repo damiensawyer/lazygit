@@ -603,6 +603,8 @@ var tests = []*components.IntegrationTest{
 	patch_building.SelectDirecoriesSharingPrefix,
 	patch_building.ToggleDirectory,
 	patch_building.ToggleRange,
+	pull_requests.CheckOutPullRequest,
+	pull_requests.CheckOutPullRequestFromFork,
 	pull_requests.ChooseRepository,
 	pull_requests.FilterPullRequests,
 	pull_requests.ListPullRequests,

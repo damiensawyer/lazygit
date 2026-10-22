@@ -905,6 +905,9 @@ keybinding:
     downloadArtifacts: a
     copyToClipboard: "y"
   pullRequests:
+    checkOut: <space>
+    checkOutOptions: c
+    checkOutInWorktree: w
     openInBrowser: o
     copyToClipboard: "y"
     filter: f

@@ -74,10 +74,23 @@ func (self *PullRequestsContext) SetListFilter(filter github_commands.ListPullRe
 func LocalBranchesOfPullRequests(model *types.Model) map[int]string {
 	branchToPr := git_commands.GenerateGithubPullRequestMap(model.ListedPullRequests, model.Branches, model.Remotes)
 	result := make(map[int]string, len(branchToPr))
+	// Two local branches tracking the same remote branch are rare; prefer the
+	// checked out one, then the one named like the head branch, then the
+	// first by name.
+	rank := func(branchName string, pr *models.GithubPullRequest) int {
+		switch branchName {
+		case model.CheckedOutBranch:
+			return 0
+		case pr.HeadRefName:
+			return 1
+		default:
+			return 2
+		}
+	}
 	for branchName, pr := range branchToPr {
-		// Two local branches tracking the same remote branch are rare; prefer
-		// the checked out one, then the one named like the head branch.
-		if existing, ok := result[pr.Number]; ok && (existing == model.CheckedOutBranch || existing == pr.HeadRefName) {
+		existing, ok := result[pr.Number]
+		if ok && (rank(existing, pr) < rank(branchName, pr) ||
+			(rank(existing, pr) == rank(branchName, pr) && existing < branchName)) {
 			continue
 		}
 		result[pr.Number] = branchName

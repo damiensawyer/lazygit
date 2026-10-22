@@ -98,6 +98,9 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 
 | Key | Action | Info |
 |-----|--------|-------------|
+| `` <space> `` | Check out | Check out the pull request the way `gh pr checkout` does: on a local branch named like its head branch (fast-forwarding it if it exists), set up to pull new commits of the pull request, and, where maintainers may push to it, to push to it. A pull request from a fork without a remote of its own is fetched from the base repository. |
+| `` c `` | Check out | Check the pull request out under another branch name, detached, in a new worktree, or reset the local branch to it rather than only fast-forwarding it. |
+| `` w `` | Check out in a new worktree |  |
 | `` o `` | Open in browser | Open the pull request on GitHub. |
 | `` y `` | Copy to clipboard |  |
 | `` f `` | Filter pull requests | Choose which pull requests to load: open, closed, merged or all of them, and only those by an author, assigned to someone, awaiting someone's review, with a label, against a base branch, or matching a search. |

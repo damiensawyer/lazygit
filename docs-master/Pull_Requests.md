@@ -39,8 +39,31 @@ review threads.
 
 | Key | Action |
 |-----|--------|
+| `space` | Check the pull request out (see below) |
+| `c` | Check it out under another branch name, detached, in a new worktree, or resetting the local branch to it |
+| `w` | Check it out in a new worktree, and switch to that |
 | `o` | Open the pull request in the browser |
 | `y` | Copy its URL, number, title, head branch or description |
 | `f` | Choose which pull requests to load: open, closed, merged or all of them; yours, the ones awaiting your review, or the ones assigned to you; or those by an author, with a label, against a base branch, or matching a search in GitHub's search syntax |
 | `R` | Reload the pull requests, logging in first if needed |
 | `/` | Filter the loaded pull requests by text |
+
+## Checking out
+
+Checking out a pull request does what `gh pr checkout` does:
+
+- A pull request from a branch of the repository, or from a fork that you
+  have a remote for, is fetched from that remote, and checked out on a local
+  branch of the same name that tracks it. If you have that branch already,
+  it is fast-forwarded to the pull request (or, with the option to reset it,
+  reset to it).
+- A pull request from a fork that you have no remote for is fetched from the
+  base repository's `refs/pull/<number>/head`, onto a local branch named
+  like its head branch (prefixed with the fork's owner if that would clash
+  with the default branch). The branch is set up so that pulling it brings
+  in new commits of the pull request; and if the fork's owner allows
+  maintainers to push to it, so that pushing it pushes to the fork.
+
+A local branch that already tracks the pull request's head branch is the
+one that is checked out and brought up to date, whatever it is called. The
+pull requests list marks the pull request that is checked out with `*`.
