@@ -48,6 +48,17 @@ var LargeNestedTree = NewIntegrationTest(NewIntegrationTestArgs{
 				Equals("▼ /"),
 				Equals("  ▼ dir01/a/b").IsSelected(),
 				Equals("    file01.txt"),
+			).
+			// collapsing while scrolled far down shrinks the list to less
+			// than the scroll offset, so the view has to scroll back up and
+			// render the rows that are then visible
+			NavigateToLine(Contains("file40.txt")).
+			Press(keys.Files.CollapseAll).
+			/* EXPECTED:
+			Lines(
+				Equals("▶ /").IsSelected(),
 			)
+			ACTUAL: */
+			IsEmpty()
 	},
 })
