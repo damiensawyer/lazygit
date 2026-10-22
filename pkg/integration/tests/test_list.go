@@ -591,6 +591,7 @@ var tests = []*components.IntegrationTest{
 	repo_files.EnterFromStash,
 	repo_files.EnterFromSubCommits,
 	repo_files.EnterFromTags,
+	repo_files.EnterWithoutSelection,
 	repo_files.FileHistory,
 	repo_files.FilterFiles,
 	repo_files.LargeNestedTree,
