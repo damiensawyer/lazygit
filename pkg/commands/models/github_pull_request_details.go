@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"strings"
 	"time"
 )
@@ -211,4 +212,34 @@ func (self *GithubPullRequestDetails) ReviewRequestedFrom(login string) bool {
 		}
 	}
 	return false
+}
+
+// GithubPullRequestRef is the local ref that a pull request's head is fetched
+// into for looking at its commits: refs/pull/<number>/head, which is what
+// GitHub calls it too.
+type GithubPullRequestRef struct {
+	Number int
+	Title  string
+}
+
+var _ Ref = GithubPullRequestRef{}
+
+func (self GithubPullRequestRef) FullRefName() string {
+	return fmt.Sprintf("refs/pull/%d/head", self.Number)
+}
+
+func (self GithubPullRequestRef) RefName() string {
+	return self.FullRefName()
+}
+
+func (self GithubPullRequestRef) ShortRefName() string {
+	return fmt.Sprintf("#%d", self.Number)
+}
+
+func (self GithubPullRequestRef) ParentRefName() string {
+	return self.FullRefName() + "^"
+}
+
+func (self GithubPullRequestRef) Description() string {
+	return fmt.Sprintf("#%d %s", self.Number, self.Title)
 }

@@ -191,3 +191,12 @@ func (self *GitHubCommands) CheckOutPullRequest(task gocui.Task, checkout PullRe
 	}
 	return nil
 }
+
+// FetchPullRequestHead fetches the head of a pull request from the base
+// repository into the local ref of the same name, refs/pull/<number>/head.
+// remote is the base repository's remote, or its URL.
+func (self *GitHubCommands) FetchPullRequestHead(task gocui.Task, remote string, number int) error {
+	ref := fmt.Sprintf("refs/pull/%d/head", number)
+	cmdArgs := NewGitCmd("fetch").Arg(remote, "+"+ref+":"+ref, "--no-tags").ToArgv()
+	return self.cmd.New(cmdArgs).PromptOnCredentialRequest(task).Run()
+}

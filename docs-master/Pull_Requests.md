@@ -39,6 +39,7 @@ review threads.
 
 | Key | Action |
 |-----|--------|
+| `enter` | Show its commits, without checking it out: its head is fetched into `refs/pull/<number>/head`, the way GitHub names it. From there, `enter` on a commit shows the files it changes, and a range of commits shows their combined diff |
 | `space` | Check the pull request out (see below) |
 | `c` | Check it out under another branch name, detached, in a new worktree, or resetting the local branch to it |
 | `w` | Check it out in a new worktree, and switch to that |

@@ -49,6 +49,14 @@ func (self *PullRequestsController) GetKeybindings(opts types.KeybindingsOpts) [
 
 	return []*types.Binding{
 		{
+			Keys:              opts.GetKeys(opts.Config.Universal.GoInto),
+			Handler:           self.withItem(self.viewCommits),
+			GetDisabledReason: self.require(self.singleItemSelected()),
+			Description:       tr.ViewCommits,
+			Tooltip:           tr.ViewCommitsTooltip,
+			DisplayOnScreen:   true,
+		},
+		{
 			Keys:              opts.GetKeys(opts.Config.PullRequests.CheckOut),
 			Handler:           self.withItem(self.checkOut),
 			GetDisabledReason: self.require(self.singleItemSelected()),
@@ -139,6 +147,10 @@ func (self *PullRequestsController) GetOnRenderToMain() func() {
 
 func (self *PullRequestsController) context() *context.PullRequestsContext {
 	return self.c.Contexts().PullRequests
+}
+
+func (self *PullRequestsController) viewCommits(pr *models.GithubPullRequest) error {
+	return self.c.Helpers().GithubPullRequests.ViewCommits(pr, self.c.Helpers().SubCommits)
 }
 
 func (self *PullRequestsController) checkOut(pr *models.GithubPullRequest) error {

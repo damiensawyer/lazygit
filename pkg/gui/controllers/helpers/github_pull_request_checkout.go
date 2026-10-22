@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/jesseduffield/lazygit/pkg/commands/git_commands"
+	"github.com/jesseduffield/lazygit/pkg/commands/github_commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/hosting_service"
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
 	"github.com/jesseduffield/lazygit/pkg/gocui"
@@ -175,4 +176,25 @@ func githubRepoURL(host string, owner string, name string, modelURL string) stri
 		return fmt.Sprintf("git@%s:%s/%s.git", host, owner, name)
 	}
 	return fmt.Sprintf("https://%s/%s/%s.git", host, owner, name)
+}
+
+// ViewCommits fetches a pull request's head and shows its commits in place of
+// the pull requests, the way entering a branch shows the branch's.
+func (self *GithubPullRequestsHelper) ViewCommits(pr *models.GithubPullRequest, subCommitsHelper *SubCommitsHelper) error {
+	return self.clientHelper.WithClient(func(*github_commands.Client) error {
+		remote, _ := self.baseRemote()
+		return self.c.WithWaitingStatus(self.c.Tr.PullRequests.FetchingPullRequest, func(task gocui.Task) error {
+			if err := self.c.Git().GitHub.FetchPullRequestHead(task, remote, pr.Number); err != nil {
+				return err
+			}
+			self.c.OnUIThread(func() error {
+				return subCommitsHelper.ViewSubCommits(ViewSubCommitsOpts{
+					Ref:      models.GithubPullRequestRef{Number: pr.Number, Title: pr.Title},
+					TitleRef: fmt.Sprintf("#%d %s", pr.Number, pr.Title),
+					Context:  self.c.Contexts().PullRequests,
+				})
+			})
+			return nil
+		})
+	})
 }

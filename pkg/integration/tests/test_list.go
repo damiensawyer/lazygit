@@ -610,6 +610,7 @@ var tests = []*components.IntegrationTest{
 	pull_requests.ListPullRequests,
 	pull_requests.NoGithubRemote,
 	pull_requests.NotLoggedIn,
+	pull_requests.ViewPullRequestCommits,
 	reflog.Checkout,
 	reflog.CherryPick,
 	reflog.DoNotShowBranchMarkersInReflogSubcommits,

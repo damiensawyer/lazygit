@@ -1221,6 +1221,9 @@ type PullRequests struct {
 	CheckOutForce                    string
 	CheckOutForceTooltip             string
 	CheckOutOptionsTitle             string
+	ViewCommits                      string
+	ViewCommitsTooltip               string
+	FetchingPullRequest              string
 }
 
 type GithubActions struct {
@@ -2862,6 +2865,9 @@ func EnglishTranslationSet() *TranslationSet {
 			CheckOutForce:                    "Check out, resetting the local branch to the pull request",
 			CheckOutForceTooltip:             "Like checking it out, but if the local branch has diverged from the pull request, reset it to the pull request rather than failing. Commits only on the local branch are lost.",
 			CheckOutOptionsTitle:             "Check out #{{.number}}",
+			ViewCommits:                      "View commits",
+			ViewCommitsTooltip:               "Fetch the pull request from GitHub and show its commits, without checking it out. From there, view the files a commit changed, or select a range of commits to see their combined diff.",
+			FetchingPullRequest:              "Fetching pull request…",
 		},
 		GithubActions: GithubActions{
 			LoginTitle:                         "Log in to {{.host}}",
