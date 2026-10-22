@@ -45,6 +45,19 @@ func TestUserConfigValidate_enums(t *testing.T) {
 			},
 		},
 		{
+			name: "Gui.SyntaxHighlightStyle",
+			setup: func(config *UserConfig, value string) {
+				config.Gui.SyntaxHighlightStyle = value
+			},
+			testCases: []testCase{
+				{value: "", valid: true},
+				{value: "monokai", valid: true},
+				{value: "github", valid: true},
+				{value: "Monokai", valid: false},
+				{value: "invalid_value", valid: false},
+			},
+		},
+		{
 			name: "Git.AutoForwardBranches",
 			setup: func(config *UserConfig, value string) {
 				config.Git.AutoForwardBranches = value
