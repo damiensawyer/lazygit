@@ -2,7 +2,7 @@
 
 A fork of [jesseduffield/lazygit](https://github.com/jesseduffield/lazygit) with extra features that aren't in upstream. Upstream stopped accepting pull requests, so these live here instead. The fork tracks upstream's `master`, so everything upstream lazygit does still works the same way. For the basics (installation, configuration, all the standard keybindings) see the [upstream README](https://github.com/jesseduffield/lazygit#readme).
 
-It should be pretty obvious I didn't write any of this. I'm an old coder who misses the old ways of vim key map coffee mugs, water cooler chats about the pros and cons of monads, multiple viewings of [Silicon Valley](https://www.youtube.com/watch?v=30WTWkFe910) and actually have to think about something slowly and carefully before the computer would do what you wanted.
+It should be pretty obvious I didn't write any of this. I'm an old coder who misses the old ways of vim key map coffee mugs, water cooler chats about the pros and cons of monads, multiple viewings of Silicon Valley and actually having to think about something slowly and carefully before the computer would do what you wanted.
 
 But hey - the times are be changing.
 
