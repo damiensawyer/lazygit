@@ -423,10 +423,10 @@ func TestUserConfigValidate_sidePanelWidths(t *testing.T) {
 	}{
 		{name: "narrow", width: 0.01, valid: true},
 		{name: "wide", width: 0.99, valid: true},
-		{name: "zero", width: 0, valid: /* EXPECTED: false ACTUAL: */ true},
-		{name: "negative", width: -0.2, valid: /* EXPECTED: false ACTUAL: */ true},
-		{name: "one", width: 1, valid: /* EXPECTED: false ACTUAL: */ true},
-		{name: "greater than one", width: 1.5, valid: /* EXPECTED: false ACTUAL: */ true},
+		{name: "zero", width: 0, valid: false},
+		{name: "negative", width: -0.2, valid: false},
+		{name: "one", width: 1, valid: false},
+		{name: "greater than one", width: 1.5, valid: false},
 	}
 
 	fields := []struct {

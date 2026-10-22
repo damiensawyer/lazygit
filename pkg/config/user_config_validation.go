@@ -73,7 +73,22 @@ func (config *UserConfig) Validate() error {
 	if err := validateSidePanels(config.Gui.SidePanels); err != nil {
 		return err
 	}
+	if err := validateSidePanelWidth("gui.sidePanelWidth", config.Gui.SidePanelWidth); err != nil {
+		return err
+	}
+	if err := validateSidePanelWidth("gui.halfScreenModeSidePanelWidth", config.Gui.HalfScreenModeSidePanelWidth); err != nil {
+		return err
+	}
 	return nil
+}
+
+// At 0 the side panel would disappear and at 1 the main view would; beyond
+// that range the layout would give one of them a negative weight.
+func validateSidePanelWidth(name string, width float64) error {
+	if width > 0 && width < 1 {
+		return nil
+	}
+	return fmt.Errorf("Unexpected value '%v' for '%s'. It must be greater than 0 and less than 1.", width, name)
 }
 
 // An unknown style name would otherwise fall back to an arbitrary style, giving

@@ -605,16 +605,16 @@
         },
         "sidePanelWidth": {
           "type": "number",
-          "maximum": 1,
-          "minimum": 0,
-          "description": "Fraction of the total screen width to use for the left side section. You may want to pick a small number (e.g. 0.2) if you're using a narrow screen, so that you can see more of the main section.\nNumber from 0 to 1.0.",
+          "exclusiveMaximum": 1,
+          "exclusiveMinimum": 0,
+          "description": "Fraction of the total screen width to use for the left side section. You may want to pick a small number (e.g. 0.2) if you're using a narrow screen, so that you can see more of the main section.\nNumber between 0 and 1.0, exclusive.",
           "default": 0.3333
         },
         "halfScreenModeSidePanelWidth": {
           "type": "number",
-          "maximum": 1,
-          "minimum": 0,
-          "description": "Fraction of the total screen width to use for the left side section when in half screen mode.\nThis overrides `sidePanelWidth` when the screen is split half and half (after pressing '+' once).\nNumber from 0 to 1.0. Defaults to 0.5 (equal split).",
+          "exclusiveMaximum": 1,
+          "exclusiveMinimum": 0,
+          "description": "Fraction of the total screen width to use for the left side section when in half screen mode.\nThis overrides `sidePanelWidth` when the screen is split half and half (after pressing '+' once).\nNumber between 0 and 1.0, exclusive. Defaults to 0.5 (equal split).",
           "default": 0.5
         },
         "expandFocusedSidePanel": {
