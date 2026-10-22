@@ -343,6 +343,18 @@ func (self *GithubActionsHelper) GetRunDetails(run *models.GithubRun) *GithubRun
 	if upToDate || self.runDetailsLoading[run.RunId] || self.client == nil {
 		return details
 	}
+	self.loadRunDetailsInBackground(run, func(*GithubRunDetails) {
+		runsContext := self.c.Contexts().GithubRuns
+		if self.c.Context().IsCurrent(runsContext) && runsContext.GetSelectedItemId() == run.ID() {
+			runsContext.HandleRenderToMain()
+		}
+	})
+	return details
+}
+
+// loadRunDetailsInBackground loads a run's details, stores them, and passes
+// them to then on the UI thread.
+func (self *GithubActionsHelper) loadRunDetailsInBackground(run *models.GithubRun, then func(*GithubRunDetails)) {
 	self.runDetailsLoading[run.RunId] = true
 
 	client := self.client
@@ -355,16 +367,11 @@ func (self *GithubActionsHelper) GetRunDetails(run *models.GithubRun) *GithubRun
 			}
 			delete(self.runDetailsLoading, run.RunId)
 			self.runDetails[run.RunId] = details
-
-			runsContext := self.c.Contexts().GithubRuns
-			if self.c.Context().IsCurrent(runsContext) && runsContext.GetSelectedItemId() == run.ID() {
-				runsContext.HandleRenderToMain()
-			}
+			then(details)
 			return nil
 		})
 		return nil
 	})
-	return details
 }
 
 func loadRunDetails(client *github_commands.Client, run *models.GithubRun) *GithubRunDetails {
