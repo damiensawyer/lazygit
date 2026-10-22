@@ -261,6 +261,7 @@ var tests = []*components.IntegrationTest{
 	diff.StatFollowsAScreenModeChange,
 	diff.StatUsesTheViewWidth,
 	diff.ToggleFullFileContext,
+	diff.ToggleFullFileContextFromAConfiguredFullFile,
 	diff.ToggleFullFileContextRestoresAChangedSize,
 	diff.ToggleShowFinalVersion,
 	file.ClickArrowToCollapse,
