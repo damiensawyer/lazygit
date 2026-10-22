@@ -47,6 +47,7 @@ func ParseWorkflowDispatchInputs(content string) ([]WorkflowInput, error) {
 		if dispatch := mappingValue(on, "workflow_dispatch"); dispatch != nil {
 			return parseWorkflowInputs(dispatch)
 		}
+	case yaml.DocumentNode, yaml.AliasNode:
 	}
 	return nil, ErrNotDispatchable
 }
