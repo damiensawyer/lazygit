@@ -343,6 +343,7 @@ var tests = []*components.IntegrationTest{
 	filter_by_path.SelectFilteredFileWhenEnteringCommitNoRootItem,
 	filter_by_path.ShowDiffsForRenamedFile,
 	filter_by_path.TypeFile,
+	github_actions.ApiErrorLoadingJobsAndLog,
 	github_actions.ApiErrorLoadingRuns,
 	github_actions.ApiErrorOnAction,
 	github_actions.ApiErrorRepoNotFound,
