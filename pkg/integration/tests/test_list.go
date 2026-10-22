@@ -152,6 +152,7 @@ var tests = []*components.IntegrationTest{
 	commit.KeepSelectedCommitAfterExternalCommit,
 	commit.NewBranch,
 	commit.OverviewModeAcrossRepoSwitch,
+	commit.OverviewModeDuringRebase,
 	commit.OverviewModeFromLogMenuAndEscape,
 	commit.OverviewModeInFilteringMode,
 	commit.OverviewModeWithNoVisibleCommits,
