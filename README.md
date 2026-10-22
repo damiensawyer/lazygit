@@ -165,7 +165,7 @@ This installs the binary as `lazygit` in `$(go env GOPATH)/bin`, so it replaces 
 
 ### Re-recording the GIFs
 
-The demos above are recorded with [vhs](https://github.com/charmbracelet/vhs) from scripted sessions. To regenerate them after changing a feature, run:
+The demos above are recorded with [vhs](https://github.com/charmbracelet/vhs) from the demo integration tests in `pkg/integration/tests/demo`. To regenerate them after changing a feature, run:
 
 ```sh
 demo/fork/record.sh               # all of them
