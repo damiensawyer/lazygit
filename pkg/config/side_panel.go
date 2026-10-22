@@ -20,6 +20,7 @@ var ValidSidePanelTabs = []string{
 	"worktrees",
 	"submodules",
 	"branches",
+	"pullRequests",
 	"remotes",
 	"tags",
 	"commits",

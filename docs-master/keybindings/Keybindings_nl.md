@@ -289,6 +289,16 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+f> `` | Find base commit for fixup | Vind de commit waar je huidige wijzigingen bovenop zijn gebouwd met als doel die commit te amenden/fixen. Hierdoor hoef je dit niet met de hand te doen. Zie: <https://github.com/jesseduffield/lazygit/tree/master/docs/Fixup_Commits.md> |
 | `` / `` | Start met zoeken |  |
 
+## Pull requests
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` o `` | Open in browser | Open the pull request on GitHub. |
+| `` y `` | Copy to clipboard |  |
+| `` f `` | Filter pull requests | Choose which pull requests to load: open, closed, merged or all of them, and only those by an author, assigned to someone, awaiting someone's review, with a label, against a base branch, or matching a search. |
+| `` R `` | Refresh pull requests | Load the pull requests again; this logs you in to GitHub first if needed. They also reload by themselves every minute while the list is shown. |
+| `` / `` | Filter the current view by text |  |
+
 ## Reflog
 
 | Key | Action | Info |

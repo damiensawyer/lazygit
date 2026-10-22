@@ -1263,6 +1263,9 @@ func (self *RefreshHelper) refreshBranches(captured capturedBranchState, waitFor
 		// Need to re-render the commits view because the visualization of local
 		// branch heads might have changed
 		self.c.Contexts().LocalCommits.HandleRender()
+		// and the pull requests, because they show which of them are checked
+		// out
+		self.c.Contexts().PullRequests.HandleRender()
 	})
 
 	self.refreshView(self.c.Contexts().Branches, env)

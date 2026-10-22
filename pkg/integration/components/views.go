@@ -74,6 +74,10 @@ func (self *Views) Remotes() *ViewDriver {
 	return self.regularView("remotes")
 }
 
+func (self *Views) PullRequests() *ViewDriver {
+	return self.regularView("pullRequests")
+}
+
 func (self *Views) RemoteBranches() *ViewDriver {
 	return self.regularView("remoteBranches")
 }

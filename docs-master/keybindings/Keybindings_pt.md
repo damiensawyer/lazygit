@@ -319,6 +319,16 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` M `` | View merge conflict options | View options for resolving merge conflicts. |
 | `` <esc> `` | Retornar ao painel de arquivos |  |
 
+## Pull requests
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` o `` | Open in browser | Open the pull request on GitHub. |
+| `` y `` | Copy to clipboard |  |
+| `` f `` | Filter pull requests | Choose which pull requests to load: open, closed, merged or all of them, and only those by an author, assigned to someone, awaiting someone's review, with a label, against a base branch, or matching a search. |
+| `` R `` | Refresh pull requests | Load the pull requests again; this logs you in to GitHub first if needed. They also reload by themselves every minute while the list is shown. |
+| `` / `` | Filtrar a visualização atual por texto |  |
+
 ## Reflog
 
 | Key | Action | Info |

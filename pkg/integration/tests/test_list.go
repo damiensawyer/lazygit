@@ -22,6 +22,7 @@ import (
 	"github.com/jesseduffield/lazygit/pkg/integration/tests/main_view"
 	"github.com/jesseduffield/lazygit/pkg/integration/tests/misc"
 	"github.com/jesseduffield/lazygit/pkg/integration/tests/patch_building"
+	"github.com/jesseduffield/lazygit/pkg/integration/tests/pull_requests"
 	"github.com/jesseduffield/lazygit/pkg/integration/tests/reflog"
 	"github.com/jesseduffield/lazygit/pkg/integration/tests/remote"
 	"github.com/jesseduffield/lazygit/pkg/integration/tests/repo_files"
@@ -602,6 +603,11 @@ var tests = []*components.IntegrationTest{
 	patch_building.SelectDirecoriesSharingPrefix,
 	patch_building.ToggleDirectory,
 	patch_building.ToggleRange,
+	pull_requests.ChooseRepository,
+	pull_requests.FilterPullRequests,
+	pull_requests.ListPullRequests,
+	pull_requests.NoGithubRemote,
+	pull_requests.NotLoggedIn,
 	reflog.Checkout,
 	reflog.CherryPick,
 	reflog.DoNotShowBranchMarkersInReflogSubcommits,

@@ -11,48 +11,51 @@ import (
 // this also gives the default view of its window. The keys must match
 // config.ValidSidePanelTabs (enforced by a test).
 var sidePanelViewNames = map[string]string{
-	"status":     "status",
-	"files":      "files",
-	"worktrees":  "worktrees",
-	"submodules": "submodules",
-	"branches":   "localBranches",
-	"remotes":    "remotes",
-	"tags":       "tags",
-	"commits":    "commits",
-	"reflog":     "reflogCommits",
-	"stash":      "stash",
+	"status":       "status",
+	"files":        "files",
+	"worktrees":    "worktrees",
+	"submodules":   "submodules",
+	"branches":     "localBranches",
+	"pullRequests": "pullRequests",
+	"remotes":      "remotes",
+	"tags":         "tags",
+	"commits":      "commits",
+	"reflog":       "reflogCommits",
+	"stash":        "stash",
 }
 
 // sidePanelTabTitles maps each gui.sidePanels name to the title shown on its tab.
 func (gui *Gui) sidePanelTabTitles() map[string]string {
 	tr := gui.c.Tr
 	return map[string]string{
-		"status":     tr.StatusTitle,
-		"files":      tr.FilesTitle,
-		"worktrees":  tr.WorktreesTitle,
-		"submodules": tr.SubmodulesTitle,
-		"branches":   tr.LocalBranchesTitle,
-		"remotes":    tr.RemotesTitle,
-		"tags":       tr.TagsTitle,
-		"commits":    tr.CommitsTitle,
-		"reflog":     tr.ReflogCommitsTitle,
-		"stash":      tr.StashTitle,
+		"status":       tr.StatusTitle,
+		"files":        tr.FilesTitle,
+		"worktrees":    tr.WorktreesTitle,
+		"submodules":   tr.SubmodulesTitle,
+		"branches":     tr.LocalBranchesTitle,
+		"pullRequests": tr.PullRequests.Title,
+		"remotes":      tr.RemotesTitle,
+		"tags":         tr.TagsTitle,
+		"commits":      tr.CommitsTitle,
+		"reflog":       tr.ReflogCommitsTitle,
+		"stash":        tr.StashTitle,
 	}
 }
 
 // sidePanelContexts maps each gui.sidePanels name to the context it controls.
 func sidePanelContexts(contextTree *context.ContextTree) map[string]types.Context {
 	return map[string]types.Context{
-		"status":     contextTree.Status,
-		"files":      contextTree.Files,
-		"worktrees":  contextTree.Worktrees,
-		"submodules": contextTree.Submodules,
-		"branches":   contextTree.Branches,
-		"remotes":    contextTree.Remotes,
-		"tags":       contextTree.Tags,
-		"commits":    contextTree.LocalCommits,
-		"reflog":     contextTree.ReflogCommits,
-		"stash":      contextTree.Stash,
+		"status":       contextTree.Status,
+		"files":        contextTree.Files,
+		"worktrees":    contextTree.Worktrees,
+		"submodules":   contextTree.Submodules,
+		"branches":     contextTree.Branches,
+		"pullRequests": contextTree.PullRequests,
+		"remotes":      contextTree.Remotes,
+		"tags":         contextTree.Tags,
+		"commits":      contextTree.LocalCommits,
+		"reflog":       contextTree.ReflogCommits,
+		"stash":        contextTree.Stash,
 	}
 }
 

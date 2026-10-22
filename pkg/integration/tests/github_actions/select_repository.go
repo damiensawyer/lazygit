@@ -22,7 +22,7 @@ var SelectRepository = NewIntegrationTest(NewIntegrationTestArgs{
 			Press(keys.Universal.OpenGithubActions)
 
 		t.ExpectPopup().Menu().
-			Title(Equals("Select the repository whose Actions to show")).
+			Title(Equals("Which GitHub repository is this one's?")).
 			Lines(
 				Contains("origin").Contains("me/repo").IsSelected(),
 				Contains("team").Contains("owner/repo"),

@@ -394,6 +394,9 @@ type Model struct {
 
 	GithubRuns []*models.GithubRun
 
+	// the pull requests the pull requests panel lists
+	ListedPullRequests []*models.GithubPullRequest
+
 	// FilteredReflogCommits are the ones that appear in the reflog panel.
 	// When in filtering mode we only include the ones that match the given path
 	FilteredReflogCommits []*models.Commit

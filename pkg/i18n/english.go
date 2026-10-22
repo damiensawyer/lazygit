@@ -1072,6 +1072,7 @@ type TranslationSet struct {
 	Bisect                                   Bisect
 	Log                                      Log
 	GithubActions                            GithubActions
+	PullRequests                             PullRequests
 	BreakingChangesTitle                     string
 	BreakingChangesMessage                   string
 	BreakingChangesByVersion                 map[string]string
@@ -1115,6 +1116,96 @@ type Log struct {
 	DroppingStash            string
 	PoppingStash             string
 	DeletingBranch           string
+}
+
+type PullRequests struct {
+	ChooseRepository                 string
+	Title                            string
+	MainTitle                        string
+	HeadIntoBase                     string
+	CreatedAndUpdated                string
+	CheckedOutAs                     string
+	Labels                           string
+	DetailsError                     string
+	LoadingDetails                   string
+	Milestone                        string
+	Assignees                        string
+	Reviewers                        string
+	Checks                           string
+	MergeStatus                      string
+	PendingReviewNotice              string
+	NoDescription                    string
+	FailingChecks                    string
+	Required                         string
+	Conversation                     string
+	ReviewThreadsHeading             string
+	NoChecks                         string
+	ChecksFailed                     string
+	ChecksPending                    string
+	ChecksPassed                     string
+	ChecksSkipped                    string
+	MergedBy                         string
+	ClosedAgo                        string
+	MergeConflicts                   string
+	MergeBehind                      string
+	MergeBlocked                     string
+	MergeUnstable                    string
+	MergeReady                       string
+	MergeDraft                       string
+	MergeUnknown                     string
+	AutoMergeEnabled                 string
+	Commented                        string
+	Approved                         string
+	RequestedChanges                 string
+	ReviewDismissed                  string
+	Reviewed                         string
+	Resolved                         string
+	Outdated                         string
+	Pending                          string
+	NoGithubRemote                   string
+	NotLoggedIn                      string
+	NoPullRequests                   string
+	Loading                          string
+	LoadError                        string
+	Refresh                          string
+	RefreshTooltip                   string
+	OpenInBrowser                    string
+	OpenInBrowserTooltip             string
+	CopyToClipboard                  string
+	CopyShort                        string
+	CopyURL                          string
+	CopyNumber                       string
+	CopyTitle                        string
+	CopyHeadBranch                   string
+	CopyDescription                  string
+	CopiedToClipboard                string
+	Filter                           string
+	FilterShort                      string
+	FilterTooltip                    string
+	FilterOpen                       string
+	FilterClosed                     string
+	FilterMerged                     string
+	FilterAll                        string
+	FilterState                      string
+	FilterMine                       string
+	FilterReviewRequested            string
+	FilterAssigned                   string
+	FilterAuthor                     string
+	FilterAuthorPrompt               string
+	FilterLabel                      string
+	FilterLabelPrompt                string
+	FilterBase                       string
+	FilterBasePrompt                 string
+	FilterSearch                     string
+	FilterSearchPrompt               string
+	ClearFilter                      string
+	FilterDescriptionAuthor          string
+	FilterDescriptionAssignee        string
+	FilterDescriptionReviewRequested string
+	FilterDescriptionLabel           string
+	FilterDescriptionBase            string
+	FilterDescriptionSearch          string
+	NoFilter                         string
 }
 
 type GithubActions struct {
@@ -2651,6 +2742,95 @@ func EnglishTranslationSet() *TranslationSet {
 			PoppingStash:             "Popping stash %s",
 			DeletingBranch:           "Deleting branch '{{.branchName}}' (was {{.hash}})",
 		},
+		PullRequests: PullRequests{
+			ChooseRepository:                 "There are several GitHub remotes. Press {{.key}} to choose the one whose pull requests to show.",
+			Title:                            "Pull requests",
+			MainTitle:                        "Pull request",
+			HeadIntoBase:                     "{{.author}} wants to merge {{.head}} into {{.base}}",
+			CreatedAndUpdated:                "opened {{.created}} ago, updated {{.updated}} ago",
+			CheckedOutAs:                     "Checked out as {{.branch}}",
+			Labels:                           "Labels",
+			DetailsError:                     "Couldn't load the pull request's details: {{.error}}",
+			LoadingDetails:                   "Loading…",
+			Milestone:                        "Milestone",
+			Assignees:                        "Assignees",
+			Reviewers:                        "Reviewers",
+			Checks:                           "Checks",
+			MergeStatus:                      "Merge",
+			PendingReviewNotice:              "You have a pending review with {{.count}} comment(s) that you haven't submitted yet.",
+			NoDescription:                    "No description provided.",
+			FailingChecks:                    "Failing checks",
+			Required:                         "(required)",
+			Conversation:                     "Conversation",
+			ReviewThreadsHeading:             "Review threads ({{.unresolved}} of {{.total}} unresolved)",
+			NoChecks:                         "none",
+			ChecksFailed:                     "{{.count}} failing",
+			ChecksPending:                    "{{.count}} pending",
+			ChecksPassed:                     "{{.count}} passing",
+			ChecksSkipped:                    "{{.count}} skipped",
+			MergedBy:                         "merged by {{.user}} {{.ago}} ago",
+			ClosedAgo:                        "closed {{.ago}} ago",
+			MergeConflicts:                   "has conflicts with the base branch",
+			MergeBehind:                      "the head branch is behind the base branch",
+			MergeBlocked:                     "blocked (required reviews or checks are missing)",
+			MergeUnstable:                    "can be merged, but some checks are failing",
+			MergeReady:                       "ready to merge",
+			MergeDraft:                       "a draft can't be merged",
+			MergeUnknown:                     "GitHub is still working out whether it can be merged",
+			AutoMergeEnabled:                 "auto-merge ({{.method}}) enabled by {{.user}}",
+			Commented:                        "commented",
+			Approved:                         "approved",
+			RequestedChanges:                 "requested changes",
+			ReviewDismissed:                  "had their review dismissed",
+			Reviewed:                         "reviewed",
+			Resolved:                         "resolved",
+			Outdated:                         "outdated",
+			Pending:                          "pending",
+			NoGithubRemote:                   "This repository has no GitHub remote, so there are no pull requests to show.",
+			NotLoggedIn:                      "Not logged in to GitHub. Press {{.key}} to log in and load the pull requests.",
+			NoPullRequests:                   "No pull requests match the filter.",
+			Loading:                          "Loading pull requests…",
+			LoadError:                        "Couldn't load the pull requests: {{.error}}",
+			Refresh:                          "Refresh pull requests",
+			RefreshTooltip:                   "Load the pull requests again; this logs you in to GitHub first if needed. They also reload by themselves every minute while the list is shown.",
+			OpenInBrowser:                    "Open in browser",
+			OpenInBrowserTooltip:             "Open the pull request on GitHub.",
+			CopyToClipboard:                  "Copy to clipboard",
+			CopyShort:                        "Copy",
+			CopyURL:                          "URL",
+			CopyNumber:                       "Number",
+			CopyTitle:                        "Title",
+			CopyHeadBranch:                   "Head branch",
+			CopyDescription:                  "Description",
+			CopiedToClipboard:                "Copied the pull request's {{.what}} to the clipboard",
+			Filter:                           "Filter pull requests",
+			FilterShort:                      "Filter",
+			FilterTooltip:                    "Choose which pull requests to load: open, closed, merged or all of them, and only those by an author, assigned to someone, awaiting someone's review, with a label, against a base branch, or matching a search.",
+			FilterOpen:                       "Open",
+			FilterClosed:                     "Closed",
+			FilterMerged:                     "Merged",
+			FilterAll:                        "All",
+			FilterState:                      "State",
+			FilterMine:                       "Created by me",
+			FilterReviewRequested:            "Awaiting my review",
+			FilterAssigned:                   "Assigned to me",
+			FilterAuthor:                     "By author…",
+			FilterAuthorPrompt:               "Author's login",
+			FilterLabel:                      "With label…",
+			FilterLabelPrompt:                "Label",
+			FilterBase:                       "Against base branch…",
+			FilterBasePrompt:                 "Base branch",
+			FilterSearch:                     "Search…",
+			FilterSearchPrompt:               `Search (GitHub search syntax, e.g. "fix in:title")`,
+			ClearFilter:                      "Show all open pull requests",
+			FilterDescriptionAuthor:          "by {{.value}}",
+			FilterDescriptionAssignee:        "assigned to {{.value}}",
+			FilterDescriptionReviewRequested: "awaiting review by {{.value}}",
+			FilterDescriptionLabel:           "labelled {{.value}}",
+			FilterDescriptionBase:            "into {{.value}}",
+			FilterDescriptionSearch:          `matching "{{.value}}"`,
+			NoFilter:                         "All open pull requests are shown already.",
+		},
 		GithubActions: GithubActions{
 			LoginTitle:                         "Log in to {{.host}}",
 			LoginPrompt:                        "Lazygit needs a GitHub token to show this repository's Actions. It is stored in the GitHub CLI's config, so gh will use it too.",
@@ -2676,7 +2856,7 @@ func EnglishTranslationSet() *TranslationSet {
 			RunsTitleForRepo:                   "Actions · {{.repo}}",
 			LoadingRuns:                        "Loading GitHub Actions runs",
 			NoGithubRemote:                     "This repository has no GitHub remote",
-			SelectRepository:                   "Select the repository whose Actions to show",
+			SelectRepository:                   "Which GitHub repository is this one's?",
 			RepoNotFound:                       "Repository {{.repo}} not found on GitHub, or your token has no access to it",
 			NoRuns:                             "No workflow runs",
 			OpenGithubActions:                  "View GitHub Actions",

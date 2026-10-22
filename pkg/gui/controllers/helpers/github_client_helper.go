@@ -83,11 +83,45 @@ func (self *GithubClientHelper) WithClient(f func(client *github_commands.Client
 			if err := self.c.Git().GitHub.SetConfiguredBaseRemoteName(remote.remote.Name); err != nil {
 				self.c.Log.Error(err)
 			}
-			return self.withClientForRemote(remote, f)
+			return self.withClientForRemote(remote, f, self.login)
 		})
 	}
 
-	return self.withClientForRemote(*remote, f)
+	return self.withClientForRemote(*remote, f, self.login)
+}
+
+// TryClient is WithClient for when the user hasn't asked for anything: where
+// the repository or the token can't be worked out without asking them, it
+// calls onUnavailable on the UI thread instead of f.
+func (self *GithubClientHelper) TryClient(f func(client *github_commands.Client) error, onUnavailable func() error) error {
+	if self.client != nil {
+		return f(self.client)
+	}
+
+	remotes := getGithubRemotes(self.c.Model().Remotes, self.c.Git().HostingService)
+	remote := getGithubBaseRemote(remotes, self.c.Git().GitHub.ConfiguredBaseRemoteName())
+	if remote == nil {
+		return onUnavailable()
+	}
+
+	return self.withClientForRemote(*remote, f, func(string, func(string) error) error {
+		return onUnavailable()
+	})
+}
+
+// BaseRemoteName returns the name of the remote that is the GitHub
+// repository, or "" if that isn't known without asking the user.
+func (self *GithubClientHelper) BaseRemoteName() string {
+	remotes := getGithubRemotes(self.c.Model().Remotes, self.c.Git().HostingService)
+	if remote := getGithubBaseRemote(remotes, self.c.Git().GitHub.ConfiguredBaseRemoteName()); remote != nil {
+		return remote.remote.Name
+	}
+	return ""
+}
+
+// HasGithubRemote reports whether the repository has a remote on GitHub.
+func (self *GithubClientHelper) HasGithubRemote() bool {
+	return len(getGithubRemotes(self.c.Model().Remotes, self.c.Git().HostingService)) > 0
 }
 
 func (self *GithubClientHelper) selectRemote(remotes []githubRemoteInfo, onSelect func(githubRemoteInfo) error) error {
@@ -102,7 +136,14 @@ func (self *GithubClientHelper) selectRemote(remotes []githubRemoteInfo, onSelec
 	})
 }
 
-func (self *GithubClientHelper) withClientForRemote(remote githubRemoteInfo, f func(client *github_commands.Client) error) error {
+// withClientForRemote calls f with a client for the remote's repository, or,
+// if there is no token for it, calls onNoToken with the host and with what to
+// do with a token once there is one.
+func (self *GithubClientHelper) withClientForRemote(
+	remote githubRemoteInfo,
+	f func(client *github_commands.Client) error,
+	onNoToken func(host string, useToken func(token string) error) error,
+) error {
 	host := remote.serviceInfo.WebDomain
 	repo := github_commands.Repo{
 		Host:  host,
@@ -131,7 +172,7 @@ func (self *GithubClientHelper) withClientForRemote(remote githubRemoteInfo, f f
 		token := self.c.Git().GitHub.GetAuthToken(host)
 		self.c.OnUIThread(func() error {
 			if token == "" {
-				return self.login(host, useToken)
+				return onNoToken(host, useToken)
 			}
 			return useToken(token)
 		})

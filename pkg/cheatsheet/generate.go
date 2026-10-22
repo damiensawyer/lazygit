@@ -130,6 +130,7 @@ func localisedTitle(tr *i18n.TranslationSet, str string) string {
 		"extras":            tr.ExtrasTitle,
 		"worktrees":         tr.WorktreesTitle,
 		"githubRuns":        tr.GithubActions.RunsTitle,
+		"pullRequests":      tr.PullRequests.Title,
 		"githubJobs":        tr.GithubActions.JobsTitle,
 		"githubSteps":       tr.GithubActions.StepsSectionTitle,
 	}

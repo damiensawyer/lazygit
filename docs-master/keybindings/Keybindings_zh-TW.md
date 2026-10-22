@@ -87,6 +87,16 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` R `` | 重新整理 |  |
 | `` / `` | 搜尋 |  |
 
+## Pull requests
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` o `` | Open in browser | Open the pull request on GitHub. |
+| `` y `` | Copy to clipboard |  |
+| `` f `` | Filter pull requests | Choose which pull requests to load: open, closed, merged or all of them, and only those by an author, assigned to someone, awaiting someone's review, with a label, against a base branch, or matching a search. |
+| `` R `` | Refresh pull requests | Load the pull requests again; this logs you in to GitHub first if needed. They also reload by themselves every minute while the list is shown. |
+| `` / `` | 搜尋 |  |
+
 ## Repo files
 
 | Key | Action | Info |

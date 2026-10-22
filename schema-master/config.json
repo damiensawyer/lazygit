@@ -637,7 +637,7 @@
             "$ref": "#/$defs/SidePanel"
           },
           "type": "array",
-          "description": "The side panels, in the order they appear from top to bottom.\nEach entry is a list of one or more names that share a single panel as tabs (cycle through them with the next-tab/previous-tab keys).\nOmit a name to hide it; give a name its own one-element list to promote a tab to a top-level panel.\nValid names are: 'status', 'files', 'worktrees', 'submodules', 'branches', 'remotes', 'tags', 'commits', 'reflog', 'stash'. 'files', 'branches', and 'commits' must always be included; they can't be hidden.",
+          "description": "The side panels, in the order they appear from top to bottom.\nEach entry is a list of one or more names that share a single panel as tabs (cycle through them with the next-tab/previous-tab keys).\nOmit a name to hide it; give a name its own one-element list to promote a tab to a top-level panel.\nValid names are: 'status', 'files', 'worktrees', 'submodules', 'branches', 'pullRequests', 'remotes', 'tags', 'commits', 'reflog', 'stash'. 'files', 'branches', and 'commits' must always be included; they can't be hidden.",
           "default": [
             [
               "status"
@@ -649,6 +649,7 @@
             ],
             [
               "branches",
+              "pullRequests",
               "remotes",
               "tags"
             ],
@@ -2188,6 +2189,9 @@
         },
         "githubActions": {
           "$ref": "#/$defs/KeybindingGithubActionsConfig"
+        },
+        "pullRequests": {
+          "$ref": "#/$defs/KeybindingPullRequestsConfig"
         }
       },
       "additionalProperties": false,
@@ -2675,6 +2679,54 @@
             }
           ],
           "default": "E"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "KeybindingPullRequestsConfig": {
+      "properties": {
+        "openInBrowser": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "o"
+        },
+        "copyToClipboard": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "y"
+        },
+        "filter": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "f"
         }
       },
       "additionalProperties": false,
@@ -4364,6 +4416,7 @@
           "worktrees",
           "submodules",
           "branches",
+          "pullRequests",
           "remotes",
           "tags",
           "commits",
