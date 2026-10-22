@@ -364,6 +364,47 @@ func TestGetCommitListDisplayStrings(t *testing.T) {
 						`),
 		},
 		{
+			testName: "display indices hiding the marked base commit",
+			/* EXPECTED:
+			expected: "hash1 ✓ commit1\nhash3 commit3\nhash4 commit4",
+			ACTUAL: */
+			expected: "hash1 ✓ commit1\nhash3 ✓ commit3\nhash4 ✓ commit4",
+			commitOpts: []models.NewCommitOpts{
+				{Name: "commit1", Hash: "hash1"},
+				{Name: "commit2", Hash: "hash2"},
+				{Name: "commit3", Hash: "hash3"},
+				{Name: "commit4", Hash: "hash4"},
+			},
+			markedBaseCommit:          "hash2",
+			startIdx:                  0,
+			endIdx:                    4,
+			displayIndices:            []int{0, 2, 3},
+			showGraph:                 false,
+			bisectInfo:                git_commands.NewNullBisectInfo(),
+			cherryPickedCommitHashSet: set.New[string](),
+			now:                       time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			testName: "startIdx is past the marked base commit",
+			/* EXPECTED:
+			expected: "hash3 commit3\nhash4 commit4",
+			ACTUAL: */
+			expected: "hash3 ✓ commit3\nhash4 ✓ commit4",
+			commitOpts: []models.NewCommitOpts{
+				{Name: "commit1", Hash: "hash1"},
+				{Name: "commit2", Hash: "hash2"},
+				{Name: "commit3", Hash: "hash3"},
+				{Name: "commit4", Hash: "hash4"},
+			},
+			markedBaseCommit:          "hash2",
+			startIdx:                  2,
+			endIdx:                    4,
+			showGraph:                 false,
+			bisectInfo:                git_commands.NewNullBisectInfo(),
+			cherryPickedCommitHashSet: set.New[string](),
+			now:                       time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
+		},
+		{
 			testName: "showing graph, including rebase commits",
 			commitOpts: []models.NewCommitOpts{
 				{Name: "commit1", Hash: "hash1", Parents: []string{"hash2", "hash3"}, Action: todo.Pick},
