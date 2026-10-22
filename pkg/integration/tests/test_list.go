@@ -598,6 +598,7 @@ var tests = []*components.IntegrationTest{
 	repo_files.LargeNestedTree,
 	repo_files.OpenAndEditWorktreeFile,
 	repo_files.OpenFileNotInWorktree,
+	repo_files.RangeSelectDisablesSingleItemActions,
 	repo_files.RestoreRangeSelection,
 	repo_files.RestoreToWorktree,
 	repo_files.RestoreWithModifiedFiles,
