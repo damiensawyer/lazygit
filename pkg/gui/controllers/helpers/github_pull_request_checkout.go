@@ -91,15 +91,7 @@ func (self *GithubPullRequestsHelper) withCheckout(pr *models.GithubPullRequest,
 func (self *GithubPullRequestsHelper) pullRequestCheckout(pr *models.GithubPullRequest, details *models.GithubPullRequestDetails, opts PullRequestCheckoutOpts) git_commands.PullRequestCheckout {
 	model := self.c.Model()
 	repo := self.clientHelper.Client().Repo()
-
-	baseRemote := self.clientHelper.BaseRemoteName()
-	baseRemoteURL := ""
-	if remote, found := lo.Find(model.Remotes, func(remote *models.Remote) bool { return remote.Name == baseRemote }); found && len(remote.Urls) > 0 {
-		baseRemoteURL = remote.Urls[0]
-	}
-	if baseRemote == "" {
-		baseRemote = githubRepoURL(repo.Host, repo.Owner, repo.Name, baseRemoteURL)
-	}
+	baseRemote, baseRemoteURL := self.baseRemote()
 
 	headRemote := baseRemote
 	if pr.HeadRepositoryName == "" {
@@ -143,6 +135,21 @@ func (self *GithubPullRequestsHelper) pullRequestCheckout(pr *models.GithubPullR
 		Detach:     opts.Detach,
 		Force:      opts.Force,
 	}
+}
+
+// baseRemote returns the name of the remote for the base repository, or its
+// URL if there is no remote for it, along with the remote's URL.
+func (self *GithubPullRequestsHelper) baseRemote() (string, string) {
+	repo := self.clientHelper.Client().Repo()
+	name := self.clientHelper.BaseRemoteName()
+	url := ""
+	if remote, found := lo.Find(self.c.Model().Remotes, func(remote *models.Remote) bool { return remote.Name == name }); found && len(remote.Urls) > 0 {
+		url = remote.Urls[0]
+	}
+	if name == "" {
+		return githubRepoURL(repo.Host, repo.Owner, repo.Name, url), url
+	}
+	return name, url
 }
 
 // findRemoteForRepo returns the name of the remote whose URL points at the
