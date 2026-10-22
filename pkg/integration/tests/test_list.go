@@ -636,6 +636,7 @@ var tests = []*components.IntegrationTest{
 	repo_files.SaveDirectoryAtCommit,
 	repo_files.SaveFileAtCommit,
 	repo_files.SaveRootDirectory,
+	repo_files.SaveSymlinkAndExecutable,
 	repo_files.StartInFlatView,
 	repo_files.SymlinksAndSubmodules,
 	repo_files.ToggleTreeViewAndCollapse,
