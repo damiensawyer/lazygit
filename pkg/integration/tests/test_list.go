@@ -545,6 +545,7 @@ var tests = []*components.IntegrationTest{
 	main_view.StageUnderConformingDiffRenderer,
 	main_view.StageUnderUnsupportedDiffRenderer,
 	main_view.StartPatchFromAnotherCommit,
+	main_view.ToggleFullFileContextWhileBuildingPatch,
 	main_view.UnstageDiffLines,
 	main_view.WrapOnlyTheDiff,
 	misc.ConfirmOnQuit,
