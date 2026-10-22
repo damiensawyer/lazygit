@@ -131,3 +131,17 @@ func runIds(runs []*models.GithubRun) []int64 {
 	}
 	return ids
 }
+
+func TestFakeGithubServesUpdatedData(t *testing.T) {
+	fake := &FakeGithub{Runs: []*models.GithubRun{{RunId: 1}}}
+	client := startFakeGithub(t, fake)
+	ctx := context.Background()
+
+	(&FakeGithubDriver{fake: fake}).Update(func(fake *FakeGithub) {
+		fake.Runs = append([]*models.GithubRun{{RunId: 2}}, fake.Runs...)
+	})
+
+	runs, err := client.ListRuns(ctx, github_commands.ListRunsOptions{})
+	assert.NoError(t, err)
+	assert.Equal(t, []int64{2, 1}, runIds(runs))
+}
