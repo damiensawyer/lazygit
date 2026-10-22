@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gookit/color"
+	"github.com/jesseduffield/lazygit/pkg/commands/github_commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
 	"github.com/jesseduffield/lazygit/pkg/i18n"
 	"github.com/stretchr/testify/assert"
@@ -93,4 +94,69 @@ func TestFormatGithubRunSummaryWhileLoading(t *testing.T) {
 
 	assert.Contains(t, FormatGithubRunSummary(tr, GithubRunSummaryOpts{Run: run}), "Jobs\nLoading jobs…\n")
 	assert.Contains(t, FormatGithubRunSummary(tr, GithubRunSummaryOpts{Run: run, JobsError: errors.New("boom")}), "Jobs\nboom\n")
+}
+
+func TestFormatGithubLogLines(t *testing.T) {
+	oldColorLevel := color.ForceSetColorLevel(terminfo.ColorLevelNone)
+	defer color.ForceSetColorLevel(oldColorLevel)
+
+	assert.Equal(t,
+		"▾ Run make\nmake: *** Error 1\nError: Process completed with exit code 2.\n",
+		FormatGithubLogLines([]string{
+			"##[group]Run make",
+			"make: *** Error 1",
+			"##[endgroup]",
+			"##[error]Process completed with exit code 2.",
+		}),
+	)
+}
+
+func TestFormatGithubJobDetailsShowsOnlyFailedStepsOfFailedJob(t *testing.T) {
+	oldColorLevel := color.ForceSetColorLevel(terminfo.ColorLevelNone)
+	defer color.ForceSetColorLevel(oldColorLevel)
+
+	start := time.Date(2026, 1, 1, 12, 0, 0, 0, time.UTC)
+	job := &models.GithubJob{
+		Name: "test", Status: "completed", Conclusion: "failure",
+		StartedAt: start, CompletedAt: start.Add(2 * time.Minute),
+		Url: "https://github.com/owner/repo/actions/runs/1/job/2",
+		Steps: []models.GithubStep{
+			{Number: 1, Name: "Set up job", Status: "completed", Conclusion: "success", StartedAt: start, CompletedAt: start.Add(time.Second)},
+			{Number: 2, Name: "Run tests", Status: "completed", Conclusion: "failure", StartedAt: start.Add(time.Second), CompletedAt: start.Add(2 * time.Minute)},
+		},
+	}
+	log := &github_commands.JobLog{
+		Steps: []github_commands.StepLog{
+			{StepNumber: 1, Lines: []string{"setting up"}},
+			{StepNumber: 2, Lines: []string{"FAIL: TestFoo", "##[error]Process completed with exit code 1."}},
+		},
+	}
+
+	details := FormatGithubJobDetails(i18n.EnglishTranslationSet(), GithubJobDetailsOpts{
+		Job: job, Log: log, LogLoaded: true, Now: start.Add(time.Hour),
+	})
+
+	assert.Equal(t, `X test 2m0s
+https://github.com/owner/repo/actions/runs/1/job/2
+
+Steps
+✓ Set up job 1s
+X Run tests 1m59s
+
+Log of failed steps
+━━ Run tests
+FAIL: TestFoo
+Error: Process completed with exit code 1.
+`, details)
+}
+
+func TestFormatGithubJobDetailsOfJobInProgress(t *testing.T) {
+	oldColorLevel := color.ForceSetColorLevel(terminfo.ColorLevelNone)
+	defer color.ForceSetColorLevel(oldColorLevel)
+
+	job := &models.GithubJob{Name: "test", Status: "in_progress", StartedAt: time.Now()}
+
+	details := FormatGithubJobDetails(i18n.EnglishTranslationSet(), GithubJobDetailsOpts{Job: job, Now: time.Now()})
+
+	assert.Contains(t, details, "Log\nThe log will be available once the job has completed\n")
 }

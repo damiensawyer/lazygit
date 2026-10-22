@@ -62,6 +62,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 
 | Key | Action | Info |
 |-----|--------|-------------|
+| `` <enter> `` | View jobs |  |
 | `` o `` | Open in browser |  |
 | `` R `` | Atualizar |  |
 | `` / `` | Filtrar a visualização atual por texto |  |
@@ -238,6 +239,14 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 |-----|--------|-------------|
 | `` <enter> `` | Confirmar |  |
 | `` <esc> `` | Fechar/Cancelar |  |
+
+## Jobs
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` o `` | Open in browser |  |
+| `` R `` | Atualizar |  |
+| `` / `` | Filtrar a visualização atual por texto |  |
 
 ## Menu
 

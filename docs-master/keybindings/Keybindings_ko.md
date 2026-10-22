@@ -62,6 +62,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 
 | Key | Action | Info |
 |-----|--------|-------------|
+| `` <enter> `` | View jobs |  |
 | `` o `` | Open in browser |  |
 | `` R `` | 새로고침 |  |
 | `` / `` | Filter the current view by text |  |
@@ -72,6 +73,14 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 |-----|--------|-------------|
 | `` <enter> `` | 확인 |  |
 | `` <esc> `` | 닫기/취소 |  |
+
+## Jobs
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` o `` | Open in browser |  |
+| `` R `` | 새로고침 |  |
+| `` / `` | Filter the current view by text |  |
 
 ## Reflog
 

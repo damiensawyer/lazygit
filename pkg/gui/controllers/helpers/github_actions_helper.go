@@ -83,6 +83,17 @@ type GithubActionsHelper struct {
 	// keyed by run ID; only touched on the UI thread
 	runDetails        map[int64]*GithubRunDetails
 	runDetailsLoading map[int64]bool
+
+	// keyed by job ID; only touched on the UI thread
+	jobLogs        map[int64]*GithubJobLog
+	jobLogsLoading map[int64]bool
+}
+
+// GithubJobLog is a completed job's log, along with its annotations.
+type GithubJobLog struct {
+	Log         *github_commands.JobLog
+	Annotations []*models.GithubAnnotation
+	Err         error
 }
 
 func NewGithubActionsHelper(
@@ -98,6 +109,8 @@ func NewGithubActionsHelper(
 		tokens:            tokens,
 		runDetails:        map[int64]*GithubRunDetails{},
 		runDetailsLoading: map[int64]bool{},
+		jobLogs:           map[int64]*GithubJobLog{},
+		jobLogsLoading:    map[int64]bool{},
 	}
 }
 
@@ -280,10 +293,17 @@ func (self *GithubActionsHelper) setRuns(runs []*models.GithubRun) {
 	self.c.PostRefreshUpdateKeepingScrollPosition(runsContext)
 }
 
-// IsShowing reports whether the GitHub Actions view is visible.
+// IsShowing reports whether any of the GitHub Actions views is visible.
 func (self *GithubActionsHelper) IsShowing() bool {
-	runsContext := self.c.Contexts().GithubRuns
-	return self.windowHelper.GetViewNameForWindow(runsContext.GetWindowName()) == runsContext.GetViewName()
+	return lo.SomeBy(self.contexts(), self.isShowing)
+}
+
+func (self *GithubActionsHelper) isShowing(context types.Context) bool {
+	return self.windowHelper.GetViewNameForWindow(context.GetWindowName()) == context.GetViewName()
+}
+
+func (self *GithubActionsHelper) contexts() []types.Context {
+	return []types.Context{self.c.Contexts().GithubRuns, self.c.Contexts().GithubJobs}
 }
 
 func (self *GithubActionsHelper) scheduleAutoRefresh() {
@@ -310,7 +330,10 @@ func (self *GithubActionsHelper) scheduleAutoRefresh() {
 				return nil
 			}
 			self.c.OnWorkerBackground(func(gocui.Task) error {
-				return self.loadRuns(true, self.markActiveRunDetailsStale)
+				return self.loadRuns(true, func() {
+					self.markActiveRunDetailsStale()
+					self.reloadJobsIfRunChanged()
+				})
 			})
 			return nil
 		})
@@ -329,6 +352,79 @@ func (self *GithubActionsHelper) markActiveRunDetailsStale() {
 	if self.c.Context().IsCurrent(self.c.Contexts().GithubRuns) {
 		self.c.Contexts().GithubRuns.HandleRenderToMain()
 	}
+}
+
+// reloadJobsIfRunChanged reloads the jobs being shown if their run has
+// progressed since they were loaded.
+func (self *GithubActionsHelper) reloadJobsIfRunChanged() {
+	jobsContext := self.c.Contexts().GithubJobs
+	shownRun := jobsContext.GetRun()
+	if shownRun == nil || !self.isShowing(jobsContext) {
+		return
+	}
+	run, found := lo.Find(self.c.Model().GithubRuns, func(run *models.GithubRun) bool {
+		return run.RunId == shownRun.RunId
+	})
+	if !found || (!run.State().IsActive() && run.UpdatedAt.Equal(shownRun.UpdatedAt)) {
+		return
+	}
+
+	self.loadRunDetailsInBackground(run, func(details *GithubRunDetails) {
+		if details.Err != nil || jobsContext.GetRun() == nil || jobsContext.GetRun().RunId != run.RunId {
+			return
+		}
+		self.setJobs(run, details.Jobs)
+	})
+}
+
+// OpenJobs shows the jobs of a run in place of the runs.
+func (self *GithubActionsHelper) OpenJobs(run *models.GithubRun) error {
+	show := func(details *GithubRunDetails) error {
+		if details.Err != nil {
+			return self.handleError(details.Err)
+		}
+		jobsContext := self.c.Contexts().GithubJobs
+		jobsContext.SetParentContext(self.c.Contexts().GithubRuns)
+		jobsContext.GetView().TitlePrefix = self.c.Contexts().GithubRuns.GetView().TitlePrefix
+		jobsContext.SetSelection(0)
+		jobsContext.ClearFilter()
+		self.setJobs(run, details.Jobs)
+		self.c.Context().Push(jobsContext, types.OnFocusOpts{})
+		return nil
+	}
+
+	if details, ok := self.runDetails[run.RunId]; ok && details.updatedAt.Equal(run.UpdatedAt) {
+		return show(details)
+	}
+
+	client := self.client
+	generation := self.c.State().GetRepoGeneration()
+	return self.c.WithWaitingStatus(self.c.Tr.GithubActions.LoadingJobs, func(gocui.Task) error {
+		details := loadRunDetails(client, run)
+		self.c.OnUIThread(func() error {
+			if self.c.State().GetRepoGeneration() != generation {
+				return nil
+			}
+			self.runDetails[run.RunId] = details
+			return show(details)
+		})
+		return nil
+	})
+}
+
+func (self *GithubActionsHelper) setJobs(run *models.GithubRun, jobs []*models.GithubJob) {
+	jobsContext := self.c.Contexts().GithubJobs
+	selectedId := jobsContext.GetSelectedItemId()
+
+	jobsContext.SetJobs(run, jobs)
+	jobsContext.ReApplyFilter(self.c.UserConfig().Gui.UseFuzzySearch())
+	if _, idx, found := lo.FindIndexOf(jobsContext.GetItems(), func(job *models.GithubJob) bool {
+		return job.ID() == selectedId
+	}); found {
+		jobsContext.SetSelection(idx)
+	}
+
+	self.c.PostRefreshUpdateKeepingScrollPosition(jobsContext)
 }
 
 // GetRunDetails returns the details of a run if they have been loaded, or nil
@@ -395,6 +491,55 @@ func loadRunDetails(client *github_commands.Client, run *models.GithubRun) *Gith
 		}
 	}
 	return details
+}
+
+// GetJobLog returns the log of a completed job if it has been loaded.
+// Otherwise it starts loading it, and re-renders the main view once it has
+// been, if the job is still selected by then. Must be called on the UI
+// thread.
+func (self *GithubActionsHelper) GetJobLog(job *models.GithubJob) *GithubJobLog {
+	if jobLog, ok := self.jobLogs[job.JobId]; ok {
+		return jobLog
+	}
+	if self.jobLogsLoading[job.JobId] || self.client == nil {
+		return nil
+	}
+	self.jobLogsLoading[job.JobId] = true
+
+	client := self.client
+	generation := self.c.State().GetRepoGeneration()
+	self.c.OnWorkerBackground(func(gocui.Task) error {
+		jobLog := loadJobLog(client, job)
+		self.c.OnUIThreadBackground(func() error {
+			if self.c.State().GetRepoGeneration() != generation {
+				return nil
+			}
+			delete(self.jobLogsLoading, job.JobId)
+			self.jobLogs[job.JobId] = jobLog
+
+			jobsContext := self.c.Contexts().GithubJobs
+			if self.c.Context().IsCurrent(jobsContext) && jobsContext.GetSelectedItemId() == job.ID() {
+				jobsContext.HandleRenderToMain()
+			}
+			return nil
+		})
+		return nil
+	})
+	return nil
+}
+
+func loadJobLog(client *github_commands.Client, job *models.GithubJob) *GithubJobLog {
+	ctx := context.Background()
+	log, err := client.GetJobLog(ctx, job.JobId)
+	if err != nil {
+		return &GithubJobLog{Err: err}
+	}
+
+	jobLog := &GithubJobLog{Log: github_commands.ParseJobLog(log, job.Steps)}
+	if job.State().IsFailed() {
+		jobLog.Annotations, _ = client.ListAnnotations(ctx, job.JobId)
+	}
+	return jobLog
 }
 
 // Client returns the client for the current repository, or nil if the

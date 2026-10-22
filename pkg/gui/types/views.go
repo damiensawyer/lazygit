@@ -15,6 +15,7 @@ type Views struct {
 	Commits        *gocui.View
 	Stash          *gocui.View
 	GithubRuns     *gocui.View
+	GithubJobs     *gocui.View
 
 	Main                   *gocui.View
 	Secondary              *gocui.View

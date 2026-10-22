@@ -112,3 +112,17 @@ func StripLogTimestamps(log string) []string {
 	}
 	return lines
 }
+
+// JobLog is a job's log with the timestamps removed, and divided up into the
+// parts each step produced where the job's steps are known.
+type JobLog struct {
+	Lines []string
+	Steps []StepLog
+}
+
+func ParseJobLog(log string, steps []models.GithubStep) *JobLog {
+	return &JobLog{
+		Lines: StripLogTimestamps(log),
+		Steps: SplitJobLog(log, steps),
+	}
+}

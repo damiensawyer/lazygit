@@ -62,6 +62,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 
 | Key | Action | Info |
 |-----|--------|-------------|
+| `` <enter> `` | View jobs |  |
 | `` o `` | Open in browser |  |
 | `` R `` | Odśwież |  |
 | `` / `` | Filtruj bieżący widok po tekście |  |
@@ -171,6 +172,14 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 |-----|--------|-------------|
 | `` <enter> `` | Potwierdź |  |
 | `` <esc> `` | Zamknij/Anuluj |  |
+
+## Jobs
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` o `` | Open in browser |  |
+| `` R `` | Odśwież |  |
+| `` / `` | Filtruj bieżący widok po tekście |  |
 
 ## Lokalne gałęzie
 

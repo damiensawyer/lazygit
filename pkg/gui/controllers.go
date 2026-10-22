@@ -200,6 +200,7 @@ func (gui *Gui) resetHelpersAndControllers() {
 	reflogCommitsController := controllers.NewReflogCommitsController(common)
 	subCommitsController := controllers.NewSubCommitsController(common)
 	githubRunsController := controllers.NewGithubRunsController(common)
+	githubJobsController := controllers.NewGithubJobsController(common)
 	statusController := controllers.NewStatusController(common)
 	commandLogController := controllers.NewCommandLogController(common)
 	confirmationController := controllers.NewConfirmationController(common)
@@ -236,6 +237,7 @@ func (gui *Gui) resetHelpersAndControllers() {
 		gui.State.Contexts.SubCommits,
 		gui.State.Contexts.Stash,
 		gui.State.Contexts.GithubRuns,
+		gui.State.Contexts.GithubJobs,
 	} {
 		controllers.AttachControllers(context, sideWindowControllerFactory.Create(context))
 	}
@@ -392,6 +394,10 @@ func (gui *Gui) resetHelpersAndControllers() {
 
 	controllers.AttachControllers(gui.State.Contexts.GithubRuns,
 		githubRunsController,
+	)
+
+	controllers.AttachControllers(gui.State.Contexts.GithubJobs,
+		githubJobsController,
 	)
 
 	controllers.AttachControllers(gui.State.Contexts.Menu,

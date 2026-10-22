@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gookit/color"
+	"github.com/jesseduffield/lazygit/pkg/commands/github_commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
 	"github.com/jesseduffield/lazygit/pkg/gui/style"
 	"github.com/jesseduffield/lazygit/pkg/i18n"
@@ -70,6 +71,16 @@ func GetGithubRunListDisplayStrings(runs []*models.GithubRun, fullDescription bo
 			githubDim.Sprint(run.Event),
 			FormatGithubDuration(run.Duration(now)),
 			run.Title(),
+		}
+	})
+}
+
+func GetGithubJobListDisplayStrings(jobs []*models.GithubJob, now time.Time) [][]string {
+	return lo.Map(jobs, func(job *models.GithubJob, _ int) []string {
+		return []string{
+			GithubActionsStateIcon(job.State()),
+			job.Name,
+			githubDurationColumn(job.State(), job.Duration(now)),
 		}
 	})
 }
@@ -217,6 +228,132 @@ func FormatGithubAnnotation(annotation *models.GithubAnnotation) string {
 			location += fmt.Sprintf("#%d", annotation.StartLine)
 		}
 		b.WriteString("    " + githubDim.Sprint(location) + "\n")
+	}
+	return b.String()
+}
+
+// FormatGithubLogLines renders log lines with the runner's workflow commands
+// (e.g. "##[error]") turned into colours, the way GitHub's web UI shows them.
+func FormatGithubLogLines(lines []string) string {
+	var b strings.Builder
+	for _, line := range lines {
+		if line == "##[endgroup]" {
+			continue
+		}
+		b.WriteString(formatGithubLogLine(line))
+		b.WriteString("\n")
+	}
+	return b.String()
+}
+
+func formatGithubLogLine(line string) string {
+	if !strings.HasPrefix(line, "##[") {
+		return line
+	}
+	command, rest, found := strings.Cut(line[len("##["):], "]")
+	if !found {
+		return line
+	}
+	switch command {
+	case "group":
+		return style.AttrBold.Sprint("▾ " + rest)
+	case "error":
+		return style.FgRed.Sprint("Error: " + rest)
+	case "warning":
+		return style.FgYellow.Sprint("Warning: " + rest)
+	case "notice":
+		return style.FgBlue.Sprint("Notice: " + rest)
+	case "debug":
+		return githubDim.Sprint(rest)
+	case "command":
+		return style.FgCyan.Sprint(rest)
+	}
+	return line
+}
+
+// GithubJobDetailsOpts is what FormatGithubJobDetails shows: a job, and once
+// they have been loaded, its log and annotations.
+type GithubJobDetailsOpts struct {
+	Job         *models.GithubJob
+	Log         *github_commands.JobLog
+	LogLoaded   bool
+	LogError    error
+	Annotations []*models.GithubAnnotation
+	Now         time.Time
+}
+
+// FormatGithubJobDetails describes a job: its steps, its annotations, and its
+// log, or, for a job that failed, only the log of the steps that failed.
+func FormatGithubJobDetails(tr *i18n.TranslationSet, opts GithubJobDetailsOpts) string {
+	job := opts.Job
+	var b strings.Builder
+
+	fmt.Fprintf(&b, "%s %s %s\n", GithubActionsStateIcon(job.State()), style.AttrBold.Sprint(job.Name),
+		githubDurationColumn(job.State(), job.Duration(opts.Now)))
+	if job.RunnerName != "" {
+		b.WriteString(githubDim.Sprint(utils.ResolvePlaceholderString(tr.GithubActions.RanOn, map[string]string{
+			"runner": job.RunnerName,
+			"labels": strings.Join(job.Labels, ", "),
+		})) + "\n")
+	}
+	b.WriteString(githubDim.Sprint(job.Url) + "\n")
+
+	b.WriteString("\n" + style.AttrBold.Sprint(tr.GithubActions.StepsSectionTitle) + "\n")
+	for i := range job.Steps {
+		step := &job.Steps[i]
+		line := GithubActionsStateIcon(step.State()) + " " + step.Name
+		if duration := githubDurationColumn(step.State(), step.Duration(opts.Now)); duration != "" {
+			line += " " + duration
+		}
+		b.WriteString(line + "\n")
+	}
+
+	if len(opts.Annotations) > 0 {
+		b.WriteString("\n" + style.AttrBold.Sprint(tr.GithubActions.AnnotationsSectionTitle) + "\n")
+		for _, annotation := range opts.Annotations {
+			b.WriteString(FormatGithubAnnotation(annotation))
+		}
+	}
+
+	onlyFailedSteps := job.State().IsFailed()
+	title := tr.GithubActions.LogSectionTitle
+	if onlyFailedSteps {
+		title = tr.GithubActions.FailedStepsLogSectionTitle
+	}
+	b.WriteString("\n" + style.AttrBold.Sprint(title) + "\n")
+	switch {
+	case job.State().IsActive():
+		b.WriteString(githubDim.Sprint(tr.GithubActions.LogNotAvailableYet) + "\n")
+	case opts.LogError != nil:
+		b.WriteString(style.FgRed.Sprint(opts.LogError.Error()) + "\n")
+	case !opts.LogLoaded:
+		b.WriteString(githubDim.Sprint(tr.GithubActions.LoadingLog) + "\n")
+	default:
+		b.WriteString(formatGithubJobLog(job, opts.Log, onlyFailedSteps))
+	}
+
+	return b.String()
+}
+
+func formatGithubJobLog(job *models.GithubJob, log *github_commands.JobLog, onlyFailedSteps bool) string {
+	if len(log.Steps) == 0 {
+		// We couldn't tell which line belongs to which step, e.g. because the
+		// job has none with timestamps.
+		return FormatGithubLogLines(log.Lines)
+	}
+
+	steps := lo.SliceToMap(job.Steps, func(step models.GithubStep) (int, models.GithubStep) {
+		return step.Number, step
+	})
+
+	var b strings.Builder
+	for _, stepLog := range log.Steps {
+		step := steps[stepLog.StepNumber]
+		if onlyFailedSteps && !step.State().IsFailed() {
+			continue
+		}
+		b.WriteString(style.FgCyan.SetBold().Sprint("━━ "+step.Name) + "\n")
+		b.WriteString(FormatGithubLogLines(stepLog.Lines))
 	}
 	return b.String()
 }

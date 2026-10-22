@@ -62,6 +62,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 
 | Key | Action | Info |
 |-----|--------|-------------|
+| `` <enter> `` | View jobs |  |
 | `` o `` | Open in browser |  |
 | `` R `` | Обновить |  |
 | `` / `` | Filter the current view by text |  |
@@ -72,6 +73,14 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 |-----|--------|-------------|
 | `` <enter> `` | Подтвердить |  |
 | `` <esc> `` | Закрыть/отменить |  |
+
+## Jobs
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` o `` | Open in browser |  |
+| `` R `` | Обновить |  |
+| `` / `` | Filter the current view by text |  |
 
 ## Repo files
 

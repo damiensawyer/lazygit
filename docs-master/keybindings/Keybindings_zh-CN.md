@@ -62,6 +62,15 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 
 | Key | Action | Info |
 |-----|--------|-------------|
+| `` <enter> `` | View jobs |  |
+| `` o `` | Open in browser |  |
+| `` R `` | 刷新 |  |
+| `` / `` | 通过文本过滤当前视图 |  |
+
+## Jobs
+
+| Key | Action | Info |
+|-----|--------|-------------|
 | `` o `` | Open in browser |  |
 | `` R `` | 刷新 |  |
 | `` / `` | 通过文本过滤当前视图 |  |

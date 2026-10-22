@@ -139,4 +139,5 @@ func (gui *Gui) assignSidePanelWindows(contextTree *context.ContextTree) {
 	// so they always take over the window hosting commits, which is the
 	// biggest one in the default layout.
 	contextTree.GithubRuns.SetWindowName(contextTree.LocalCommits.GetWindowName())
+	contextTree.GithubJobs.SetWindowName(contextTree.LocalCommits.GetWindowName())
 }
