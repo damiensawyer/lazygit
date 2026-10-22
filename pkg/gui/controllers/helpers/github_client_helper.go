@@ -194,13 +194,17 @@ func (self *GithubClientHelper) login(host string, onSuccess func(token string) 
 func (self *GithubClientHelper) HandleError(err error, retry func() error) error {
 	var apiErr *github_commands.APIError
 	if errors.As(err, &apiErr) && apiErr.StatusCode == http.StatusUnauthorized && self.client != nil {
-		// The token has been revoked or has expired; get a new one.
-		host := self.client.Repo().Host
-		self.client = nil
-		self.tokens.set(host, "")
-		return self.login(host, func(string) error { return retry() })
+		// The token has been revoked or has expired; get a new one. Until the
+		// user has, the client keeps the old one, so that what they do in the
+		// meantime fails the same way rather than finding no client.
+		client := self.client
+		self.tokens.set(client.Repo().Host, "")
+		return self.login(client.Repo().Host, func(token string) error {
+			self.client = client.WithToken(token)
+			return retry()
+		})
 	}
-	if github_commands.IsNotFound(err) {
+	if github_commands.IsNotFound(err) && self.client != nil {
 		return errors.New(utils.ResolvePlaceholderString(self.c.Tr.GithubActions.RepoNotFound, map[string]string{
 			"repo": self.client.Repo().FullName(),
 		}))

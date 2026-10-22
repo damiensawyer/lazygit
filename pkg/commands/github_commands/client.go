@@ -83,6 +83,14 @@ func NewClientWithBaseURL(repo Repo, baseURL string) *Client {
 	}
 }
 
+// WithToken returns a client for the same repository that authenticates with
+// another token.
+func (self *Client) WithToken(token string) *Client {
+	client := *self
+	client.repo.Token = token
+	return &client
+}
+
 func (self *Client) Repo() Repo {
 	return self.repo
 }

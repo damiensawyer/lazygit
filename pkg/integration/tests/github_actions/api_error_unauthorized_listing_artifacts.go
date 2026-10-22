@@ -7,7 +7,7 @@ import (
 )
 
 var ApiErrorUnauthorizedListingArtifacts = NewIntegrationTest(NewIntegrationTestArgs{
-	Description:  "When GitHub rejects the token while listing a run's artifacts, the user is asked to log in again",
+	Description:  "When GitHub rejects the token while listing a run's artifacts, the user is asked to log in again, and asked again if they try again without having",
 	ExtraCmdArgs: []string{},
 	Skip:         false,
 	SetupConfig:  func(config *config.AppConfig) {},
@@ -31,6 +31,16 @@ var ApiErrorUnauthorizedListingArtifacts = NewIntegrationTest(NewIntegrationTest
 		t.Views().GithubRuns().
 			IsFocused().
 			NavigateToLine(Contains("Fix the frobnicator")).
+			Press(keys.GithubActions.DownloadArtifacts)
+
+		t.ExpectPopup().
+			Menu().
+			Title(Equals("Log in to github.com")).
+			Cancel()
+
+		// Trying again without having logged in asks again.
+		t.Views().GithubRuns().
+			IsFocused().
 			Press(keys.GithubActions.DownloadArtifacts)
 
 		t.ExpectPopup().
