@@ -468,6 +468,7 @@ type KeybindingConfig struct {
 	Main           KeybindingMainConfig           `yaml:"main"`
 	Submodules     KeybindingSubmodulesConfig     `yaml:"submodules"`
 	CommitMessage  KeybindingCommitMessageConfig  `yaml:"commitMessage"`
+	GithubActions  KeybindingGithubActionsConfig  `yaml:"githubActions"`
 }
 
 // damn looks like we have some inconsistencies here with -alt and -alt1
@@ -576,6 +577,7 @@ type KeybindingUniversalConfig struct {
 	OpenDiffTool                      Keybinding `yaml:"openDiffTool"`
 	BrowseAllFilesAtCommit            Keybinding `yaml:"browseAllFilesAtCommit"`
 	EditConfig                        Keybinding `yaml:"editConfig"`
+	OpenGithubActions                 Keybinding `yaml:"openGithubActions"`
 }
 
 type KeybindingStatusConfig struct {
@@ -669,6 +671,10 @@ type KeybindingAmendAttributeConfig struct {
 type KeybindingStashConfig struct {
 	PopStash    Keybinding `yaml:"popStash"`
 	RenameStash Keybinding `yaml:"renameStash"`
+}
+
+type KeybindingGithubActionsConfig struct {
+	OpenInBrowser Keybinding `yaml:"openInBrowser"`
 }
 
 type KeybindingCommitFilesConfig struct {
@@ -1107,6 +1113,7 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 				OpenDiffTool:                      Keybinding{"<ctrl+t>"},
 				BrowseAllFilesAtCommit:            Keybinding{"E"},
 				EditConfig:                        Keybinding{"<alt+shift+c>"},
+				OpenGithubActions:                 Keybinding{"<ctrl+a>"},
 			},
 			Status: KeybindingStatusConfig{
 				CheckForUpdate:             Keybinding{"u"},
@@ -1197,6 +1204,9 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 			},
 			CommitFiles: KeybindingCommitFilesConfig{
 				CheckoutCommitFile: Keybinding{"c"},
+			},
+			GithubActions: KeybindingGithubActionsConfig{
+				OpenInBrowser: Keybinding{"o"},
 			},
 			RepoFiles: KeybindingRepoFilesConfig{
 				Restore:  Keybinding{"c"},

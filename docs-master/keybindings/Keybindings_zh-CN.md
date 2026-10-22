@@ -37,6 +37,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <ctrl+z> `` | 挂起应用程序 |  |
 | `` <ctrl+w> `` | 切换是否在差异视图中显示空白字符差异 | 切换是否在差异视图中显示空白字符更改。<br><br>默认值可在配置文件中通过键 'git.ignoreWhitespaceInDiffView' 更改。 |
 | `` <alt+shift+c> `` | 编辑配置文件 | 使用外部编辑器打开文件 |
+| `` <ctrl+a> `` | View GitHub Actions | Show the workflow runs of this repository on GitHub, like `gh run list` does. The list refreshes itself while it is shown. |
 | `` z `` | 撤销 | Reflog将用于确定运行哪个git命令来撤消最后一个git命令。这并不包括对工作树的更改，只考虑提交。 |
 | `` Z `` | 重做 | Reflog将用于确定运行哪个git命令来重做上一个git命令。这并不包括对工作树的更改，只考虑提交。 |
 
@@ -56,6 +57,14 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` L `` | 向右滚动 |  |
 | `` ] `` | 下一个标签 |  |
 | `` [ `` | 上一个标签 |  |
+
+## Actions
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` o `` | Open in browser |  |
+| `` R `` | 刷新 |  |
+| `` / `` | 通过文本过滤当前视图 |  |
 
 ## Repo files
 

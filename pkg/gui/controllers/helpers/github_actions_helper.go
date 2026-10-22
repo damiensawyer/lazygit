@@ -1,0 +1,392 @@
+package helpers
+
+import (
+	"context"
+	"errors"
+	"net/http"
+	"sync"
+	"time"
+
+	"github.com/jesseduffield/lazygit/pkg/commands/github_commands"
+	"github.com/jesseduffield/lazygit/pkg/commands/models"
+	"github.com/jesseduffield/lazygit/pkg/gocui"
+	"github.com/jesseduffield/lazygit/pkg/gui/style"
+	"github.com/jesseduffield/lazygit/pkg/gui/types"
+	"github.com/jesseduffield/lazygit/pkg/utils"
+	"github.com/samber/lo"
+)
+
+const (
+	// How often the runs are reloaded while the GitHub Actions view is shown.
+	// Something still running is worth watching closely; otherwise we only
+	// look out for new runs.
+	githubActiveRefreshInterval = 5 * time.Second
+	githubIdleRefreshInterval   = 30 * time.Second
+
+	githubRunsLimit = 50
+)
+
+// GithubTokens remembers the tokens the user logged in with during this
+// session. It outlives repo switches, unlike the helpers, so that the user
+// doesn't have to log in again in every repo; and it covers for the token
+// lookup, which doesn't see a token we stored ourselves if gh isn't installed
+// (go-gh caches the config file it read on first use).
+type GithubTokens struct {
+	mutex  sync.Mutex
+	byHost map[string]string
+}
+
+func (self *GithubTokens) get(host string) string {
+	self.mutex.Lock()
+	defer self.mutex.Unlock()
+	return self.byHost[host]
+}
+
+func (self *GithubTokens) set(host string, token string) {
+	self.mutex.Lock()
+	defer self.mutex.Unlock()
+	if self.byHost == nil {
+		self.byHost = map[string]string{}
+	}
+	self.byHost[host] = token
+}
+
+// GithubRunDetails is what we load about a run in addition to what the runs
+// list says about it, for showing it in the main view.
+type GithubRunDetails struct {
+	Jobs        []*models.GithubJob
+	Annotations map[int64][]*models.GithubAnnotation
+	Err         error
+
+	// the run's UpdatedAt when the details were loaded
+	updatedAt time.Time
+}
+
+// GithubActionsHelper loads the current repository's GitHub Actions data and
+// keeps it fresh while it is being shown.
+type GithubActionsHelper struct {
+	c            *HelperCommon
+	windowHelper *WindowHelper
+	loginHelper  *GithubLoginHelper
+	tokens       *GithubTokens
+
+	// nil until the repo and token have been resolved
+	client *github_commands.Client
+
+	// bumped whenever the runs are loaded, so that an auto-refresh scheduled
+	// before then knows it has been superseded
+	refreshGeneration int
+
+	// keyed by run ID; only touched on the UI thread
+	runDetails        map[int64]*GithubRunDetails
+	runDetailsLoading map[int64]bool
+}
+
+func NewGithubActionsHelper(
+	c *HelperCommon,
+	windowHelper *WindowHelper,
+	loginHelper *GithubLoginHelper,
+	tokens *GithubTokens,
+) *GithubActionsHelper {
+	return &GithubActionsHelper{
+		c:                 c,
+		windowHelper:      windowHelper,
+		loginHelper:       loginHelper,
+		tokens:            tokens,
+		runDetails:        map[int64]*GithubRunDetails{},
+		runDetailsLoading: map[int64]bool{},
+	}
+}
+
+// Open shows the runs of the current repository, logging in first if needed.
+func (self *GithubActionsHelper) Open() error {
+	return self.withClient(func() error {
+		// The runs take over the commits window, so escaping from them shows the
+		// commits again.
+		runsContext := self.c.Contexts().GithubRuns
+		runsContext.SetParentContext(self.c.Contexts().LocalCommits)
+		runsContext.GetView().TitlePrefix = self.c.Contexts().LocalCommits.GetView().TitlePrefix
+
+		return self.c.WithWaitingStatus(self.c.Tr.GithubActions.LoadingRuns, func(gocui.Task) error {
+			return self.loadRuns(false, func() {
+				runsContext.SetSelection(0)
+				self.c.Context().Push(runsContext, types.OnFocusOpts{})
+			})
+		})
+	})
+}
+
+// RefreshRuns reloads the runs, keeping the selected one selected.
+func (self *GithubActionsHelper) RefreshRuns() error {
+	return self.withClient(func() error {
+		return self.c.WithWaitingStatus(self.c.Tr.GithubActions.LoadingRuns, func(gocui.Task) error {
+			return self.loadRuns(false, func() {})
+		})
+	})
+}
+
+// withClient makes sure we know which repository to talk to and have a token
+// for it, asking the user where we can't work that out, and then calls f on
+// the UI thread.
+func (self *GithubActionsHelper) withClient(f func() error) error {
+	if self.client != nil {
+		return f()
+	}
+
+	remotes := getGithubRemotes(self.c.Model().Remotes, self.c.Git().HostingService)
+	if len(remotes) == 0 {
+		return errors.New(self.c.Tr.GithubActions.NoGithubRemote)
+	}
+
+	remote := getGithubBaseRemote(remotes, self.c.Git().GitHub.ConfiguredBaseRemoteName())
+	if remote == nil {
+		return self.selectRemote(remotes, func(remote githubRemoteInfo) error {
+			if err := self.c.Git().GitHub.SetConfiguredBaseRemoteName(remote.remote.Name); err != nil {
+				self.c.Log.Error(err)
+			}
+			return self.withClientForRemote(remote, f)
+		})
+	}
+
+	return self.withClientForRemote(*remote, f)
+}
+
+func (self *GithubActionsHelper) selectRemote(remotes []githubRemoteInfo, onSelect func(githubRemoteInfo) error) error {
+	return self.c.Menu(types.CreateMenuOptions{
+		Title: self.c.Tr.GithubActions.SelectRepository,
+		Items: lo.Map(remotes, func(remote githubRemoteInfo, _ int) *types.MenuItem {
+			return &types.MenuItem{
+				LabelColumns: []string{remote.remote.Name, style.FgCyan.Sprint(remote.serviceInfo.RepoName)},
+				OnPress:      func() error { return onSelect(remote) },
+			}
+		}),
+	})
+}
+
+func (self *GithubActionsHelper) withClientForRemote(remote githubRemoteInfo, f func() error) error {
+	host := remote.serviceInfo.WebDomain
+	useToken := func(token string) error {
+		self.client = github_commands.NewClient(github_commands.Repo{
+			Host:  host,
+			Owner: remote.serviceInfo.Owner,
+			Name:  remote.serviceInfo.Repository,
+			Token: token,
+		})
+		self.updateTitle()
+		return f()
+	}
+
+	if token := self.tokens.get(host); token != "" {
+		return useToken(token)
+	}
+
+	// Asking gh for the token runs a subprocess, so do it off the UI thread.
+	self.c.OnWorker(func(gocui.Task) error {
+		token := self.c.Git().GitHub.GetAuthToken(host)
+		self.c.OnUIThread(func() error {
+			if token == "" {
+				return self.login(host, useToken)
+			}
+			return useToken(token)
+		})
+		return nil
+	})
+	return nil
+}
+
+func (self *GithubActionsHelper) login(host string, onSuccess func(token string) error) error {
+	return self.loginHelper.Login(host, func(token string) error {
+		self.tokens.set(host, token)
+		return onSuccess(token)
+	})
+}
+
+// handleError reports a failed API request. Must be called on the UI thread.
+func (self *GithubActionsHelper) handleError(err error) error {
+	var apiErr *github_commands.APIError
+	if errors.As(err, &apiErr) && apiErr.StatusCode == http.StatusUnauthorized && self.client != nil {
+		// The token has been revoked or has expired; get a new one.
+		host := self.client.Repo().Host
+		self.client = nil
+		self.tokens.set(host, "")
+		return self.login(host, func(string) error { return self.Open() })
+	}
+	if github_commands.IsNotFound(err) {
+		return errors.New(utils.ResolvePlaceholderString(self.c.Tr.GithubActions.RepoNotFound, map[string]string{
+			"repo": self.client.Repo().FullName(),
+		}))
+	}
+	return err
+}
+
+func (self *GithubActionsHelper) updateTitle() {
+	self.c.Views().GithubRuns.Title = utils.ResolvePlaceholderString(self.c.Tr.GithubActions.RunsTitleForRepo, map[string]string{
+		"repo": self.client.Repo().FullName(),
+	})
+}
+
+// loadRuns runs on a worker. It fetches the runs and, on the UI thread, shows
+// them and then calls then. A background load is one the user didn't ask
+// for, so it doesn't report errors; it just tries again later.
+func (self *GithubActionsHelper) loadRuns(background bool, then func()) error {
+	client := self.client
+	generation := self.c.State().GetRepoGeneration()
+
+	runs, err := client.ListRuns(context.Background(), github_commands.ListRunsOptions{Limit: githubRunsLimit})
+
+	onUIThread := self.c.OnUIThread
+	if background {
+		onUIThread = self.c.OnUIThreadBackground
+	}
+	onUIThread(func() error {
+		if self.c.State().GetRepoGeneration() != generation {
+			return nil
+		}
+		if err != nil {
+			if background {
+				self.c.Log.Warnf("Failed to refresh GitHub Actions runs: %v", err)
+				self.scheduleAutoRefresh()
+				return nil
+			}
+			return self.handleError(err)
+		}
+		self.setRuns(runs)
+		then()
+		self.scheduleAutoRefresh()
+		return nil
+	})
+	return nil
+}
+
+func (self *GithubActionsHelper) setRuns(runs []*models.GithubRun) {
+	runsContext := self.c.Contexts().GithubRuns
+	selectedId := runsContext.GetSelectedItemId()
+
+	self.c.Model().GithubRuns = runs
+	runsContext.ReApplyFilter(self.c.UserConfig().Gui.UseFuzzySearch())
+
+	// New runs show up at the top, so the selected one may have moved down.
+	if selectedId != "" {
+		if _, idx, found := lo.FindIndexOf(runsContext.GetItems(), func(run *models.GithubRun) bool {
+			return run.ID() == selectedId
+		}); found {
+			runsContext.SetSelection(idx)
+		}
+	}
+
+	self.c.PostRefreshUpdateKeepingScrollPosition(runsContext)
+}
+
+// IsShowing reports whether the GitHub Actions view is visible.
+func (self *GithubActionsHelper) IsShowing() bool {
+	runsContext := self.c.Contexts().GithubRuns
+	return self.windowHelper.GetViewNameForWindow(runsContext.GetWindowName()) == runsContext.GetViewName()
+}
+
+func (self *GithubActionsHelper) scheduleAutoRefresh() {
+	self.refreshGeneration++
+	refreshGeneration := self.refreshGeneration
+	repoGeneration := self.c.State().GetRepoGeneration()
+
+	interval := githubIdleRefreshInterval
+	if lo.SomeBy(self.c.Model().GithubRuns, func(run *models.GithubRun) bool { return run.State().IsActive() }) {
+		interval = githubActiveRefreshInterval
+	}
+
+	time.AfterFunc(interval, func() {
+		self.c.OnUIThreadBackground(func() error {
+			if refreshGeneration != self.refreshGeneration ||
+				repoGeneration != self.c.State().GetRepoGeneration() ||
+				self.client == nil {
+				return nil
+			}
+			if !self.IsShowing() {
+				// Look again later; the view may be shown again without being
+				// reopened, e.g. by switching back to its window.
+				self.scheduleAutoRefresh()
+				return nil
+			}
+			self.c.OnWorkerBackground(func(gocui.Task) error {
+				return self.loadRuns(true, self.reloadActiveRunDetails)
+			})
+			return nil
+		})
+	})
+}
+
+// reloadActiveRunDetails drops the loaded details of runs that are still
+// going, so that the main view shows their progress.
+func (self *GithubActionsHelper) reloadActiveRunDetails() {
+	for _, run := range self.c.Model().GithubRuns {
+		if run.State().IsActive() {
+			delete(self.runDetails, run.RunId)
+		}
+	}
+	if self.c.Context().IsCurrent(self.c.Contexts().GithubRuns) {
+		self.c.Contexts().GithubRuns.HandleRenderToMain()
+	}
+}
+
+// GetRunDetails returns the details of a run if they have been loaded.
+// Otherwise it starts loading them, and re-renders the main view once they
+// have been, if the run is still selected by then. Must be called on the UI
+// thread.
+func (self *GithubActionsHelper) GetRunDetails(run *models.GithubRun) *GithubRunDetails {
+	if details, ok := self.runDetails[run.RunId]; ok && details.updatedAt.Equal(run.UpdatedAt) {
+		return details
+	}
+	if self.runDetailsLoading[run.RunId] || self.client == nil {
+		return nil
+	}
+	self.runDetailsLoading[run.RunId] = true
+
+	client := self.client
+	generation := self.c.State().GetRepoGeneration()
+	self.c.OnWorkerBackground(func(gocui.Task) error {
+		details := loadRunDetails(client, run)
+		self.c.OnUIThreadBackground(func() error {
+			if self.c.State().GetRepoGeneration() != generation {
+				return nil
+			}
+			delete(self.runDetailsLoading, run.RunId)
+			self.runDetails[run.RunId] = details
+
+			runsContext := self.c.Contexts().GithubRuns
+			if self.c.Context().IsCurrent(runsContext) && runsContext.GetSelectedItemId() == run.ID() {
+				runsContext.HandleRenderToMain()
+			}
+			return nil
+		})
+		return nil
+	})
+	return nil
+}
+
+func loadRunDetails(client *github_commands.Client, run *models.GithubRun) *GithubRunDetails {
+	details := &GithubRunDetails{updatedAt: run.UpdatedAt, Annotations: map[int64][]*models.GithubAnnotation{}}
+
+	ctx := context.Background()
+	details.Jobs, details.Err = client.ListJobs(ctx, run.RunId)
+	if details.Err != nil {
+		return details
+	}
+
+	// Annotations explain failures (a compiler error, a failed assertion),
+	// so they are worth a request per failed job.
+	for _, job := range details.Jobs {
+		if !job.State().IsFailed() {
+			continue
+		}
+		annotations, err := client.ListAnnotations(ctx, job.JobId)
+		if err == nil {
+			details.Annotations[job.JobId] = annotations
+		}
+	}
+	return details
+}
+
+// Client returns the client for the current repository, or nil if the
+// GitHub Actions view hasn't been opened yet.
+func (self *GithubActionsHelper) Client() *github_commands.Client {
+	return self.client
+}

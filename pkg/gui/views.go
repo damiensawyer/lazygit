@@ -39,6 +39,7 @@ func (gui *Gui) orderedViewNameMappings() []viewNameMapping {
 		{viewPtr: &gui.Views.Commits, name: "commits"},
 		{viewPtr: &gui.Views.Stash, name: "stash"},
 		{viewPtr: &gui.Views.SubCommits, name: "subCommits"},
+		{viewPtr: &gui.Views.GithubRuns, name: "githubRuns"},
 		{viewPtr: &gui.Views.CommitFiles, name: "commitFiles"},
 		{viewPtr: &gui.Views.RepoFiles, name: "repoFiles"},
 
@@ -181,6 +182,7 @@ func (gui *Gui) configureViewProperties() {
 	gui.c.SetViewContent(gui.Views.SearchPrefix, gui.c.Tr.SearchPrefix)
 
 	gui.Views.Stash.Title = gui.c.Tr.StashTitle
+	gui.Views.GithubRuns.Title = gui.c.Tr.GithubActions.RunsTitle
 	gui.Views.Commits.Title = gui.c.Tr.CommitsTitle
 	gui.Views.ReflogCommits.Title = gui.c.Tr.ReflogCommitsTitle
 	gui.Views.CommitFiles.Title = gui.c.Tr.CommitFiles

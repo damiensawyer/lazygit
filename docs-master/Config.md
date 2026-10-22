@@ -753,6 +753,7 @@ keybinding:
     openDiffTool: <ctrl+t>
     browseAllFilesAtCommit: E
     editConfig: <alt+shift+c>
+    openGithubActions: <ctrl+a>
   status:
     checkForUpdate: u
     recentRepos: <enter>
@@ -851,6 +852,8 @@ keybinding:
     bulkMenu: b
   commitMessage:
     commitMenu: <ctrl+o>
+  githubActions:
+    openInBrowser: o
 ```
 <!-- END CONFIG YAML -->
 

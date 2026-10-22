@@ -375,6 +375,8 @@ type Model struct {
 	PullRequests          []*models.GithubPullRequest
 	PullRequestsMap       map[string]*models.GithubPullRequest
 
+	GithubRuns []*models.GithubRun
+
 	// FilteredReflogCommits are the ones that appear in the reflog panel.
 	// When in filtering mode we only include the ones that match the given path
 	FilteredReflogCommits []*models.Commit

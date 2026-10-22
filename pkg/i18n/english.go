@@ -1054,20 +1054,37 @@ type Log struct {
 }
 
 type GithubActions struct {
-	LoginTitle             string
-	LoginPrompt            string
-	LoginWithBrowser       string
-	LoginWithToken         string
-	LoginWithTokenTooltip  string
-	RequestingLoginCode    string
-	DeviceLoginTitle       string
-	DeviceLoginPrompt      string
-	WaitingForBrowserLogin string
-	PasteTokenTitle        string
-	CheckingToken          string
-	LoggedIn               string
-	LoggedInButNotStored   string
-	LoginFailed            string
+	LoginTitle               string
+	LoginPrompt              string
+	LoginWithBrowser         string
+	LoginWithToken           string
+	LoginWithTokenTooltip    string
+	RequestingLoginCode      string
+	DeviceLoginTitle         string
+	DeviceLoginPrompt        string
+	WaitingForBrowserLogin   string
+	PasteTokenTitle          string
+	CheckingToken            string
+	LoggedIn                 string
+	LoggedInButNotStored     string
+	LoginFailed              string
+	JobsSectionTitle         string
+	LoadingJobs              string
+	NoJobs                   string
+	AnnotationsSectionTitle  string
+	RunTriggered             string
+	RunAttempt               string
+	RunsTitle                string
+	RunsTitleForRepo         string
+	LoadingRuns              string
+	NoGithubRemote           string
+	SelectRepository         string
+	RepoNotFound             string
+	NoRuns                   string
+	OpenGithubActions        string
+	OpenGithubActionsTooltip string
+	OpenRunInBrowser         string
+	RunMainTitle             string
 }
 
 type Actions struct {
@@ -2394,20 +2411,37 @@ func EnglishTranslationSet() *TranslationSet {
 			DeletingBranch:           "Deleting branch '{{.branchName}}' (was {{.hash}})",
 		},
 		GithubActions: GithubActions{
-			LoginTitle:             "Log in to {{.host}}",
-			LoginPrompt:            "Lazygit needs a GitHub token to show this repository's Actions. It is stored in the GitHub CLI's config, so gh will use it too.",
-			LoginWithBrowser:       "Log in with a web browser",
-			LoginWithToken:         "Paste an authentication token",
-			LoginWithTokenTooltip:  "Create a personal access token at https://github.com/settings/tokens. A fine-grained token needs read access to Actions and contents; to re-run, cancel and dispatch workflows it also needs write access to Actions.",
-			RequestingLoginCode:    "Requesting login code",
-			DeviceLoginTitle:       "Log in to GitHub",
-			DeviceLoginPrompt:      "Your one-time code is {{.code}}\n\nPress enter to copy it and open {{.url}} in your browser, then paste it there.",
-			WaitingForBrowserLogin: "Waiting for login in browser",
-			PasteTokenTitle:        "GitHub token for {{.host}}",
-			CheckingToken:          "Checking token",
-			LoggedIn:               "Logged in to GitHub as {{.username}}",
-			LoggedInButNotStored:   "Logged in to GitHub as {{.username}}, but the token couldn't be saved for next time: {{.error}}",
-			LoginFailed:            "GitHub login failed: {{.error}}",
+			LoginTitle:               "Log in to {{.host}}",
+			LoginPrompt:              "Lazygit needs a GitHub token to show this repository's Actions. It is stored in the GitHub CLI's config, so gh will use it too.",
+			LoginWithBrowser:         "Log in with a web browser",
+			LoginWithToken:           "Paste an authentication token",
+			LoginWithTokenTooltip:    "Create a personal access token at https://github.com/settings/tokens. A fine-grained token needs read access to Actions and contents; to re-run, cancel and dispatch workflows it also needs write access to Actions.",
+			RequestingLoginCode:      "Requesting login code",
+			DeviceLoginTitle:         "Log in to GitHub",
+			DeviceLoginPrompt:        "Your one-time code is {{.code}}\n\nPress enter to copy it and open {{.url}} in your browser, then paste it there.",
+			WaitingForBrowserLogin:   "Waiting for login in browser",
+			PasteTokenTitle:          "GitHub token for {{.host}}",
+			CheckingToken:            "Checking token",
+			LoggedIn:                 "Logged in to GitHub as {{.username}}",
+			LoggedInButNotStored:     "Logged in to GitHub as {{.username}}, but the token couldn't be saved for next time: {{.error}}",
+			LoginFailed:              "GitHub login failed: {{.error}}",
+			JobsSectionTitle:         "Jobs",
+			LoadingJobs:              "Loading jobs…",
+			NoJobs:                   "This run has no jobs",
+			AnnotationsSectionTitle:  "Annotations",
+			RunTriggered:             "Triggered via {{.event}} by {{.actor}} {{.ago}} ago",
+			RunAttempt:               "attempt {{.attempt}}",
+			RunsTitle:                "Actions",
+			RunsTitleForRepo:         "Actions · {{.repo}}",
+			LoadingRuns:              "Loading GitHub Actions runs",
+			NoGithubRemote:           "This repository has no GitHub remote",
+			SelectRepository:         "Select the repository whose Actions to show",
+			RepoNotFound:             "Repository {{.repo}} not found on GitHub, or your token has no access to it",
+			NoRuns:                   "No workflow runs",
+			OpenGithubActions:        "View GitHub Actions",
+			OpenGithubActionsTooltip: "Show the workflow runs of this repository on GitHub, like `gh run list` does. The list refreshes itself while it is shown.",
+			OpenRunInBrowser:         "Open in browser",
+			RunMainTitle:             "Run",
 		},
 		BreakingChangesTitle: "Breaking Changes",
 		BreakingChangesMessage: `You are updating to a new version of lazygit which contains breaking changes. Please review the notes below and update your configuration if necessary.

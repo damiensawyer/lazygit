@@ -130,6 +130,7 @@ func localisedTitle(tr *i18n.TranslationSet, str string) string {
 		"suggestions":       tr.SuggestionsCheatsheetTitle,
 		"extras":            tr.ExtrasTitle,
 		"worktrees":         tr.WorktreesTitle,
+		"githubRuns":        tr.GithubActions.RunsTitle,
 	}
 
 	title, ok := contextTitleMap[str]
