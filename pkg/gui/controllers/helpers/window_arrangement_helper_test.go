@@ -506,6 +506,187 @@ func TestGetWindowDimensions(t *testing.T) {
 			`,
 		},
 		{
+			name: "runtime SidePanelWidth overrides config",
+			mutateArgs: func(args *WindowArrangementArgs) {
+				args.UserConfig.Gui.SidePanelWidth = 0.8
+				args.SidePanelWidth = 0.2
+			},
+			expected: `
+			╭status───────╮╭main──────────────────────────────────────────────────────╮
+			│             ││                                                          │
+			╰─────────────╯│                                                          │
+			╭files────────╮│                                                          │
+			│             ││                                                          │
+			│             ││                                                          │
+			│             ││                                                          │
+			│             ││                                                          │
+			│             ││                                                          │
+			│             ││                                                          │
+			╰─────────────╯│                                                          │
+			╭branches─────╮│                                                          │
+			│             ││                                                          │
+			│             ││                                                          │
+			│             ││                                                          │
+			│             ││                                                          │
+			│             ││                                                          │
+			│             ││                                                          │
+			╰─────────────╯│                                                          │
+			╭commits──────╮│                                                          │
+			│             ││                                                          │
+			│             ││                                                          │
+			│             ││                                                          │
+			│             ││                                                          │
+			│             ││                                                          │
+			╰─────────────╯│                                                          │
+			╭stash────────╮│                                                          │
+			│             ││                                                          │
+			╰─────────────╯╰──────────────────────────────────────────────────────────╯
+			<options──────────────────────────────────────────────────────>A<B────────>
+			A: statusSpacer1
+			B: information
+			`,
+		},
+		{
+			name: "half screen mode with adjusted width",
+			mutateArgs: func(args *WindowArrangementArgs) {
+				args.Height = 20 // smaller height because we don't need more here
+				args.ScreenMode = types.SCREEN_HALF
+				args.SidePanelWidth = 0.6
+				args.HalfScreenModeSidePanelWidth = 0.3
+			},
+			expected: `
+			╭status────────────────╮╭main─────────────────────────────────────────────╮
+			│                      ││                                                 │
+			│                      ││                                                 │
+			│                      ││                                                 │
+			│                      ││                                                 │
+			│                      ││                                                 │
+			│                      ││                                                 │
+			│                      ││                                                 │
+			│                      ││                                                 │
+			│                      ││                                                 │
+			│                      ││                                                 │
+			│                      ││                                                 │
+			│                      ││                                                 │
+			│                      ││                                                 │
+			│                      ││                                                 │
+			│                      ││                                                 │
+			│                      ││                                                 │
+			│                      ││                                                 │
+			╰──────────────────────╯╰─────────────────────────────────────────────────╯
+			<options──────────────────────────────────────────────────────>A<B────────>
+			A: statusSpacer1
+			B: information
+			`,
+		},
+		{
+			name: "half screen mode with adjusted width, main focused",
+			mutateArgs: func(args *WindowArrangementArgs) {
+				args.Height = 20 // smaller height because we don't need more here
+				args.ScreenMode = types.SCREEN_HALF
+				args.CurrentWindow = "main"
+				args.HalfScreenModeSidePanelWidth = 0.3
+			},
+			expected: `
+			╭main─────────────────────────────────────────────────────────────────────╮
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			╰─────────────────────────────────────────────────────────────────────────╯
+			<options──────────────────────────────────────────────────────>A<B────────>
+			A: statusSpacer1
+			B: information
+			`,
+		},
+		{
+			name: "full screen mode ignores adjusted widths",
+			mutateArgs: func(args *WindowArrangementArgs) {
+				args.Height = 20 // smaller height because we don't need more here
+				args.ScreenMode = types.SCREEN_FULL
+				args.SidePanelWidth = 0.2
+				args.HalfScreenModeSidePanelWidth = 0.3
+			},
+			expected: `
+			╭status───────────────────────────────────────────────────────────────────╮
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			│                                                                         │
+			╰─────────────────────────────────────────────────────────────────────────╯
+			<options──────────────────────────────────────────────────────>A<B────────>
+			A: statusSpacer1
+			B: information
+			`,
+		},
+		{
+			name: "runtime SidePanelWidth with expandFocusedSidePanel",
+			mutateArgs: func(args *WindowArrangementArgs) {
+				args.UserConfig.Gui.ExpandFocusedSidePanel = true
+				args.SidePanelWidth = 0.6
+			},
+			expected: `
+			╭status─────────────────────────────────────╮╭main────────────────────────╮
+			│                                           ││                            │
+			╰───────────────────────────────────────────╯│                            │
+			╭files──────────────────────────────────────╮│                            │
+			│                                           ││                            │
+			│                                           ││                            │
+			│                                           ││                            │
+			│                                           ││                            │
+			│                                           ││                            │
+			│                                           ││                            │
+			│                                           ││                            │
+			│                                           ││                            │
+			│                                           ││                            │
+			╰───────────────────────────────────────────╯│                            │
+			╭branches───────────────────────────────────╮│                            │
+			│                                           ││                            │
+			│                                           ││                            │
+			│                                           ││                            │
+			│                                           ││                            │
+			╰───────────────────────────────────────────╯│                            │
+			╭commits────────────────────────────────────╮│                            │
+			│                                           ││                            │
+			│                                           ││                            │
+			│                                           ││                            │
+			│                                           ││                            │
+			╰───────────────────────────────────────────╯│                            │
+			╭stash──────────────────────────────────────╮│                            │
+			│                                           ││                            │
+			╰───────────────────────────────────────────╯╰────────────────────────────╯
+			<options──────────────────────────────────────────────────────>A<B────────>
+			A: statusSpacer1
+			B: information
+			`,
+		},
+		{
 			name: "portrait auto mode, enabled",
 			mutateArgs: func(args *WindowArrangementArgs) {
 				args.Width = 50
@@ -963,6 +1144,119 @@ func TestGetMidSectionWeights(t *testing.T) {
 			},
 			sideWeight: 60,
 			mainWeight: 60,
+		},
+		{
+			name: "zero runtime side panel width falls back to config",
+			mutateArgs: func(args *WindowArrangementArgs) {
+				args.UserConfig.Gui.SidePanelWidth = 0.25
+				args.SidePanelWidth = 0
+			},
+			sideWeight: 30,
+			mainWeight: 90,
+		},
+		{
+			name: "normal mode ignores half screen mode width",
+			mutateArgs: func(args *WindowArrangementArgs) {
+				args.SidePanelWidth = 0.25
+				args.HalfScreenModeSidePanelWidth = 0.7
+			},
+			sideWeight: 30,
+			mainWeight: 90,
+		},
+		{
+			name: "fractional widths are rounded to the nearest column weight",
+			mutateArgs: func(args *WindowArrangementArgs) {
+				args.SidePanelWidth = 0.2833
+			},
+			sideWeight: 34,
+			mainWeight: 86,
+		},
+		{
+			name: "minimum adjustable side panel width",
+			mutateArgs: func(args *WindowArrangementArgs) {
+				args.SidePanelWidth = 0.1
+			},
+			sideWeight: 12,
+			mainWeight: 108,
+		},
+		{
+			name: "maximum adjustable side panel width",
+			mutateArgs: func(args *WindowArrangementArgs) {
+				args.SidePanelWidth = 0.9
+			},
+			sideWeight: 108,
+			mainWeight: 12,
+		},
+		{
+			name: "half screen mode with minimum width",
+			mutateArgs: func(args *WindowArrangementArgs) {
+				args.ScreenMode = types.SCREEN_HALF
+				args.HalfScreenModeSidePanelWidth = 0.1
+			},
+			sideWeight: 12,
+			mainWeight: 108,
+		},
+		{
+			name: "half screen mode with maximum width",
+			mutateArgs: func(args *WindowArrangementArgs) {
+				args.ScreenMode = types.SCREEN_HALF
+				args.HalfScreenModeSidePanelWidth = 0.9
+			},
+			sideWeight: 108,
+			mainWeight: 12,
+		},
+		{
+			name: "half screen mode hides the side panel when main is focused",
+			mutateArgs: func(args *WindowArrangementArgs) {
+				args.ScreenMode = types.SCREEN_HALF
+				args.CurrentWindow = "main"
+				args.SidePanelWidth = 0.25
+				args.HalfScreenModeSidePanelWidth = 0.3
+			},
+			sideWeight: 0,
+			mainWeight: 90,
+		},
+		{
+			name: "full screen mode hides the main panel when a side panel is focused",
+			mutateArgs: func(args *WindowArrangementArgs) {
+				args.ScreenMode = types.SCREEN_FULL
+				args.SidePanelWidth = 0.25
+				args.HalfScreenModeSidePanelWidth = 0.3
+			},
+			sideWeight: 30,
+			mainWeight: 0,
+		},
+		{
+			name: "full screen mode hides the side panel when main is focused",
+			mutateArgs: func(args *WindowArrangementArgs) {
+				args.ScreenMode = types.SCREEN_FULL
+				args.CurrentWindow = "secondary"
+				args.SidePanelWidth = 0.25
+				args.HalfScreenModeSidePanelWidth = 0.3
+			},
+			sideWeight: 0,
+			mainWeight: 90,
+		},
+		{
+			name: "side-by-side main panels shrink the side panel in normal mode",
+			mutateArgs: func(args *WindowArrangementArgs) {
+				args.MainPanes = types.BothMainPanes
+				args.UserConfig.Gui.MainPanelSplitMode = "horizontal"
+				args.SidePanelWidth = 0.25
+			},
+			sideWeight: 30,
+			mainWeight: 150,
+		},
+		{
+			name: "half screen mode width applies even with side-by-side main panels",
+			mutateArgs: func(args *WindowArrangementArgs) {
+				args.ScreenMode = types.SCREEN_HALF
+				args.MainPanes = types.BothMainPanes
+				args.UserConfig.Gui.MainPanelSplitMode = "horizontal"
+				args.HalfScreenModeSidePanelWidth = 0.4
+			},
+			sideWeight: 48,
+			mainWeight: 72,
 		},
 	}
 
