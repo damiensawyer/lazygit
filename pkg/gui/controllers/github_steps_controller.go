@@ -42,6 +42,13 @@ func (self *GithubStepsController) GetKeybindings(opts types.KeybindingsOpts) []
 			DisplayOnScreen:   true,
 		},
 		{
+			Keys:              opts.GetKeys(opts.Config.Universal.Edit),
+			Handler:           self.withItem(self.openLogInEditor),
+			GetDisabledReason: self.require(self.singleItemSelected(self.jobIsComplete)),
+			Description:       self.c.Tr.GithubActions.OpenLogInEditor,
+			Tooltip:           self.c.Tr.GithubActions.OpenLogInEditorTooltip,
+		},
+		{
 			Keys:        opts.GetKeys(opts.Config.Universal.Refresh),
 			Handler:     self.c.Helpers().GithubActions.RefreshRuns,
 			Description: self.c.Tr.Refresh,
@@ -94,4 +101,15 @@ func (self *GithubStepsController) openInBrowser(step *models.GithubStep) error 
 
 func (self *GithubStepsController) context() *context.GithubStepsContext {
 	return self.c.Contexts().GithubSteps
+}
+
+func (self *GithubStepsController) jobIsComplete(*models.GithubStep) *types.DisabledReason {
+	if job := self.context().GetJob(); job != nil && job.State().IsActive() {
+		return &types.DisabledReason{Text: self.c.Tr.GithubActions.LogNotAvailableYet}
+	}
+	return nil
+}
+
+func (self *GithubStepsController) openLogInEditor(step *models.GithubStep) error {
+	return self.c.Helpers().GithubActions.WithJobLogFile(self.context().GetJob(), step.Number, self.c.Helpers().Files.EditFileAtLine)
 }

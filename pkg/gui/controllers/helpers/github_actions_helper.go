@@ -3,7 +3,10 @@ package helpers
 import (
 	goContext "context"
 	"errors"
+	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -686,6 +689,62 @@ func (self *GithubActionsHelper) GetJobLog(job *models.GithubJob) *GithubJobLog 
 		return nil
 	})
 	return nil
+}
+
+// WithJobLog passes the log of a completed job to f on the UI thread, loading
+// it first if it hasn't been yet.
+func (self *GithubActionsHelper) WithJobLog(job *models.GithubJob, f func(*github_commands.JobLog) error) error {
+	if job.State().IsActive() {
+		return errors.New(self.c.Tr.GithubActions.LogNotAvailableYet)
+	}
+	if jobLog, ok := self.jobLogs[job.JobId]; ok && jobLog.Err == nil {
+		return f(jobLog.Log)
+	}
+
+	client := self.client
+	generation := self.c.State().GetRepoGeneration()
+	return self.c.WithWaitingStatus(self.c.Tr.GithubActions.LoadingLog, func(gocui.Task) error {
+		jobLog := loadJobLog(client, job)
+		self.c.OnUIThread(func() error {
+			if self.c.State().GetRepoGeneration() != generation {
+				return nil
+			}
+			if jobLog.Err != nil {
+				return self.handleError(jobLog.Err)
+			}
+			self.jobLogs[job.JobId] = jobLog
+			return f(jobLog.Log)
+		})
+		return nil
+	})
+}
+
+// WithJobLogFile writes a job's log to a file, for opening in the user's
+// editor, which is better at searching a long log than the main view is. It
+// passes f the file's path, and the line that the given step's part of the
+// log starts at, or 1 if stepNumber is 0.
+func (self *GithubActionsHelper) WithJobLogFile(job *models.GithubJob, stepNumber int, f func(path string, line int) error) error {
+	return self.WithJobLog(job, func(log *github_commands.JobLog) error {
+		dir := filepath.Join(self.c.OS().GetTempDir(), "github-actions")
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			return err
+		}
+		path := filepath.Join(dir, fmt.Sprintf("%s-%s-job-%d.log",
+			self.client.Repo().Owner, self.client.Repo().Name, job.JobId))
+		content := utils.Decolorise(strings.Join(log.Lines, "\n")) + "\n"
+		if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+			return err
+		}
+
+		line := 1
+		for _, stepLog := range log.Steps {
+			if stepLog.StepNumber == stepNumber {
+				return f(path, line)
+			}
+			line += len(stepLog.Lines)
+		}
+		return f(path, 1)
+	})
 }
 
 func loadJobLog(client *github_commands.Client, job *models.GithubJob) *GithubJobLog {

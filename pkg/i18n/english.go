@@ -1191,6 +1191,8 @@ type GithubActions struct {
 	DownloadArtifactPrompt             string
 	DownloadingArtifacts               string
 	ArtifactsDownloaded                string
+	OpenLogInEditor                    string
+	OpenLogInEditorTooltip             string
 }
 
 type Actions struct {
@@ -2654,6 +2656,8 @@ func EnglishTranslationSet() *TranslationSet {
 			DownloadArtifactPrompt:             "Download to directory",
 			DownloadingArtifacts:               "Downloading artifacts",
 			ArtifactsDownloaded:                "Downloaded to {{.path}}",
+			OpenLogInEditor:                    "Open log in editor",
+			OpenLogInEditorTooltip:             "Open the whole log of the job in your editor, e.g. to search it, starting at the selected step.",
 		},
 		BreakingChangesTitle: "Breaking Changes",
 		BreakingChangesMessage: `You are updating to a new version of lazygit which contains breaking changes. Please review the notes below and update your configuration if necessary.

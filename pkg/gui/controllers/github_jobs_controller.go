@@ -61,6 +61,12 @@ func (self *GithubJobsController) GetKeybindings(opts types.KeybindingsOpts) []*
 			DisplayOnScreen:   true,
 		},
 		{
+			Keys:              opts.GetKeys(opts.Config.Universal.Edit),
+			Handler:           self.withItem(self.openLogInEditor),
+			GetDisabledReason: self.require(self.singleItemSelected(self.jobIsComplete)),
+			Description:       tr.OpenLogInEditor,
+		},
+		{
 			Keys:        opts.GetKeys(opts.Config.Universal.Refresh),
 			Handler:     self.c.Helpers().GithubActions.RefreshRuns,
 			Description: self.c.Tr.Refresh,
@@ -136,4 +142,15 @@ func (self *GithubJobsController) rerun(job *models.GithubJob) error {
 			rerunItem(tr.RerunThisJobWithDebug, true),
 		},
 	})
+}
+
+func (self *GithubJobsController) jobIsComplete(job *models.GithubJob) *types.DisabledReason {
+	if job.State().IsActive() {
+		return &types.DisabledReason{Text: self.c.Tr.GithubActions.LogNotAvailableYet}
+	}
+	return nil
+}
+
+func (self *GithubJobsController) openLogInEditor(job *models.GithubJob) error {
+	return self.c.Helpers().GithubActions.WithJobLogFile(job, 0, self.c.Helpers().Files.EditFileAtLine)
 }

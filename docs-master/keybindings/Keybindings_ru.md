@@ -87,6 +87,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <enter> `` | View steps |  |
 | `` o `` | Open in browser |  |
 | `` r `` | Re-run job | Re-run this job, and the jobs that depend on it, optionally with debug logging enabled. |
+| `` e `` | Open log in editor |  |
 | `` R `` | Обновить |  |
 | `` / `` | Filter the current view by text |  |
 
@@ -112,6 +113,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | Key | Action | Info |
 |-----|--------|-------------|
 | `` o `` | Open in browser |  |
+| `` e `` | Open log in editor | Open the whole log of the job in your editor, e.g. to search it, starting at the selected step. |
 | `` R `` | Обновить |  |
 | `` / `` | Filter the current view by text |  |
 
