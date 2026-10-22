@@ -175,6 +175,7 @@ var tests = []*components.IntegrationTest{
 	config.NegativeRefspec,
 	config.RemoteNamedStar,
 	config.SidePanelWidth,
+	config.SidePanelWidthClamping,
 	config.SidePanelsInPerRepoConfig,
 	conflicts.ConflictMarkerSizeNotAutoStaged,
 	conflicts.ConflictMarkerSizeResolve,
