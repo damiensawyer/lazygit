@@ -234,10 +234,7 @@ func TestSplitJobLogEdgeCases(t *testing.T) {
 				step(2, "Two", "00:00:05", "00:00:06"),
 			},
 			expected: []StepLog{
-				/* EXPECTED:
 				{StepNumber: 1, Lines: []string{"one"}},
-				ACTUAL: */
-				{StepNumber: 1, Lines: []string{"one", ""}},
 				{StepNumber: 2},
 			},
 		},
@@ -249,10 +246,7 @@ func TestSplitJobLogEdgeCases(t *testing.T) {
 				step(2, "Two", "00:00:05", "00:00:06"),
 			},
 			expected: []StepLog{
-				/* EXPECTED:
 				{StepNumber: 1, Lines: []string{"one", "two"}},
-				ACTUAL: */
-				{StepNumber: 1, Lines: []string{"one", "two", ""}},
 				{StepNumber: 2},
 			},
 		},

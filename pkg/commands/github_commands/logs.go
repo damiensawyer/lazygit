@@ -38,8 +38,7 @@ func SplitJobLog(log string, steps []models.GithubStep) []StepLog {
 	}
 
 	current := 0
-	for line := range strings.SplitSeq(strings.TrimPrefix(log, byteOrderMark), "\n") {
-		line = strings.TrimSuffix(line, "\r")
+	for _, line := range logLines(log) {
 		timestamp, text := splitLogTimestamp(line)
 		if !timestamp.IsZero() {
 			second := timestamp.Truncate(time.Second)
@@ -58,12 +57,6 @@ func SplitJobLog(log string, steps []models.GithubStep) []StepLog {
 			}
 		}
 		result[current].Lines = append(result[current].Lines, text)
-	}
-
-	// The log ends with a newline, which leaves an empty last line.
-	last := &result[len(result)-1]
-	if n := len(last.Lines); n > 0 && last.Lines[n-1] == "" {
-		last.Lines = last.Lines[:n-1]
 	}
 
 	return result
