@@ -235,6 +235,17 @@ func FormatPullRequestDetails(tr *i18n.TranslationSet, opts PullRequestDetailsOp
 		}
 	}
 
+	if len(details.Files) > 0 {
+		line("")
+		line("%s", style.AttrBold.Sprint(resolve(t.FilesChanged, map[string]string{
+			"count":   fmt.Sprint(len(details.Files)),
+			"commits": fmt.Sprint(details.CommitsCount),
+		})))
+		for _, file := range details.Files {
+			line("  %s %s %s", fileChangeType(file.ChangeType), file.Path, formatDiffStat(file.Additions, file.Deletions))
+		}
+	}
+
 	if len(details.Timeline) > 0 {
 		line("")
 		line("%s", style.AttrBold.Sprint(t.Conversation))
@@ -260,6 +271,23 @@ func FormatPullRequestDetails(tr *i18n.TranslationSet, opts PullRequestDetailsOp
 	}
 
 	return b.String()
+}
+
+// fileChangeType abbreviates how a pull request changes a file the way git
+// status does.
+func fileChangeType(changeType string) string {
+	switch changeType {
+	case "ADDED":
+		return style.FgGreen.Sprint("A")
+	case "DELETED":
+		return style.FgRed.Sprint("D")
+	case "RENAMED":
+		return style.FgCyan.Sprint("R")
+	case "COPIED":
+		return style.FgCyan.Sprint("C")
+	default:
+		return style.FgYellow.Sprint("M")
+	}
 }
 
 func formatReviewers(details *models.GithubPullRequestDetails) string {

@@ -68,7 +68,11 @@ func widgetDetails() *models.GithubPullRequestDetails {
 			{Name: "build", Workflow: "CI", Status: "completed", Conclusion: "success", RunId: 101, JobId: 1001},
 			{Name: "test", Workflow: "CI", Status: "completed", Conclusion: "failure", IsRequired: true, RunId: 101, JobId: 1002},
 		},
-		CommitsCount:     2,
+		CommitsCount: 2,
+		Files: []*models.GithubPullRequestFile{
+			{Path: "widget.go", Additions: 30, Deletions: 0, ChangeType: "ADDED"},
+			{Path: "frame.go", Additions: 10, Deletions: 3, ChangeType: "MODIFIED"},
+		},
 		MergeStateStatus: "BLOCKED",
 		ReviewThreads: []*models.GithubReviewThread{{
 			NodeId: "T_1", Path: "widget.go", Line: 7, DiffSide: "RIGHT",

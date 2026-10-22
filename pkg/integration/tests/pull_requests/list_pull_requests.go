@@ -57,6 +57,11 @@ var ListPullRequests = NewIntegrationTest(NewIntegrationTestArgs{
 				Contains("CI / test (required)"),
 			).
 			ContainsLines(
+				Contains("2 file(s) changed in 2 commit(s)"),
+				Contains("A widget.go +30 -0"),
+				Contains("M frame.go +10 -3"),
+			).
+			ContainsLines(
 				Contains("carol commented"),
 				Equals("  Looks useful"),
 			).

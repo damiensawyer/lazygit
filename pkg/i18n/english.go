@@ -1362,6 +1362,7 @@ type PullRequests struct {
 	OpenThreadInBrowser              string
 	ReviewThreads                    string
 	ReviewThreadsTooltip             string
+	FilesChanged                     string
 }
 
 type GithubActions struct {
@@ -3152,6 +3153,7 @@ func EnglishTranslationSet() *TranslationSet {
 			OpenThreadInBrowser:              "Open in the browser",
 			ReviewThreads:                    "Review threads",
 			ReviewThreadsTooltip:             "List the conversations about lines of the pull request, unresolved ones first, to reply to them or resolve them. To start one, select lines of the pull request's diff in the main view and press the key for commenting there.",
+			FilesChanged:                     "{{.count}} file(s) changed in {{.commits}} commit(s)",
 		},
 		GithubActions: GithubActions{
 			LoginTitle:                         "Log in to {{.host}}",
