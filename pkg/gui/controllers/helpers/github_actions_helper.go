@@ -60,6 +60,9 @@ type GithubRunDetails struct {
 
 	// the run's UpdatedAt when the details were loaded
 	updatedAt time.Time
+	// set for a run that is still going, whose jobs may have progressed
+	// without the run's UpdatedAt changing
+	stale bool
 }
 
 // GithubActionsHelper loads the current repository's GitHub Actions data and
@@ -307,19 +310,20 @@ func (self *GithubActionsHelper) scheduleAutoRefresh() {
 				return nil
 			}
 			self.c.OnWorkerBackground(func(gocui.Task) error {
-				return self.loadRuns(true, self.reloadActiveRunDetails)
+				return self.loadRuns(true, self.markActiveRunDetailsStale)
 			})
 			return nil
 		})
 	})
 }
 
-// reloadActiveRunDetails drops the loaded details of runs that are still
-// going, so that the main view shows their progress.
-func (self *GithubActionsHelper) reloadActiveRunDetails() {
+// markActiveRunDetailsStale makes the details of runs that are still going
+// reload the next time they are shown, so that the main view shows their
+// progress.
+func (self *GithubActionsHelper) markActiveRunDetailsStale() {
 	for _, run := range self.c.Model().GithubRuns {
-		if run.State().IsActive() {
-			delete(self.runDetails, run.RunId)
+		if details, ok := self.runDetails[run.RunId]; ok && run.State().IsActive() {
+			details.stale = true
 		}
 	}
 	if self.c.Context().IsCurrent(self.c.Contexts().GithubRuns) {
@@ -327,16 +331,17 @@ func (self *GithubActionsHelper) reloadActiveRunDetails() {
 	}
 }
 
-// GetRunDetails returns the details of a run if they have been loaded.
-// Otherwise it starts loading them, and re-renders the main view once they
-// have been, if the run is still selected by then. Must be called on the UI
-// thread.
+// GetRunDetails returns the details of a run if they have been loaded, or nil
+// if they haven't. Unless they are up to date, it starts loading them, and
+// re-renders the main view once they have been, if the run is still selected
+// by then. Outdated details are returned in the meantime, so that the main
+// view doesn't flash a loading message on every refresh of a run in progress.
+// Must be called on the UI thread.
 func (self *GithubActionsHelper) GetRunDetails(run *models.GithubRun) *GithubRunDetails {
-	if details, ok := self.runDetails[run.RunId]; ok && details.updatedAt.Equal(run.UpdatedAt) {
+	details, loaded := self.runDetails[run.RunId]
+	upToDate := loaded && !details.stale && details.updatedAt.Equal(run.UpdatedAt)
+	if upToDate || self.runDetailsLoading[run.RunId] || self.client == nil {
 		return details
-	}
-	if self.runDetailsLoading[run.RunId] || self.client == nil {
-		return nil
 	}
 	self.runDetailsLoading[run.RunId] = true
 
@@ -359,7 +364,7 @@ func (self *GithubActionsHelper) GetRunDetails(run *models.GithubRun) *GithubRun
 		})
 		return nil
 	})
-	return nil
+	return details
 }
 
 func loadRunDetails(client *github_commands.Client, run *models.GithubRun) *GithubRunDetails {
