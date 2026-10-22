@@ -101,18 +101,12 @@ func TestElapsed(t *testing.T) {
 		{"zero length", start, start, 0},
 		{
 			"ended before it started", start, start.Add(-time.Second),
-			/* EXPECTED:
 			0,
-			ACTUAL: */
-			time.Hour,
 		},
 		{
 			"started after now", now.Add(time.Second),
 			time.Time{},
-			/* EXPECTED:
 			0,
-			ACTUAL: */
-			-time.Second,
 		},
 	}
 

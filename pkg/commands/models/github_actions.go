@@ -75,15 +75,16 @@ func (self GithubActionsState) IsActive() bool {
 }
 
 // elapsed returns how long something that started at `start` ran, ending at
-// `end`, or at `now` if it hasn't ended yet.
+// `end`, or at `now` if it hasn't ended yet. The clocks involved don't always
+// agree, so an end before the start counts as no time at all.
 func elapsed(start, end, now time.Time) time.Duration {
 	if start.IsZero() {
 		return 0
 	}
-	if end.IsZero() || end.Before(start) {
+	if end.IsZero() {
 		end = now
 	}
-	return end.Sub(start).Truncate(time.Second)
+	return max(end.Sub(start), 0).Truncate(time.Second)
 }
 
 // GithubRun is a workflow run.
