@@ -2121,6 +2121,20 @@
             }
           ],
           "default": "a"
+        },
+        "copyToClipboard": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "y"
         }
       },
       "additionalProperties": false,

@@ -69,6 +69,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` d `` | Delete run | Delete the run along with its logs and artifacts. |
 | `` f `` | Filter runs | Only show the runs of a branch, a workflow, a commit, with a status, or triggered by an event, like the flags of `gh run list` do. |
 | `` a `` | Download artifacts | Download and unpack the files the run uploaded, like `gh run download` does. |
+| `` y `` | Copy to clipboard |  |
 | `` w `` | Workflows | Run a workflow, enable or disable it, or show only its runs, like `gh workflow` does. |
 | `` R `` | Verversen |  |
 | `` / `` | Filter the current view by text |  |
@@ -232,6 +233,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` o `` | Open in browser |  |
 | `` r `` | Re-run job | Re-run this job, and the jobs that depend on it, optionally with debug logging enabled. |
 | `` e `` | Open log in editor |  |
+| `` y `` | Copy to clipboard |  |
 | `` R `` | Verversen |  |
 | `` / `` | Filter the current view by text |  |
 
@@ -417,6 +419,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 |-----|--------|-------------|
 | `` o `` | Open in browser |  |
 | `` e `` | Open log in editor | Open the whole log of the job in your editor, e.g. to search it, starting at the selected step. |
+| `` y `` | Log of this step |  |
 | `` R `` | Verversen |  |
 | `` / `` | Filter the current view by text |  |
 

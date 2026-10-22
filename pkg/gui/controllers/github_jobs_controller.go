@@ -67,6 +67,13 @@ func (self *GithubJobsController) GetKeybindings(opts types.KeybindingsOpts) []*
 			Description:       tr.OpenLogInEditor,
 		},
 		{
+			Keys:              opts.GetKeys(opts.Config.GithubActions.CopyToClipboard),
+			Handler:           self.withItem(self.copyToClipboard),
+			GetDisabledReason: self.require(self.singleItemSelected()),
+			Description:       tr.CopyToClipboard,
+			OpensMenu:         true,
+		},
+		{
 			Keys:        opts.GetKeys(opts.Config.Universal.Refresh),
 			Handler:     self.c.Helpers().GithubActions.RefreshRuns,
 			Description: self.c.Tr.Refresh,
@@ -153,4 +160,25 @@ func (self *GithubJobsController) jobIsComplete(job *models.GithubJob) *types.Di
 
 func (self *GithubJobsController) openLogInEditor(job *models.GithubJob) error {
 	return self.c.Helpers().GithubActions.WithJobLogFile(job, 0, self.c.Helpers().Files.EditFileAtLine)
+}
+
+func (self *GithubJobsController) copyToClipboard(job *models.GithubJob) error {
+	tr := self.c.Tr.GithubActions
+	helper := self.c.Helpers().GithubActions
+
+	items := []githubCopyItem{
+		githubCopyValue(tr.CopyJobUrl, job.Url),
+		githubCopyValue(tr.CopyJobId, job.ID()),
+	}
+	if !job.State().IsActive() {
+		items = append(items, githubCopyItem{
+			label: tr.CopyJobLog,
+			get: func(f func(string) error) error {
+				return helper.WithJobLog(job, func(log *github_commands.JobLog) error {
+					return f(joinLogLines(log.Lines))
+				})
+			},
+		})
+	}
+	return githubCopyMenu(self.c, items)
 }

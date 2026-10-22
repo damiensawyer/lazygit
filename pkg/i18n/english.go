@@ -1193,6 +1193,16 @@ type GithubActions struct {
 	ArtifactsDownloaded                string
 	OpenLogInEditor                    string
 	OpenLogInEditorTooltip             string
+	CopyToClipboard                    string
+	CopyRunUrl                         string
+	CopyJobUrl                         string
+	CopyRunId                          string
+	CopyJobId                          string
+	CopyCommitHash                     string
+	CopyBranchName                     string
+	CopyStepLog                        string
+	CopyJobLog                         string
+	CopiedToClipboard                  string
 }
 
 type Actions struct {
@@ -2658,6 +2668,16 @@ func EnglishTranslationSet() *TranslationSet {
 			ArtifactsDownloaded:                "Downloaded to {{.path}}",
 			OpenLogInEditor:                    "Open log in editor",
 			OpenLogInEditorTooltip:             "Open the whole log of the job in your editor, e.g. to search it, starting at the selected step.",
+			CopyToClipboard:                    "Copy to clipboard",
+			CopyRunUrl:                         "Run URL",
+			CopyJobUrl:                         "Job URL",
+			CopyRunId:                          "Run ID",
+			CopyJobId:                          "Job ID",
+			CopyCommitHash:                     "Commit hash",
+			CopyBranchName:                     "Branch name",
+			CopyStepLog:                        "Log of this step",
+			CopyJobLog:                         "Log",
+			CopiedToClipboard:                  "{{.what}} copied to clipboard",
 		},
 		BreakingChangesTitle: "Breaking Changes",
 		BreakingChangesMessage: `You are updating to a new version of lazygit which contains breaking changes. Please review the notes below and update your configuration if necessary.

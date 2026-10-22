@@ -98,6 +98,13 @@ func (self *GithubRunsController) GetKeybindings(opts types.KeybindingsOpts) []*
 			OpensMenu:         true,
 		},
 		{
+			Keys:              opts.GetKeys(opts.Config.GithubActions.CopyToClipboard),
+			Handler:           self.withItem(self.copyToClipboard),
+			GetDisabledReason: self.require(self.singleItemSelected()),
+			Description:       tr.CopyToClipboard,
+			OpensMenu:         true,
+		},
+		{
 			Keys:        opts.GetKeys(opts.Config.GithubActions.ViewWorkflows),
 			Handler:     (&GithubWorkflowsAction{c: self.c}).Call,
 			Description: tr.Workflows,
@@ -499,4 +506,14 @@ func (self *GithubRunsController) promptForArtifactsDir(initialDir string, artif
 		},
 	})
 	return nil
+}
+
+func (self *GithubRunsController) copyToClipboard(run *models.GithubRun) error {
+	tr := self.c.Tr.GithubActions
+	return githubCopyMenu(self.c, []githubCopyItem{
+		githubCopyValue(tr.CopyRunUrl, run.Url),
+		githubCopyValue(tr.CopyRunId, run.ID()),
+		githubCopyValue(tr.CopyCommitHash, run.HeadSha),
+		githubCopyValue(tr.CopyBranchName, run.HeadBranch),
+	})
 }

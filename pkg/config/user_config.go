@@ -680,6 +680,7 @@ type KeybindingGithubActionsConfig struct {
 	FilterRuns        Keybinding `yaml:"filterRuns"`
 	ViewWorkflows     Keybinding `yaml:"viewWorkflows"`
 	DownloadArtifacts Keybinding `yaml:"downloadArtifacts"`
+	CopyToClipboard   Keybinding `yaml:"copyToClipboard"`
 }
 
 type KeybindingCommitFilesConfig struct {
@@ -1217,6 +1218,7 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 				FilterRuns:        Keybinding{"f"},
 				ViewWorkflows:     Keybinding{"w"},
 				DownloadArtifacts: Keybinding{"a"},
+				CopyToClipboard:   Keybinding{"y"},
 			},
 			RepoFiles: KeybindingRepoFilesConfig{
 				Restore:  Keybinding{"c"},

@@ -859,6 +859,7 @@ keybinding:
     filterRuns: f
     viewWorkflows: w
     downloadArtifacts: a
+    copyToClipboard: "y"
 ```
 <!-- END CONFIG YAML -->
 
