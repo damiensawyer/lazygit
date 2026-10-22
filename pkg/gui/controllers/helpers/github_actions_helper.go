@@ -190,15 +190,14 @@ func (self *GithubActionsHelper) selectRemote(remotes []githubRemoteInfo, onSele
 
 func (self *GithubActionsHelper) withClientForRemote(remote githubRemoteInfo, f func() error) error {
 	host := remote.serviceInfo.WebDomain
+	repo := github_commands.Repo{
+		Host:  host,
+		Owner: remote.serviceInfo.Owner,
+		Name:  remote.serviceInfo.Repository,
+	}
 	useToken := func(token string) error {
-		self.client = github_commands.NewClient(github_commands.Repo{
-			Host:  host,
-			Owner: remote.serviceInfo.Owner,
-			Name:  remote.serviceInfo.Repository,
-			Token: token,
-		})
-		self.updateTitle()
-		return f()
+		repo.Token = token
+		return self.useClient(github_commands.NewClient(repo), f)
 	}
 
 	if token := self.tokens.get(host); token != "" {
@@ -217,6 +216,12 @@ func (self *GithubActionsHelper) withClientForRemote(remote githubRemoteInfo, f 
 		return nil
 	})
 	return nil
+}
+
+func (self *GithubActionsHelper) useClient(client *github_commands.Client, f func() error) error {
+	self.client = client
+	self.updateTitle()
+	return f()
 }
 
 func (self *GithubActionsHelper) login(host string, onSuccess func(token string) error) error {
