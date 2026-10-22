@@ -345,6 +345,7 @@ var tests = []*components.IntegrationTest{
 	filter_by_path.TypeFile,
 	github_actions.ListNoRuns,
 	github_actions.ListRuns,
+	github_actions.OpenLogInEditor,
 	github_actions.OpenWithoutGithubRemote,
 	github_actions.ViewJobsAndSteps,
 	interactive_rebase.AdvancedInteractiveRebase,
