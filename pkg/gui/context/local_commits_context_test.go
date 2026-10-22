@@ -236,3 +236,126 @@ func TestPullRequestDiff(t *testing.T) {
 		})
 	}
 }
+
+// overviewModelGuiCommon serves just the model, which is all that
+// overviewDisplayIndices reads.
+type overviewModelGuiCommon struct {
+	types.IGuiCommon
+	model *types.Model
+}
+
+func (self *overviewModelGuiCommon) Model() *types.Model {
+	return self.model
+}
+
+func TestOverviewDisplayIndices(t *testing.T) {
+	hashPool := &utils.StringPool{}
+	source := lo.Map([]string{"a", "b", "c", "d", "e", "f"}, func(hash string, _ int) *models.Commit {
+		return models.NewCommit(hashPool, models.NewCommitOpts{Hash: hash})
+	})
+	// the overview shows a, c, d, and f
+	displayed := []*models.Commit{source[0], source[2], source[3], source[5]}
+	indices := []int{0, 2, 3, 5}
+
+	scenarios := []struct {
+		name      string
+		displayed []*models.Commit
+		source    []*models.Commit
+		indices   []int
+		startIdx  int
+		endIdx    int
+		expected  []int
+	}{
+		{
+			name:      "overview mode is off",
+			displayed: source,
+			startIdx:  0,
+			endIdx:    6,
+			expected:  nil,
+		},
+		{
+			name:      "all displayed rows",
+			displayed: displayed,
+			source:    source,
+			indices:   indices,
+			startIdx:  0,
+			endIdx:    4,
+			expected:  []int{0, 2, 3, 5},
+		},
+		{
+			name:      "a window of the displayed rows",
+			displayed: displayed,
+			source:    source,
+			indices:   indices,
+			startIdx:  1,
+			endIdx:    3,
+			expected:  []int{2, 3},
+		},
+		{
+			name:      "a window reaching past the end of the displayed rows",
+			displayed: displayed,
+			source:    source,
+			indices:   indices,
+			startIdx:  2,
+			endIdx:    10,
+			expected:  []int{3, 5},
+		},
+		{
+			name:      "a window starting past the end of the displayed rows",
+			displayed: displayed,
+			source:    source,
+			indices:   indices,
+			startIdx:  4,
+			endIdx:    10,
+			expected:  []int{},
+		},
+		{
+			name:      "nothing is displayed",
+			displayed: []*models.Commit{},
+			source:    source,
+			indices:   []int{},
+			startIdx:  0,
+			endIdx:    10,
+			expected:  []int{},
+		},
+		{
+			name:      "the displayed rows were replaced by a list of a different length",
+			displayed: source[:3],
+			source:    source,
+			indices:   indices,
+			startIdx:  0,
+			endIdx:    3,
+			expected:  nil,
+		},
+		{
+			name:      "the displayed rows were replaced by different commits",
+			displayed: []*models.Commit{source[0], source[1], source[3], source[5]},
+			source:    source,
+			indices:   indices,
+			startIdx:  0,
+			endIdx:    4,
+			expected:  nil,
+		},
+		{
+			name:      "an index points past the end of the full list",
+			displayed: displayed,
+			source:    source[:5],
+			indices:   indices,
+			startIdx:  0,
+			endIdx:    4,
+			expected:  nil,
+		},
+	}
+
+	for _, s := range scenarios {
+		t.Run(s.name, func(t *testing.T) {
+			c := &ContextCommon{IGuiCommon: &overviewModelGuiCommon{model: &types.Model{
+				Commits:               s.displayed,
+				OverviewCommitsSource: s.source,
+				OverviewCommitIndices: s.indices,
+			}}}
+
+			assert.Equal(t, s.expected, overviewDisplayIndices(c, s.startIdx, s.endIdx))
+		})
+	}
+}
