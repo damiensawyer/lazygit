@@ -584,6 +584,7 @@ var tests = []*components.IntegrationTest{
 	repo_files.BrowseAllFilesAtCommit,
 	repo_files.CopyMenu,
 	repo_files.EnterFromBranches,
+	repo_files.EnterFromStash,
 	repo_files.EnterFromTags,
 	repo_files.FileHistory,
 	repo_files.OpenFileNotInWorktree,
