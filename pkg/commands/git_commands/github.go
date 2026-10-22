@@ -21,6 +21,10 @@ import (
 
 type GitHubCommands struct {
 	*GitCommon
+
+	// set for integration tests, which must never talk to GitHub with the
+	// token of whoever runs them
+	authTokensDisabled bool
 }
 
 func NewGitHubCommands(gitCommon *GitCommon) *GitHubCommands {
@@ -165,7 +169,17 @@ func fetchPullRequestsQuery(branches []string, owner string, repo string) (strin
 // GetAuthToken returns the token to authenticate against the given host with,
 // or an empty string if there is none.
 func (self *GitHubCommands) GetAuthToken(host string) string {
+	if self.authTokensDisabled {
+		return ""
+	}
 	return github_commands.TokenForHost(host)
+}
+
+// DisableAuthTokens makes GetAuthToken find no token. The environment of an
+// integration test doesn't have the variables or the config file of whoever
+// runs it, but the system keyring is still theirs.
+func (self *GitHubCommands) DisableAuthTokens() {
+	self.authTokensDisabled = true
 }
 
 // FetchRecentPRs fetches recent pull requests using GraphQL. serviceInfo

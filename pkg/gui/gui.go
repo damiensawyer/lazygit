@@ -399,6 +399,9 @@ func (gui *Gui) onNewRepo(startArgs appTypes.StartArgs, contextKey types.Context
 	if err != nil {
 		return err
 	}
+	if startArgs.IntegrationTest != nil || gui.integrationTest != nil {
+		git.GitHub.DisableAuthTokens()
+	}
 	gui.git = git
 
 	err = gui.Config.ReloadUserConfigForRepo(gui.getPerRepoConfigFiles())
