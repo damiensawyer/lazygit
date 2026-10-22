@@ -456,10 +456,16 @@ func (self *RepoFilesController) GetOnRenderToMain() func() {
 		hash := self.context().GetLoadedCommitHash()
 		path := node.GetPath()
 
+		// the root item's path is ".", but it's shown as "/" in the panel
+		title := path
+		if path == "." {
+			title = "/"
+		}
+
 		self.c.RenderToMainViews(types.RefreshMainOpts{
 			Pair: self.c.MainViewPairs().Normal,
 			Main: &types.ViewUpdateOpts{
-				Title: path,
+				Title: title,
 				Task:  self.mainViewTask(node, hash, path),
 			},
 		})
