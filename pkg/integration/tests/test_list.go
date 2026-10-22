@@ -261,6 +261,7 @@ var tests = []*components.IntegrationTest{
 	diff.ShowFinalVersionOfCommitFile,
 	diff.ShowFinalVersionOfRenamedAndDeletedCommitFiles,
 	diff.ShowFinalVersionOfStagedChanges,
+	diff.ShowFinalVersionOfStashAndBranchFiles,
 	diff.ShowFinalVersionSkipsDirectories,
 	diff.StatFollowsAScreenModeChange,
 	diff.StatUsesTheViewWidth,
