@@ -177,7 +177,6 @@ func TestStoreTokenInNullConfig(t *testing.T) {
 
 			content, err := os.ReadFile(path)
 			assert.NoError(t, err)
-			/* EXPECTED:
 			assert.Equal(t, "github.com:\n"+
 				"    oauth_token: gho_new\n"+
 				"    user: octocat\n"+
@@ -185,8 +184,6 @@ func TestStoreTokenInNullConfig(t *testing.T) {
 				"    users:\n"+
 				"        octocat:\n"+
 				"            oauth_token: gho_new\n", string(content))
-			ACTUAL: */
-			assert.NotContains(t, string(content), "gho_new")
 		})
 	}
 }
@@ -203,10 +200,7 @@ func TestStoreTokenInCommentsOnlyConfig(t *testing.T) {
 	content, err := os.ReadFile(path)
 	assert.NoError(t, err)
 	assert.Equal(t,
-		/* EXPECTED:
 		"# kept\n# also kept\n"+"github.com:\n"+
-		ACTUAL: */
-		"github.com:\n"+
 			"    oauth_token: gho_new\n"+
 			"    user: octocat\n"+
 			"    git_protocol: https\n"+
@@ -225,16 +219,10 @@ func TestStoreTokenKeepsConfigThatIsNotAMapping(t *testing.T) {
 
 	err := StoreToken("github.com", "octocat", "gho_new")
 
-	/* EXPECTED:
 	assert.ErrorContains(t, err, "couldn't update "+path)
-	ACTUAL: */
-	assert.NoError(t, err)
 	content, readErr := os.ReadFile(path)
 	assert.NoError(t, readErr)
-	/* EXPECTED:
 	assert.Equal(t, existing, string(content))
-	ACTUAL: */
-	assert.Contains(t, string(content), existing+"- github.com\n")
 }
 
 func TestStoreTokenKeepsMalformedConfig(t *testing.T) {
