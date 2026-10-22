@@ -264,6 +264,106 @@ func TestGetCommitListDisplayStrings(t *testing.T) {
 				`),
 		},
 		{
+			testName: "showing graph with display indices of a window further down the list",
+			commitOpts: []models.NewCommitOpts{
+				{Name: "commit1", Hash: "hash1", Parents: []string{"hash2", "hash3"}},
+				{Name: "commit2", Hash: "hash2", Parents: []string{"hash3"}},
+				{Name: "commit3", Hash: "hash3", Parents: []string{"hash4"}},
+				{Name: "commit4", Hash: "hash4", Parents: []string{"hash5"}},
+				{Name: "commit5", Hash: "hash5", Parents: []string{"hash7"}},
+			},
+			// startIdx and endIdx are overridden by the display indices
+			startIdx:                  0,
+			endIdx:                    1,
+			displayIndices:            []int{1, 4},
+			showGraph:                 true,
+			bisectInfo:                git_commands.NewNullBisectInfo(),
+			cherryPickedCommitHashSet: set.New[string](),
+			now:                       time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
+			expected: formatExpected(`
+		hash2 ○ │ commit2
+		hash5 ○ commit5
+						`),
+		},
+		{
+			testName: "empty display indices",
+			commitOpts: []models.NewCommitOpts{
+				{Name: "commit1", Hash: "hash1", Parents: []string{"hash2"}},
+				{Name: "commit2", Hash: "hash2"},
+			},
+			startIdx:                  0,
+			endIdx:                    2,
+			displayIndices:            []int{},
+			showGraph:                 true,
+			bisectInfo:                git_commands.NewNullBisectInfo(),
+			cherryPickedCommitHashSet: set.New[string](),
+			now:                       time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
+			expected:                  "",
+		},
+		{
+			testName: "display indices without graph",
+			commitOpts: []models.NewCommitOpts{
+				{Name: "commit1", Hash: "hash1"},
+				{Name: "commit2", Hash: "hash2"},
+				{Name: "commit3", Hash: "hash3"},
+			},
+			startIdx:                  0,
+			endIdx:                    3,
+			displayIndices:            []int{0, 2},
+			showGraph:                 false,
+			bisectInfo:                git_commands.NewNullBisectInfo(),
+			cherryPickedCommitHashSet: set.New[string](),
+			now:                       time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
+			expected: formatExpected(`
+		hash1 commit1
+		hash3 commit3
+						`),
+		},
+		{
+			testName: "display indices skipping rebase commits",
+			commitOpts: []models.NewCommitOpts{
+				{Name: "commit1", Hash: "hash1", Action: todo.Pick},
+				{Name: "commit2", Hash: "hash2", Action: todo.Pick},
+				{Name: "commit3", Hash: "hash3", Parents: []string{"hash4"}},
+				{Name: "commit4", Hash: "hash4", Parents: []string{"hash5"}},
+				{Name: "commit5", Hash: "hash5"},
+			},
+			startIdx:                  0,
+			endIdx:                    5,
+			displayIndices:            []int{1, 3, 4},
+			showGraph:                 true,
+			bisectInfo:                git_commands.NewNullBisectInfo(),
+			cherryPickedCommitHashSet: set.New[string](),
+			now:                       time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
+			expected: formatExpected(`
+		hash2 pick commit2
+		hash4      ○ commit4
+		hash5      ○ commit5
+				`),
+		},
+		{
+			testName: "display indices with a visible marked base commit",
+			commitOpts: []models.NewCommitOpts{
+				{Name: "commit1", Hash: "hash1"},
+				{Name: "commit2", Hash: "hash2"},
+				{Name: "commit3", Hash: "hash3"},
+				{Name: "commit4", Hash: "hash4"},
+			},
+			markedBaseCommit:          "hash3",
+			startIdx:                  0,
+			endIdx:                    4,
+			displayIndices:            []int{0, 2, 3},
+			showGraph:                 false,
+			bisectInfo:                git_commands.NewNullBisectInfo(),
+			cherryPickedCommitHashSet: set.New[string](),
+			now:                       time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
+			expected: formatExpected(`
+		hash1 ✓ commit1
+		hash3 ↑↑↑ Will rebase from here ↑↑↑ commit3
+		hash4 commit4
+						`),
+		},
+		{
 			testName: "showing graph, including rebase commits",
 			commitOpts: []models.NewCommitOpts{
 				{Name: "commit1", Hash: "hash1", Parents: []string{"hash2", "hash3"}, Action: todo.Pick},
