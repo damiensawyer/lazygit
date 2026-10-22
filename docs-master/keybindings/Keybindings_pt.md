@@ -330,6 +330,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` M `` | Merge | Merge the pull request on GitHub with a merge commit, by squashing or by rebasing, optionally deleting its branch, locally too; or have GitHub merge it once it's ready. |
 | `` r `` | Review | Approve the pull request, request changes, or comment on it, submitting the line comments you collected in a pending review along with it. |
 | `` C `` | Comment | Add a comment to the pull request's conversation. |
+| `` t `` | View checks | List the pull request's checks, failing ones first, like `gh pr checks` does. A GitHub Actions job opens in the GitHub Actions view, at its log; any other check opens in the browser. Failed GitHub Actions jobs can be re-run from here. |
 | `` e `` | Edit | Edit the pull request's title and description, change its base branch, and add or remove labels, assignees and requested reviewers, like `gh pr edit` does. |
 | `` d `` | Close, reopen, or change draft state | Close or reopen the pull request, mark it as ready for review, or convert it to a draft. |
 | `` u `` | Update branch | Bring the pull request's branch up to date with its base branch on GitHub, by merging the base branch into it or by rebasing it, like `gh pr update-branch` does. |

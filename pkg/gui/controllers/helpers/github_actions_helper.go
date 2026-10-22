@@ -402,6 +402,41 @@ func (self *GithubActionsHelper) reloadJobsIfRunChanged() {
 
 // OpenJobs shows the jobs of a run in place of the runs.
 func (self *GithubActionsHelper) OpenJobs(run *models.GithubRun) error {
+	return self.openJobs(run, 0)
+}
+
+// OpenRunJobs opens the GitHub Actions view at the jobs of a run, e.g. one
+// that a pull request's check is a job of, selecting that job. Escaping from
+// them shows the runs.
+func (self *GithubActionsHelper) OpenRunJobs(runId int64, jobId int64) error {
+	return self.withClient(func() error {
+		client := self.clientHelper.Client()
+		return self.c.WithWaitingStatus(self.c.Tr.GithubActions.LoadingJobs, func(gocui.Task) error {
+			run, err := client.GetRun(goContext.Background(), runId)
+			if err != nil {
+				self.c.OnUIThread(func() error { return self.handleError(err) })
+				return nil
+			}
+			return self.loadRuns(false, func() {
+				runsContext := self.c.Contexts().GithubRuns
+				runsContext.SetParentContext(self.c.Contexts().LocalCommits)
+				runsContext.GetView().TitlePrefix = self.c.Contexts().LocalCommits.GetView().TitlePrefix
+				_, idx, _ := lo.FindIndexOf(runsContext.GetItems(), func(listed *models.GithubRun) bool {
+					return listed.RunId == run.RunId
+				})
+				runsContext.SetSelection(max(idx, 0))
+				self.c.Context().Push(runsContext, types.OnFocusOpts{})
+				if err := self.openJobs(run, jobId); err != nil {
+					self.c.Log.Error(err)
+				}
+			})
+		})
+	})
+}
+
+// openJobs shows the jobs of a run in place of the runs, selecting the job
+// with the given ID if it is one of them.
+func (self *GithubActionsHelper) openJobs(run *models.GithubRun, selectJobId int64) error {
 	show := func(details *GithubRunDetails) error {
 		if details.Err != nil {
 			return self.handleError(details.Err)
@@ -412,6 +447,11 @@ func (self *GithubActionsHelper) OpenJobs(run *models.GithubRun) error {
 		jobsContext.SetSelection(0)
 		jobsContext.ClearFilter()
 		self.setJobs(run, details.Jobs)
+		if _, idx, found := lo.FindIndexOf(jobsContext.GetItems(), func(job *models.GithubJob) bool {
+			return job.JobId == selectJobId
+		}); found {
+			jobsContext.SetSelection(idx)
+		}
 		self.c.Context().Push(jobsContext, types.OnFocusOpts{})
 		return nil
 	}

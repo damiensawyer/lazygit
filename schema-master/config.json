@@ -2812,6 +2812,20 @@
           ],
           "default": "e"
         },
+        "viewChecks": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "t"
+        },
         "openInBrowser": {
           "oneOf": [
             {

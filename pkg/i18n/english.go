@@ -1332,6 +1332,15 @@ type PullRequests struct {
 	RequestReviewFromPrompt          string
 	Edit                             string
 	EditTooltip                      string
+	NoChecksToShow                   string
+	RerunFailedChecks                string
+	RerunFailedChecksTooltip         string
+	RerunningChecks                  string
+	RerunRequested                   string
+	OpenChecksInBrowser              string
+	ChecksTitle                      string
+	ViewChecks                       string
+	ViewChecksTooltip                string
 }
 
 type GithubActions struct {
@@ -3092,6 +3101,15 @@ func EnglishTranslationSet() *TranslationSet {
 			RequestReviewFromPrompt:          "Request a review from (a login, or org/team)",
 			Edit:                             "Edit",
 			EditTooltip:                      "Edit the pull request's title and description, change its base branch, and add or remove labels, assignees and requested reviewers, like `gh pr edit` does.",
+			NoChecksToShow:                   "The pull request has no checks.",
+			RerunFailedChecks:                "Re-run the failed GitHub Actions jobs",
+			RerunFailedChecksTooltip:         "Re-run the jobs that failed, and the jobs that depend on them, of every GitHub Actions run among the checks.",
+			RerunningChecks:                  "Re-running…",
+			RerunRequested:                   "Requested re-runs of {{.count}} workflow run(s)",
+			OpenChecksInBrowser:              "Open the checks in the browser",
+			ChecksTitle:                      "Checks of #{{.number}}",
+			ViewChecks:                       "View checks",
+			ViewChecksTooltip:                "List the pull request's checks, failing ones first, like `gh pr checks` does. A GitHub Actions job opens in the GitHub Actions view, at its log; any other check opens in the browser. Failed GitHub Actions jobs can be re-run from here.",
 		},
 		GithubActions: GithubActions{
 			LoginTitle:                         "Log in to {{.host}}",

@@ -43,6 +43,7 @@ review threads.
 | `space` | Check the pull request out (see below) |
 | `c` | Check it out under another branch name, detached, in a new worktree, or resetting the local branch to it |
 | `w` | Check it out in a new worktree, and switch to that |
+| `t` | List its checks, failing ones first, like `gh pr checks`. A check that is a GitHub Actions job opens in the [GitHub Actions view](./GitHub_Actions.md) at that job, where its log can be read; any other opens in the browser. The failed GitHub Actions jobs can be re-run from there too |
 | `n` | Create a pull request for the checked out branch (see below) |
 | `M` | Merge it: with a merge commit, by squashing, or by rebasing, as the repository allows; optionally deleting its branch, on GitHub and locally (checking out its base branch first if it's checked out). Or have GitHub merge it once its requirements are met (auto-merge), or stop it from doing that |
 | `r` | Review it: approve it, request changes, or comment, submitting your pending review along with it if you have one; or discard the pending review |

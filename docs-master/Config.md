@@ -914,6 +914,7 @@ keybinding:
     comment: C
     review: r
     edit: e
+    viewChecks: t
     openInBrowser: o
     copyToClipboard: "y"
     filter: f
