@@ -54,11 +54,8 @@ var LargeNestedTree = NewIntegrationTest(NewIntegrationTestArgs{
 			// render the rows that are then visible
 			NavigateToLine(Contains("file40.txt")).
 			Press(keys.Files.CollapseAll).
-			/* EXPECTED:
 			Lines(
 				Equals("▶ /").IsSelected(),
 			)
-			ACTUAL: */
-			IsEmpty()
 	},
 })

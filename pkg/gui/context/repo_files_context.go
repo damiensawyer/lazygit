@@ -51,12 +51,13 @@ func NewRepoFilesContext(c *ContextCommon) *RepoFilesContext {
 	ctx.ListContextTrait = &ListContextTrait{
 		Context: NewSimpleContext(
 			NewBaseContext(NewBaseContextOpts{
-				View:       c.Views().RepoFiles,
-				WindowName: "commits",
-				Key:        REPO_FILES_CONTEXT_KEY,
-				Kind:       types.SIDE_CONTEXT,
-				Focusable:  true,
-				Transient:  true,
+				View:                        c.Views().RepoFiles,
+				WindowName:                  "commits",
+				Key:                         REPO_FILES_CONTEXT_KEY,
+				Kind:                        types.SIDE_CONTEXT,
+				Focusable:                   true,
+				Transient:                   true,
+				NeedsRerenderOnHeightChange: true,
 			}),
 		),
 		ListRenderer: ListRenderer{
