@@ -45,6 +45,11 @@ var EnableAndDisableWorkflow = NewIntegrationTest(NewIntegrationTestArgs{
 
 		t.ExpectPopup().Menu().
 			Title(Equals("Nightly")).
+			Select(Contains("Run workflow")).
+			/* EXPECTED:
+			Tooltip(Contains("Disabled: The workflow is disabled, so it can't be run until it is enabled again.")).
+			ACTUAL: */
+			Tooltip(Contains("Disabled: disabled")).
 			Select(Contains("Enable workflow")).
 			Confirm()
 
