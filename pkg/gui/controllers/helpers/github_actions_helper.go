@@ -29,6 +29,10 @@ const (
 	githubIdleRefreshInterval   = 30 * time.Second
 
 	githubRunsLimit = 50
+
+	// what we authenticate with to an integration test's fake API, which
+	// doesn't check it
+	fakeGithubToken = "fake-github-token"
 )
 
 // GithubTokens remembers the tokens the user logged in with during this
@@ -195,6 +199,11 @@ func (self *GithubActionsHelper) withClientForRemote(remote githubRemoteInfo, f 
 		Owner: remote.serviceInfo.Owner,
 		Name:  remote.serviceInfo.Repository,
 	}
+	if baseURL := self.c.FakeGithubAPIURL(); baseURL != "" {
+		repo.Token = fakeGithubToken
+		return self.useClient(github_commands.NewClientWithBaseURL(repo, baseURL), f)
+	}
+
 	useToken := func(token string) error {
 		repo.Token = token
 		return self.useClient(github_commands.NewClient(repo), f)
