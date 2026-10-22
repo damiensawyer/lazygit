@@ -190,6 +190,7 @@ var tests = []*components.IntegrationTest{
 	config.SidePanelWidthFullScreenMode,
 	config.SidePanelWidthInPopup,
 	config.SidePanelWidthPersistence,
+	config.SidePanelWidthRounding,
 	config.SidePanelWidthSwitchingRepos,
 	config.SidePanelsInPerRepoConfig,
 	conflicts.ConflictMarkerSizeNotAutoStaged,
