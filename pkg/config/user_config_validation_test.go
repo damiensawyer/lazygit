@@ -415,6 +415,45 @@ func TestUserConfigValidate_sidePanels(t *testing.T) {
 	}
 }
 
+func TestUserConfigValidate_sidePanelWidths(t *testing.T) {
+	scenarios := []struct {
+		name  string
+		width float64
+		valid bool
+	}{
+		{name: "narrow", width: 0.01, valid: true},
+		{name: "wide", width: 0.99, valid: true},
+		{name: "zero", width: 0, valid: /* EXPECTED: false ACTUAL: */ true},
+		{name: "negative", width: -0.2, valid: /* EXPECTED: false ACTUAL: */ true},
+		{name: "one", width: 1, valid: /* EXPECTED: false ACTUAL: */ true},
+		{name: "greater than one", width: 1.5, valid: /* EXPECTED: false ACTUAL: */ true},
+	}
+
+	fields := []struct {
+		name string
+		set  func(config *UserConfig, width float64)
+	}{
+		{name: "sidePanelWidth", set: func(config *UserConfig, width float64) { config.Gui.SidePanelWidth = width }},
+		{name: "halfScreenModeSidePanelWidth", set: func(config *UserConfig, width float64) { config.Gui.HalfScreenModeSidePanelWidth = width }},
+	}
+
+	for _, field := range fields {
+		for _, s := range scenarios {
+			t.Run(field.name+" "+s.name, func(t *testing.T) {
+				config := GetDefaultConfig()
+				field.set(config, s.width)
+				err := config.Validate()
+
+				if s.valid {
+					assert.NoError(t, err)
+				} else {
+					assert.Error(t, err)
+				}
+			})
+		}
+	}
+}
+
 func TestUserConfigValidate_diffRenderers(t *testing.T) {
 	scenarios := []struct {
 		name         string
