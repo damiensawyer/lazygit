@@ -18,6 +18,8 @@ type GithubStepsController struct {
 	baseController
 	*ListControllerTrait[*models.GithubStep]
 	c *ControllerCommon
+
+	mainView *githubMainViewRenderer
 }
 
 var _ types.IController = &GithubStepsController{}
@@ -32,6 +34,10 @@ func NewGithubStepsController(c *ControllerCommon) *GithubStepsController {
 			c.Contexts().GithubSteps.GetSelectedItems,
 		),
 		c: c,
+		mainView: &githubMainViewRenderer{
+			c:     c,
+			title: func() string { return c.Tr.GithubActions.StepMainTitle },
+		},
 	}
 }
 
@@ -70,13 +76,14 @@ func (self *GithubStepsController) GetOnRenderToMain() func() {
 		job := self.context().GetJob()
 		step := self.context().GetSelected()
 		if job == nil || step == nil {
-			self.renderToMain(self.c.Tr.GithubActions.NoSteps)
+			self.mainView.render("", self.c.Tr.GithubActions.NoSteps)
 			return
 		}
 
 		tr := self.c.Tr.GithubActions
+		stepId := fmt.Sprintf("%d/%d", job.JobId, step.Number)
 		if job.State().IsActive() {
-			self.renderToMain(fmt.Sprintf("%s %s\n\n%s\n",
+			self.mainView.render(stepId, fmt.Sprintf("%s %s\n\n%s\n",
 				presentation.GithubActionsStateIcon(step.State()), style.AttrBold.Sprint(step.Name), tr.LogNotAvailableYet))
 			return
 		}
@@ -84,23 +91,13 @@ func (self *GithubStepsController) GetOnRenderToMain() func() {
 		jobLog := self.c.Helpers().GithubActions.GetJobLog(job)
 		switch {
 		case jobLog == nil:
-			self.renderToMain(tr.LoadingLog)
+			self.mainView.render(stepId, tr.LoadingLog)
 		case jobLog.Err != nil:
-			self.renderToMain(style.FgRed.Sprint(jobLog.Err.Error()))
+			self.mainView.render(stepId, style.FgRed.Sprint(jobLog.Err.Error()))
 		default:
-			self.renderToMain(presentation.FormatGithubStepLog(self.c.Tr, job, step, jobLog.Log, time.Now()))
+			self.mainView.render(stepId, presentation.FormatGithubStepLog(self.c.Tr, job, step, jobLog.Log, time.Now()))
 		}
 	}
-}
-
-func (self *GithubStepsController) renderToMain(content string) {
-	self.c.RenderToMainViews(types.RefreshMainOpts{
-		Pair: self.c.MainViewPairs().Normal,
-		Main: &types.ViewUpdateOpts{
-			Title: self.c.Tr.GithubActions.StepMainTitle,
-			Task:  types.NewRenderStringTask(content),
-		},
-	})
 }
 
 func (self *GithubStepsController) openInBrowser(step *models.GithubStep) error {
