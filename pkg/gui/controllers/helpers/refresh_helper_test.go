@@ -188,6 +188,25 @@ func TestFilterCommitsForOverview(t *testing.T) {
 	}
 }
 
+func TestFilterCommitsForOverviewKeepingNothing(t *testing.T) {
+	hashPool := &utils.StringPool{}
+	commits := []*models.Commit{
+		models.NewCommit(hashPool, models.NewCommitOpts{Hash: "a", Parents: []string{"b"}}),
+		models.NewCommit(hashPool, models.NewCommitOpts{Hash: "b"}),
+	}
+
+	for _, commits := range [][]*models.Commit{commits, {}} {
+		kept, indices := filterCommitsForOverview(commits)
+
+		// non-nil, so that the model can tell an empty overview from overview
+		// mode being off
+		assert.NotNil(t, kept)
+		assert.Empty(t, kept)
+		assert.NotNil(t, indices)
+		assert.Empty(t, indices)
+	}
+}
+
 func TestFindNewConflictedCommit(t *testing.T) {
 	testCases := []struct {
 		name            string
