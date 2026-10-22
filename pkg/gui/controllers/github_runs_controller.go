@@ -23,6 +23,8 @@ type GithubRunsController struct {
 	baseController
 	*ListControllerTrait[*models.GithubRun]
 	c *ControllerCommon
+
+	mainView *githubMainViewRenderer
 }
 
 var _ types.IController = &GithubRunsController{}
@@ -37,6 +39,10 @@ func NewGithubRunsController(c *ControllerCommon) *GithubRunsController {
 			c.Contexts().GithubRuns.GetSelectedItems,
 		),
 		c: c,
+		mainView: &githubMainViewRenderer{
+			c:     c,
+			title: func() string { return c.Tr.GithubActions.RunMainTitle },
+		},
 	}
 }
 
@@ -390,7 +396,7 @@ func (self *GithubRunsController) GetOnRenderToMain() func() {
 	return func() {
 		run := self.context().GetSelected()
 		if run == nil {
-			self.renderToMain(self.c.Tr.GithubActions.NoRuns)
+			self.mainView.render("", self.c.Tr.GithubActions.NoRuns)
 			return
 		}
 
@@ -401,18 +407,8 @@ func (self *GithubRunsController) GetOnRenderToMain() func() {
 			opts.JobsError = details.Err
 			opts.Annotations = details.Annotations
 		}
-		self.renderToMain(presentation.FormatGithubRunSummary(self.c.Tr, opts))
+		self.mainView.render(run.ID(), presentation.FormatGithubRunSummary(self.c.Tr, opts))
 	}
-}
-
-func (self *GithubRunsController) renderToMain(content string) {
-	self.c.RenderToMainViews(types.RefreshMainOpts{
-		Pair: self.c.MainViewPairs().Normal,
-		Main: &types.ViewUpdateOpts{
-			Title: self.c.Tr.GithubActions.RunMainTitle,
-			Task:  types.NewRenderStringTask(content),
-		},
-	})
 }
 
 func (self *GithubRunsController) openInBrowser(run *models.GithubRun) error {
