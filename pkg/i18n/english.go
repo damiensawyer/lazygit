@@ -1101,6 +1101,35 @@ type GithubActions struct {
 	ViewSteps                  string
 	NoSteps                    string
 	NoLogForStep               string
+	Rerun                      string
+	RerunTooltip               string
+	RerunMenuTitle             string
+	RerunAllJobs               string
+	RerunFailedJobs            string
+	RerunAllJobsWithDebug      string
+	RerunFailedJobsWithDebug   string
+	RerunJob                   string
+	RerunJobTooltip            string
+	RerunJobMenuTitle          string
+	RerunThisJob               string
+	RerunThisJobWithDebug      string
+	RequestingRerun            string
+	RerunRequested             string
+	RunStillInProgress         string
+	RunNotInProgress           string
+	NoFailedJobs               string
+	CancelRun                  string
+	CancelRunTooltip           string
+	CancelRunMenuTitle         string
+	ForceCancelRun             string
+	CancellingRun              string
+	CancelRequested            string
+	DeleteRun                  string
+	DeleteRunTooltip           string
+	DeleteRunTitle             string
+	DeleteRunPrompt            string
+	DeletingRun                string
+	RunDeleted                 string
 }
 
 type Actions struct {
@@ -2474,6 +2503,35 @@ func EnglishTranslationSet() *TranslationSet {
 			ViewSteps:                  "View steps",
 			NoSteps:                    "This job has no steps",
 			NoLogForStep:               "This step logged nothing",
+			Rerun:                      "Re-run",
+			RerunTooltip:               "Re-run all jobs or the failed jobs of the run, optionally with debug logging enabled.",
+			RerunMenuTitle:             "Re-run {{.workflow}} #{{.number}}",
+			RerunAllJobs:               "Re-run all jobs",
+			RerunFailedJobs:            "Re-run failed jobs",
+			RerunAllJobsWithDebug:      "Re-run all jobs with debug logging",
+			RerunFailedJobsWithDebug:   "Re-run failed jobs with debug logging",
+			RerunJob:                   "Re-run job",
+			RerunJobTooltip:            "Re-run this job, and the jobs that depend on it, optionally with debug logging enabled.",
+			RerunJobMenuTitle:          "Re-run {{.job}}",
+			RerunThisJob:               "Re-run this job",
+			RerunThisJobWithDebug:      "Re-run this job with debug logging",
+			RequestingRerun:            "Requesting re-run",
+			RerunRequested:             "Re-run requested",
+			RunStillInProgress:         "The run is still in progress",
+			RunNotInProgress:           "The run has already completed",
+			NoFailedJobs:               "The run has no failed jobs",
+			CancelRun:                  "Cancel run",
+			CancelRunTooltip:           "Cancel the run. Force cancelling also stops jobs that would otherwise keep running, e.g. because of an always() condition.",
+			CancelRunMenuTitle:         "Cancel {{.workflow}} #{{.number}}",
+			ForceCancelRun:             "Force cancel run",
+			CancellingRun:              "Cancelling run",
+			CancelRequested:            "Cancellation requested",
+			DeleteRun:                  "Delete run",
+			DeleteRunTooltip:           "Delete the run along with its logs and artifacts.",
+			DeleteRunTitle:             "Delete run",
+			DeleteRunPrompt:            "Delete {{.workflow}} #{{.number}} ({{.title}}) along with its logs and artifacts? This cannot be undone.",
+			DeletingRun:                "Deleting run",
+			RunDeleted:                 "Run deleted",
 		},
 		BreakingChangesTitle: "Breaking Changes",
 		BreakingChangesMessage: `You are updating to a new version of lazygit which contains breaking changes. Please review the notes below and update your configuration if necessary.

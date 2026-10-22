@@ -64,6 +64,9 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 |-----|--------|-------------|
 | `` <enter> `` | View jobs |  |
 | `` o `` | Open in browser |  |
+| `` r `` | Re-run | Re-run all jobs or the failed jobs of the run, optionally with debug logging enabled. |
+| `` c `` | Cancel run | Cancel the run. Force cancelling also stops jobs that would otherwise keep running, e.g. because of an always() condition. |
+| `` d `` | Delete run | Delete the run along with its logs and artifacts. |
 | `` R `` | Обновить |  |
 | `` / `` | Filter the current view by text |  |
 
@@ -80,6 +83,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 |-----|--------|-------------|
 | `` <enter> `` | View steps |  |
 | `` o `` | Open in browser |  |
+| `` r `` | Re-run job | Re-run this job, and the jobs that depend on it, optionally with debug logging enabled. |
 | `` R `` | Обновить |  |
 | `` / `` | Filter the current view by text |  |
 

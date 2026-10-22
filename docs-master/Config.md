@@ -854,6 +854,8 @@ keybinding:
     commitMenu: <ctrl+o>
   githubActions:
     openInBrowser: o
+    rerun: r
+    cancelRun: c
 ```
 <!-- END CONFIG YAML -->
 

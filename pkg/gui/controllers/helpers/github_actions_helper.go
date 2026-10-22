@@ -330,12 +330,35 @@ func (self *GithubActionsHelper) scheduleAutoRefresh() {
 				return nil
 			}
 			self.c.OnWorkerBackground(func(gocui.Task) error {
-				return self.loadRuns(true, func() {
-					self.markActiveRunDetailsStale()
-					self.reloadJobsIfRunChanged()
-				})
+				return self.loadRuns(true, self.reloadChangedDetails)
 			})
 			return nil
+		})
+	})
+}
+
+// reloadChangedDetails brings what is shown about the runs' jobs up to date
+// with freshly loaded runs.
+func (self *GithubActionsHelper) reloadChangedDetails() {
+	self.markActiveRunDetailsStale()
+	self.reloadJobsIfRunChanged()
+}
+
+// RunAction performs an action on the repository's runs, like cancelling one,
+// and then reloads the runs to show its effect.
+func (self *GithubActionsHelper) RunAction(waitingStatus string, doneToast string, action func(ctx context.Context, client *github_commands.Client) error) error {
+	return self.withClient(func() error {
+		client := self.client
+		return self.c.WithWaitingStatus(waitingStatus, func(gocui.Task) error {
+			if err := action(context.Background(), client); err != nil {
+				self.c.OnUIThread(func() error { return self.handleError(err) })
+				return nil
+			}
+			self.c.OnUIThread(func() error {
+				self.c.Toast(doneToast)
+				return nil
+			})
+			return self.loadRuns(false, self.reloadChangedDetails)
 		})
 	})
 }

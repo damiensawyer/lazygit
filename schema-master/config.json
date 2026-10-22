@@ -2051,6 +2051,34 @@
             }
           ],
           "default": "o"
+        },
+        "rerun": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "r"
+        },
+        "cancelRun": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "c"
         }
       },
       "additionalProperties": false,

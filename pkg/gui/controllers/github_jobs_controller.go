@@ -1,12 +1,15 @@
 package controllers
 
 import (
+	goContext "context"
 	"time"
 
+	"github.com/jesseduffield/lazygit/pkg/commands/github_commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
 	"github.com/jesseduffield/lazygit/pkg/gui/context"
 	"github.com/jesseduffield/lazygit/pkg/gui/presentation"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
+	"github.com/jesseduffield/lazygit/pkg/utils"
 )
 
 type GithubJobsController struct {
@@ -46,6 +49,15 @@ func (self *GithubJobsController) GetKeybindings(opts types.KeybindingsOpts) []*
 			Handler:           self.withItem(self.openInBrowser),
 			GetDisabledReason: self.require(self.singleItemSelected()),
 			Description:       tr.OpenJobInBrowser,
+			DisplayOnScreen:   true,
+		},
+		{
+			Keys:              opts.GetKeys(opts.Config.GithubActions.Rerun),
+			Handler:           self.withItem(self.rerun),
+			GetDisabledReason: self.require(self.singleItemSelected(self.runIsComplete)),
+			Description:       tr.RerunJob,
+			Tooltip:           tr.RerunJobTooltip,
+			OpensMenu:         true,
 			DisplayOnScreen:   true,
 		},
 		{
@@ -93,4 +105,35 @@ func (self *GithubJobsController) openInBrowser(job *models.GithubJob) error {
 
 func (self *GithubJobsController) context() *context.GithubJobsContext {
 	return self.c.Contexts().GithubJobs
+}
+
+// GitHub only re-runs jobs of a run that has completed as a whole.
+func (self *GithubJobsController) runIsComplete(*models.GithubJob) *types.DisabledReason {
+	if run := self.context().GetRun(); run != nil && run.State().IsActive() {
+		return &types.DisabledReason{Text: self.c.Tr.GithubActions.RunStillInProgress}
+	}
+	return nil
+}
+
+func (self *GithubJobsController) rerun(job *models.GithubJob) error {
+	tr := self.c.Tr.GithubActions
+
+	rerunItem := func(label string, debug bool) *types.MenuItem {
+		return &types.MenuItem{
+			Label: label,
+			OnPress: func() error {
+				return self.c.Helpers().GithubActions.RunAction(tr.RequestingRerun, tr.RerunRequested, func(ctx goContext.Context, client *github_commands.Client) error {
+					return client.RerunJob(ctx, job.JobId, debug)
+				})
+			},
+		}
+	}
+
+	return self.c.Menu(types.CreateMenuOptions{
+		Title: utils.ResolvePlaceholderString(tr.RerunJobMenuTitle, map[string]string{"job": job.Name}),
+		Items: []*types.MenuItem{
+			rerunItem(tr.RerunThisJob, false),
+			rerunItem(tr.RerunThisJobWithDebug, true),
+		},
+	})
 }
