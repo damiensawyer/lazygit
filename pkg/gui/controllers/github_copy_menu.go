@@ -28,18 +28,24 @@ func githubCopyMenu(c *ControllerCommon, items []githubCopyItem) error {
 				Label: item.label,
 				OnPress: func() error {
 					return item.get(func(value string) error {
-						if err := c.OS().CopyToClipboard(utils.Decolorise(value)); err != nil {
-							return err
-						}
-						c.Toast(utils.ResolvePlaceholderString(c.Tr.GithubActions.CopiedToClipboard, map[string]string{
-							"what": item.label,
-						}))
-						return nil
+						return copyGithubValue(c, item.label, value)
 					})
 				},
 			}
 		}),
 	})
+}
+
+// copyGithubValue copies something from the GitHub Actions views to the
+// clipboard, saying what it was.
+func copyGithubValue(c *ControllerCommon, label string, value string) error {
+	if err := c.OS().CopyToClipboard(utils.Decolorise(value)); err != nil {
+		return err
+	}
+	c.Toast(utils.ResolvePlaceholderString(c.Tr.GithubActions.CopiedToClipboard, map[string]string{
+		"what": label,
+	}))
+	return nil
 }
 
 func joinLogLines(lines []string) string {
