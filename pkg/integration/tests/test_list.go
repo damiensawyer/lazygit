@@ -602,6 +602,7 @@ var tests = []*components.IntegrationTest{
 	repo_files.SaveFileAtCommit,
 	repo_files.SymlinksAndSubmodules,
 	repo_files.ToggleTreeViewAndCollapse,
+	repo_files.UnicodeAndSpacesInPaths,
 	repo_files.ViewFileAtCommit,
 	shell_commands.BasicShellCommand,
 	shell_commands.ComplexShellCommand,
