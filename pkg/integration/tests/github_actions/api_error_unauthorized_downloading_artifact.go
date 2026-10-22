@@ -43,13 +43,8 @@ var ApiErrorUnauthorizedDownloadingArtifact = NewIntegrationTest(NewIntegrationT
 			Confirm()
 
 		t.ExpectPopup().
-			/* EXPECTED:
 			Menu().
 			Title(Equals("Log in to github.com")).
-			ACTUAL: */
-			Alert().
-			Title(Equals("Error")).
-			Content(Equals("GitHub API request failed: HTTP 401: Bad credentials")).
 			Cancel()
 	},
 })

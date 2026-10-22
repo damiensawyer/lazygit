@@ -45,10 +45,7 @@ var RunWorkflowOnRefWithoutIt = NewIntegrationTest(NewIntegrationTestArgs{
 
 		t.ExpectPopup().Alert().
 			Title(Equals("Error")).
-			/* EXPECTED:
 			Content(Equals(".github/workflows/ci.yml doesn't exist at no-such-branch")).
-			ACTUAL: */
-			Content(Equals("GitHub API request failed: HTTP 404: Not Found")).
 			Confirm()
 	},
 })

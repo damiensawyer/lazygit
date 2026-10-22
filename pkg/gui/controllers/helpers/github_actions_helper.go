@@ -126,6 +126,12 @@ func (self *GithubActionsHelper) withClient(f func() error) error {
 	})
 }
 
+// HandleError reports a failed API request, logging the user in again if
+// the token has stopped working. Must be called on the UI thread.
+func (self *GithubActionsHelper) HandleError(err error) error {
+	return self.handleError(err)
+}
+
 // handleError reports a failed API request. Must be called on the UI thread.
 func (self *GithubActionsHelper) handleError(err error) error {
 	return self.clientHelper.HandleError(err, self.Open)

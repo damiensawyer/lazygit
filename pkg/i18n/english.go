@@ -1231,6 +1231,7 @@ type GithubActions struct {
 	RunWorkflowRefPrompt               string
 	LoadingWorkflow                    string
 	NotDispatchable                    string
+	WorkflowFileNotAtRef               string
 	WorkflowInputPrompt                string
 	WorkflowInputPromptWithDescription string
 	StartingWorkflow                   string
@@ -2766,6 +2767,7 @@ func EnglishTranslationSet() *TranslationSet {
 			RunWorkflowRefPrompt:               "Run {{.workflow}} on branch or tag",
 			LoadingWorkflow:                    "Loading workflow",
 			NotDispatchable:                    "{{.workflow}} can't be run manually: it has no workflow_dispatch trigger",
+			WorkflowFileNotAtRef:               "{{.path}} doesn't exist at {{.ref}}",
 			WorkflowInputPrompt:                "{{.name}}",
 			WorkflowInputPromptWithDescription: "{{.name}}: {{.description}}",
 			StartingWorkflow:                   "Starting workflow",
