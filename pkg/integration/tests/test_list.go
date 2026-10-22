@@ -593,6 +593,7 @@ var tests = []*components.IntegrationTest{
 	repo_files.EnterFromTags,
 	repo_files.FileHistory,
 	repo_files.FilterFiles,
+	repo_files.LargeNestedTree,
 	repo_files.OpenAndEditWorktreeFile,
 	repo_files.OpenFileNotInWorktree,
 	repo_files.RestoreRangeSelection,
