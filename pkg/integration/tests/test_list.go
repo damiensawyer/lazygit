@@ -534,6 +534,7 @@ var tests = []*components.IntegrationTest{
 	main_view.SelectionCommandsOnlyWhereTheyApply,
 	main_view.SelectionOverTheCustomPatch,
 	main_view.ShowAnotherLongDiffAfterScrollingFarDown,
+	main_view.ShowFinalVersionInFocusedMainView,
 	main_view.ShowTheTabSwitchedToLast,
 	main_view.StageDeletedFile,
 	main_view.StageDiffLines,
