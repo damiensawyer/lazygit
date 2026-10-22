@@ -700,3 +700,26 @@ func TestToggleShowFinalVersionDefaultIsUnshifted(t *testing.T) {
 	assert.True(t, ok, "expected default binding %q to parse", bindings[0])
 	assert.Equal(t, gocui.NewKeyStrMod("\\", gocui.ModAlt), key)
 }
+
+func TestSidePanelWidthDefaultBindingsParse(t *testing.T) {
+	universal := GetDefaultConfig().Keybinding.Universal
+	scenarios := []struct {
+		name     string
+		bindings Keybinding
+		expected gocui.Key
+	}{
+		{"decrease", universal.DecreaseSidePanelWidth, gocui.NewKey(gocui.KeyArrowLeft, "", gocui.ModShift|gocui.ModAlt)},
+		{"increase", universal.IncreaseSidePanelWidth, gocui.NewKey(gocui.KeyArrowRight, "", gocui.ModShift|gocui.ModAlt)},
+		{"reset", universal.ResetSidePanelWidth, gocui.NewKeyStrMod("=", gocui.ModShift|gocui.ModAlt)},
+	}
+
+	for _, s := range scenarios {
+		t.Run(s.name, func(t *testing.T) {
+			assert.Len(t, s.bindings, 1)
+
+			key, ok := KeyFromLabel(s.bindings[0])
+			assert.True(t, ok, "expected default binding %q to parse", s.bindings[0])
+			assert.Equal(t, s.expected, key)
+		})
+	}
+}
