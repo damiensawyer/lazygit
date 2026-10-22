@@ -58,13 +58,6 @@ var SaveSymlinkAndExecutable = NewIntegrationTest(NewIntegrationTestArgs{
 		// the saved entries match the commit again, so there's nothing left
 		// to restore
 		t.Views().Files().
-			/* EXPECTED:
 			IsEmpty()
-			ACTUAL: */
-			Lines(
-				Equals("▼ /"),
-				Equals("   T link"),
-				Equals("   M script.sh"),
-			)
 	},
 })

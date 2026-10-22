@@ -58,6 +58,12 @@ func (self *ConfigCommands) GetGpgTagSign() bool {
 	return self.gitConfig.GetBool(string(TagGpgSign))
 }
 
+// Whether git checks symlinks out as symlinks rather than as plain files
+// containing the link target; git defaults to true when it's unset.
+func (self *ConfigCommands) GetCoreSymlinks() bool {
+	return self.gitConfig.GetGeneral("--bool --get core.symlinks") != "false"
+}
+
 func (self *ConfigCommands) GetCoreEditor() string {
 	return self.gitConfig.Get("core.editor")
 }

@@ -398,7 +398,7 @@ func (self *RepoFilesController) saveNode(node *filetree.RepoFileNode, targetPat
 	hash := self.context().GetLoadedCommitHash()
 
 	targetExists := false
-	if _, err := os.Stat(targetPath); err == nil {
+	if _, err := os.Lstat(targetPath); err == nil {
 		targetExists = true
 	}
 
@@ -424,12 +424,26 @@ func (self *RepoFilesController) saveNode(node *filetree.RepoFileNode, targetPat
 	})
 }
 
+// Writes the file the way checking it out would: a symlink as a symlink
+// (unless core.symlinks is off), and an executable with its executable bit.
 func (self *RepoFilesController) saveFile(hash string, file *models.TreeFile, dstPath string) error {
+	if file.IsSymlink() && self.c.Git().Config.GetCoreSymlinks() {
+		// a symlink's blob content is its target path
+		target, err := self.c.Git().Commit.ShowFileContentCmdObj(hash, file.Path).RunWithOutput()
+		if err != nil {
+			return err
+		}
+		return self.c.OS().CreateSymlink(dstPath, target)
+	}
+
 	content, err := self.c.Git().Commit.GetFilteredFileContent(hash, file.Path)
 	if err != nil {
 		return err
 	}
-	return self.c.OS().CreateFileWithContent(dstPath, content)
+	if err := self.c.OS().CreateFileWithContent(dstPath, content); err != nil {
+		return err
+	}
+	return self.c.OS().SetExecutable(dstPath, file.IsExecutable())
 }
 
 func (self *RepoFilesController) GetOnRenderToMain() func() {

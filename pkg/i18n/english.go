@@ -1111,6 +1111,7 @@ type Log struct {
 	CopyToClipboard          string
 	Remove                   string
 	CreateFileWithContent    string
+	CreateSymlink            string
 	AppendingLineToFile      string
 	EditRebaseFromBaseCommit string
 	DroppingStash            string
@@ -2647,6 +2648,7 @@ func EnglishTranslationSet() *TranslationSet {
 			CopyToClipboard:          "Copying '{{.str}}' to clipboard",
 			Remove:                   "Removing '{{.filename}}'",
 			CreateFileWithContent:    "Creating file '{{.path}}'",
+			CreateSymlink:            "Creating symlink '{{.path}}' pointing to '{{.target}}'",
 			AppendingLineToFile:      "Appending '{{.line}}' to file '{{.filename}}'",
 			EditRebaseFromBaseCommit: "Beginning interactive rebase from '{{.baseCommit}}' onto '{{.targetBranchName}}'",
 			DroppingStash:            "Dropping stash %s",
