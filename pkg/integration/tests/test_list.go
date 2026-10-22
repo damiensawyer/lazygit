@@ -596,6 +596,7 @@ var tests = []*components.IntegrationTest{
 	repo_files.RestoreRangeSelection,
 	repo_files.RestoreToWorktree,
 	repo_files.RestoreWithModifiedFiles,
+	repo_files.SaveDirectoryAtCommit,
 	repo_files.SaveFileAtCommit,
 	repo_files.SymlinksAndSubmodules,
 	repo_files.ToggleTreeViewAndCollapse,
