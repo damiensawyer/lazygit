@@ -594,6 +594,7 @@ var tests = []*components.IntegrationTest{
 	repo_files.EnterWithoutSelection,
 	repo_files.FileHistory,
 	repo_files.FilterFiles,
+	repo_files.KeybindingsMenu,
 	repo_files.LargeNestedTree,
 	repo_files.OpenAndEditWorktreeFile,
 	repo_files.OpenFileNotInWorktree,
