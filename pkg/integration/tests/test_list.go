@@ -186,6 +186,7 @@ var tests = []*components.IntegrationTest{
 	config.RemoteNamedStar,
 	config.SidePanelWidth,
 	config.SidePanelWidthClamping,
+	config.SidePanelWidthConfigReload,
 	config.SidePanelWidthFromPerRepoConfig,
 	config.SidePanelWidthFullScreenMode,
 	config.SidePanelWidthInPopup,
