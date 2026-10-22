@@ -1203,6 +1203,7 @@ type GithubActions struct {
 	CopyStepLog                        string
 	CopyJobLog                         string
 	CopiedToClipboard                  string
+	CopyStepLogAction                  string
 }
 
 type Actions struct {
@@ -2678,6 +2679,7 @@ func EnglishTranslationSet() *TranslationSet {
 			CopyStepLog:                        "Log of this step",
 			CopyJobLog:                         "Log",
 			CopiedToClipboard:                  "{{.what}} copied to clipboard",
+			CopyStepLogAction:                  "Copy step log",
 		},
 		BreakingChangesTitle: "Breaking Changes",
 		BreakingChangesMessage: `You are updating to a new version of lazygit which contains breaking changes. Please review the notes below and update your configuration if necessary.

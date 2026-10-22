@@ -429,7 +429,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 |-----|--------|-------------|
 | `` o `` | Open in browser |  |
 | `` e `` | Open log in editor | Open the whole log of the job in your editor, e.g. to search it, starting at the selected step. |
-| `` y `` | Log of this step |  |
+| `` y `` | Copy step log |  |
 | `` R `` | Atualizar |  |
 | `` / `` | Filtrar a visualização atual por texto |  |
 

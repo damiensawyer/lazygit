@@ -61,7 +61,7 @@ func (self *GithubStepsController) GetKeybindings(opts types.KeybindingsOpts) []
 			Keys:              opts.GetKeys(opts.Config.GithubActions.CopyToClipboard),
 			Handler:           self.withItem(self.copyStepLog),
 			GetDisabledReason: self.require(self.singleItemSelected(self.jobIsComplete)),
-			Description:       self.c.Tr.GithubActions.CopyStepLog,
+			Description:       self.c.Tr.GithubActions.CopyStepLogAction,
 		},
 		{
 			Keys:        opts.GetKeys(opts.Config.Universal.Refresh),
