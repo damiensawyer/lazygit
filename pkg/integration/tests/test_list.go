@@ -590,6 +590,7 @@ var tests = []*components.IntegrationTest{
 	repo_files.EnterFromSubCommits,
 	repo_files.EnterFromTags,
 	repo_files.FileHistory,
+	repo_files.FilterFiles,
 	repo_files.OpenFileNotInWorktree,
 	repo_files.RestoreToWorktree,
 	repo_files.SaveFileAtCommit,
