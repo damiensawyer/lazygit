@@ -32,10 +32,7 @@ var OverviewModeRangeWithHiddenAnchor = NewIntegrationTest(NewIntegrationTestArg
 			Title(Equals("Commits (overview)")).
 			Lines(
 				Contains("top").IsSelected(),
-				/* EXPECTED:
 				Contains("base"),
-				ACTUAL: */
-				Contains("base").IsSelected(),
 			)
 	},
 })

@@ -227,6 +227,16 @@ func (self *ModeHelper) EnterOverviewMode() error {
 		}
 	}
 
+	// A range whose anchor is about to be hidden would be restored by the
+	// anchor's list position, which in the condensed list belongs to another
+	// commit; collapse it to the cursor instead, as happens when the cursor
+	// is the end that gets hidden.
+	if rangeStartIdx, ok := commitsContext.GetRangeStartIdx(); ok &&
+		rangeStartIdx < len(self.c.Model().Commits) &&
+		!commitShownInOverview(self.c.Model().Commits[rangeStartIdx]) {
+		commitsContext.CancelRangeSelect()
+	}
+
 	commitsContext.SetOverviewMode(true)
 	self.UpdateCommitsViewTitle()
 	// The condensed list can have far fewer rows than the threshold of the
