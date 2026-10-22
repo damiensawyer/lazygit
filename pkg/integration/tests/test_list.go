@@ -152,6 +152,7 @@ var tests = []*components.IntegrationTest{
 	commit.KeepSelectedCommitAfterExternalCommit,
 	commit.NewBranch,
 	commit.OverviewModeAcrossRepoSwitch,
+	commit.OverviewModeFromLogMenuAndEscape,
 	commit.PasteCommitMessage,
 	commit.PasteCommitMessageOverExisting,
 	commit.PreserveCommitMessage,
