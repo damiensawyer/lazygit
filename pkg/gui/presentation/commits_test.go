@@ -365,10 +365,7 @@ func TestGetCommitListDisplayStrings(t *testing.T) {
 		},
 		{
 			testName: "display indices hiding the marked base commit",
-			/* EXPECTED:
 			expected: "hash1 ✓ commit1\nhash3 commit3\nhash4 commit4",
-			ACTUAL: */
-			expected: "hash1 ✓ commit1\nhash3 ✓ commit3\nhash4 ✓ commit4",
 			commitOpts: []models.NewCommitOpts{
 				{Name: "commit1", Hash: "hash1"},
 				{Name: "commit2", Hash: "hash2"},
@@ -386,10 +383,7 @@ func TestGetCommitListDisplayStrings(t *testing.T) {
 		},
 		{
 			testName: "startIdx is past the marked base commit",
-			/* EXPECTED:
 			expected: "hash3 commit3\nhash4 commit4",
-			ACTUAL: */
-			expected: "hash3 ✓ commit3\nhash4 ✓ commit4",
 			commitOpts: []models.NewCommitOpts{
 				{Name: "commit1", Hash: "hash1"},
 				{Name: "commit2", Hash: "hash2"},
