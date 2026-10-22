@@ -260,6 +260,7 @@ var tests = []*components.IntegrationTest{
 	diff.ShowFinalVersionOfCommitFile,
 	diff.StatFollowsAScreenModeChange,
 	diff.StatUsesTheViewWidth,
+	diff.ToggleFullFileContext,
 	diff.ToggleShowFinalVersion,
 	file.ClickArrowToCollapse,
 	file.CollapseExpand,
