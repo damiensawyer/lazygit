@@ -17,7 +17,8 @@ type TestDriver struct {
 	mouseX     int
 	mouseY     int
 	*assertionHelper
-	shell *Shell
+	shell      *Shell
+	fakeGithub *FakeGithub
 }
 
 func NewTestDriver(gui integrationTypes.GuiDriver, shell *Shell, keys config.KeybindingConfig, inputDelay int) *TestDriver {
@@ -233,6 +234,14 @@ func (self *TestDriver) Git() *Git {
 // for making assertions on the file system
 func (self *TestDriver) FileSystem() *FileSystem {
 	return &FileSystem{assertionHelper: self.assertionHelper}
+}
+
+// for making assertions on the requests made to the test's FakeGithub
+func (self *TestDriver) FakeGithub() *FakeGithubDriver {
+	if self.fakeGithub == nil {
+		self.Fail("The test has no FakeGithub")
+	}
+	return &FakeGithubDriver{t: self, fake: self.fakeGithub}
 }
 
 // for when you just want to fail the test yourself.

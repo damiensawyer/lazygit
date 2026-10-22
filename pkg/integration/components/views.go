@@ -98,6 +98,18 @@ func (self *Views) RepoFiles() *ViewDriver {
 	return self.regularView("repoFiles")
 }
 
+func (self *Views) GithubRuns() *ViewDriver {
+	return self.regularView("githubRuns")
+}
+
+func (self *Views) GithubJobs() *ViewDriver {
+	return self.regularView("githubJobs")
+}
+
+func (self *Views) GithubSteps() *ViewDriver {
+	return self.regularView("githubSteps")
+}
+
 func (self *Views) Stash() *ViewDriver {
 	return self.regularView("stash")
 }
