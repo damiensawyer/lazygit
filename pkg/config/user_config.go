@@ -707,6 +707,11 @@ type KeybindingPullRequestsConfig struct {
 	CheckOut           Keybinding `yaml:"checkOut"`
 	CheckOutOptions    Keybinding `yaml:"checkOutOptions"`
 	CheckOutInWorktree Keybinding `yaml:"checkOutInWorktree"`
+	Merge              Keybinding `yaml:"merge"`
+	ChangeState        Keybinding `yaml:"changeState"`
+	UpdateBranch       Keybinding `yaml:"updateBranch"`
+	Comment            Keybinding `yaml:"comment"`
+	Review             Keybinding `yaml:"review"`
 	OpenInBrowser      Keybinding `yaml:"openInBrowser"`
 	CopyToClipboard    Keybinding `yaml:"copyToClipboard"`
 	Filter             Keybinding `yaml:"filter"`
@@ -1257,6 +1262,11 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 				CheckOut:           Keybinding{"<space>"},
 				CheckOutOptions:    Keybinding{"c"},
 				CheckOutInWorktree: Keybinding{"w"},
+				Merge:              Keybinding{"M"},
+				ChangeState:        Keybinding{"d"},
+				UpdateBranch:       Keybinding{"u"},
+				Comment:            Keybinding{"C"},
+				Review:             Keybinding{"r"},
 				OpenInBrowser:      Keybinding{"o"},
 				CopyToClipboard:    Keybinding{"y"},
 				Filter:             Keybinding{"f"},

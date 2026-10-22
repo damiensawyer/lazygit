@@ -95,6 +95,11 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` <space> `` | Check out | Check out the pull request the way `gh pr checkout` does: on a local branch named like its head branch (fast-forwarding it if it exists), set up to pull new commits of the pull request, and, where maintainers may push to it, to push to it. A pull request from a fork without a remote of its own is fetched from the base repository. |
 | `` c `` | Check out | Check the pull request out under another branch name, detached, in a new worktree, or reset the local branch to it rather than only fast-forwarding it. |
 | `` w `` | Check out in a new worktree |  |
+| `` M `` | Merge | Merge the pull request on GitHub with a merge commit, by squashing or by rebasing, optionally deleting its branch, locally too; or have GitHub merge it once it's ready. |
+| `` r `` | Review | Approve the pull request, request changes, or comment on it, submitting the line comments you collected in a pending review along with it. |
+| `` C `` | Comment | Add a comment to the pull request's conversation. |
+| `` d `` | Close, reopen, or change draft state | Close or reopen the pull request, mark it as ready for review, or convert it to a draft. |
+| `` u `` | Update branch | Bring the pull request's branch up to date with its base branch on GitHub, by merging the base branch into it or by rebasing it, like `gh pr update-branch` does. |
 | `` o `` | Open in browser | Open the pull request on GitHub. |
 | `` y `` | Copy to clipboard |  |
 | `` f `` | Filter pull requests | Choose which pull requests to load: open, closed, merged or all of them, and only those by an author, assigned to someone, awaiting someone's review, with a label, against a base branch, or matching a search. |

@@ -908,6 +908,11 @@ keybinding:
     checkOut: <space>
     checkOutOptions: c
     checkOutInWorktree: w
+    merge: M
+    changeState: d
+    updateBranch: u
+    comment: C
+    review: r
     openInBrowser: o
     copyToClipboard: "y"
     filter: f

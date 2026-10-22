@@ -115,6 +115,13 @@ func IsNotFound(err error) bool {
 	return errors.As(err, &apiErr) && apiErr.StatusCode == http.StatusNotFound
 }
 
+// IsUnprocessable reports whether err is a 422 from the API, which it answers
+// e.g. for deleting a branch that doesn't exist any more.
+func IsUnprocessable(err error) bool {
+	var apiErr *APIError
+	return errors.As(err, &apiErr) && apiErr.StatusCode == http.StatusUnprocessableEntity
+}
+
 // repoPath returns the API path for something under the repository, e.g.
 // repoPath("actions/runs") -> "/repos/owner/name/actions/runs".
 func (self *Client) repoPath(format string, args ...any) string {

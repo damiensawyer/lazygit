@@ -188,6 +188,7 @@ func (self *FakeGithub) handler() http.Handler {
 	mux.HandleFunc("POST "+repo+"actions/workflows/{id}/dispatches", accept(http.StatusNoContent))
 	mux.HandleFunc("PUT "+repo+"actions/workflows/{id}/enable", accept(http.StatusNoContent))
 	mux.HandleFunc("PUT "+repo+"actions/workflows/{id}/disable", accept(http.StatusNoContent))
+	mux.HandleFunc("DELETE "+repo+"git/refs/heads/{branch...}", accept(http.StatusNoContent))
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, err := io.ReadAll(r.Body)

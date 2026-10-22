@@ -2,12 +2,14 @@ package helpers
 
 import (
 	goContext "context"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/jesseduffield/lazygit/pkg/commands/github_commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
 	"github.com/jesseduffield/lazygit/pkg/gocui"
+	"github.com/jesseduffield/lazygit/pkg/gui/context"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
 	"github.com/jesseduffield/lazygit/pkg/utils"
 	"github.com/samber/lo"
@@ -53,9 +55,11 @@ type GithubPullRequestDetails struct {
 // GithubPullRequestsHelper loads the pull requests of the current repository's
 // GitHub repository and keeps them fresh while they are shown.
 type GithubPullRequestsHelper struct {
-	c            *HelperCommon
-	windowHelper *WindowHelper
-	clientHelper *GithubClientHelper
+	c             *HelperCommon
+	windowHelper  *WindowHelper
+	clientHelper  *GithubClientHelper
+	commitsHelper *CommitsHelper
+	filesHelper   *FilesHelper
 
 	loadState PullRequestsLoadState
 	loadErr   error
@@ -69,11 +73,19 @@ type GithubPullRequestsHelper struct {
 	detailsLoading map[int]bool
 }
 
-func NewGithubPullRequestsHelper(c *HelperCommon, windowHelper *WindowHelper, clientHelper *GithubClientHelper) *GithubPullRequestsHelper {
+func NewGithubPullRequestsHelper(
+	c *HelperCommon,
+	windowHelper *WindowHelper,
+	clientHelper *GithubClientHelper,
+	commitsHelper *CommitsHelper,
+	filesHelper *FilesHelper,
+) *GithubPullRequestsHelper {
 	return &GithubPullRequestsHelper{
 		c:              c,
 		windowHelper:   windowHelper,
 		clientHelper:   clientHelper,
+		commitsHelper:  commitsHelper,
+		filesHelper:    filesHelper,
 		details:        map[int]*GithubPullRequestDetails{},
 		detailsLoading: map[int]bool{},
 	}
@@ -414,4 +426,47 @@ func (self *GithubPullRequestsHelper) MainViewMessage() string {
 	default:
 		return tr.Loading
 	}
+}
+
+type EditTextOpts struct {
+	Title string
+	// what the text starts out as: a first line, and the rest of it
+	InitialText string
+}
+
+// EditText lets the user write a comment or the like, in the commit message
+// panel or, from there, in their editor, and passes it to onConfirm.
+func (self *GithubPullRequestsHelper) EditText(opts EditTextOpts, onConfirm func(text string) error) error {
+	self.commitsHelper.OpenCommitMessagePanel(&OpenCommitMessagePanelOpts{
+		CommitIndex:       context.NoCommitIndex,
+		SummaryTitle:      opts.Title,
+		DescriptionTitle:  self.c.Tr.PullRequests.TextContinued,
+		InitialMessage:    opts.InitialText,
+		UnwrapDescription: true,
+		OnConfirm: func(summary string, description string) error {
+			return onConfirm(joinFirstLineAndRest(summary, description))
+		},
+		OnSwitchToEditor: func(path string) error {
+			if err := self.filesHelper.EditFileAtLineAndWait(path, 1); err != nil {
+				return err
+			}
+			content, err := os.ReadFile(path)
+			if err != nil {
+				return err
+			}
+			text := strings.TrimSpace(string(content))
+			if text == "" {
+				return nil
+			}
+			return onConfirm(text)
+		},
+	})
+	return nil
+}
+
+func joinFirstLineAndRest(firstLine string, rest string) string {
+	if strings.TrimSpace(rest) == "" {
+		return strings.TrimSpace(firstLine)
+	}
+	return strings.TrimSpace(firstLine) + "\n\n" + strings.TrimSpace(rest)
 }

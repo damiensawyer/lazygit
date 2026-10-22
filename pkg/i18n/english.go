@@ -1226,6 +1226,77 @@ type PullRequests struct {
 	ViewCommits                      string
 	ViewCommitsTooltip               string
 	FetchingPullRequest              string
+	NotOpen                          string
+	DefaultMethod                    string
+	MergeMethodNotAllowed            string
+	DraftCannotBeMerged              string
+	MergeCommit                      string
+	SquashAndMerge                   string
+	RebaseAndMerge                   string
+	DisableAutoMerge                 string
+	DisablingAutoMerge               string
+	AutoMergeDisabled                string
+	EnableAutoMerge                  string
+	EnableAutoMergeTooltip           string
+	AutoMergeNotAllowed              string
+	AutoMergeNotNeeded               string
+	MergeTitle                       string
+	MergeKeepBranch                  string
+	MergeDeleteBranch                string
+	MergeDeleteBranches              string
+	MergeConfirmTitle                string
+	Merging                          string
+	Merged                           string
+	EnablingAutoMerge                string
+	AutoMergeEnabledToast            string
+	AlreadyMerged                    string
+	Close                            string
+	CloseConfirm                     string
+	Closing                          string
+	Closed                           string
+	MarkReady                        string
+	Updating                         string
+	MarkedReady                      string
+	ConvertToDraft                   string
+	ConvertedToDraft                 string
+	Reopen                           string
+	Reopening                        string
+	Reopened                         string
+	StateTitle                       string
+	UpdatingBranch                   string
+	BranchUpdated                    string
+	UpdateBranchTitle                string
+	UpdateBranchPrompt               string
+	UpdateWithMerge                  string
+	UpdateWithRebase                 string
+	CommentTitle                     string
+	TextContinued                    string
+	Commenting                       string
+	CommentAdded                     string
+	SubmittingReview                 string
+	ReviewSubmitted                  string
+	CannotReviewOwnPullRequest       string
+	Approve                          string
+	ApproveWithComment               string
+	RequestChanges                   string
+	ReviewComment                    string
+	SubmitPendingReview              string
+	DiscardPendingReview             string
+	DiscardPendingReviewTitle        string
+	DiscardPendingReviewPrompt       string
+	PendingReviewDiscarded           string
+	ReviewTitle                      string
+	SubmitPendingReviewTitle         string
+	MergeKeyDescription              string
+	MergeTooltip                     string
+	StateKeyDescription              string
+	StateTooltip                     string
+	UpdateBranch                     string
+	UpdateBranchTooltip              string
+	Comment                          string
+	CommentTooltip                   string
+	Review                           string
+	ReviewTooltip                    string
 }
 
 type GithubActions struct {
@@ -1509,6 +1580,8 @@ type Actions struct {
 	OpenCommitInBrowser              string
 	OpenPullRequest                  string
 	CheckOutPullRequest              string
+	MergePullRequest                 string
+	ReviewPullRequest                string
 	StartBisect                      string
 	ResetBisect                      string
 	BisectSkip                       string
@@ -2730,6 +2803,8 @@ func EnglishTranslationSet() *TranslationSet {
 			OpenCommitInBrowser:              "Open commit in browser",
 			OpenPullRequest:                  "Open pull request in browser",
 			CheckOutPullRequest:              "Check out pull request",
+			MergePullRequest:                 "Merge pull request",
+			ReviewPullRequest:                "Review pull request",
 			StartBisect:                      "Start bisect",
 			ResetBisect:                      "Reset bisect",
 			BisectSkip:                       "Bisect skip",
@@ -2874,6 +2949,77 @@ func EnglishTranslationSet() *TranslationSet {
 			ViewCommits:                      "View commits",
 			ViewCommitsTooltip:               "Fetch the pull request from GitHub and show its commits, without checking it out. From there, view the files a commit changed, or select a range of commits to see their combined diff.",
 			FetchingPullRequest:              "Fetching pull request…",
+			NotOpen:                          "The pull request isn't open.",
+			DefaultMethod:                    "(your default)",
+			MergeMethodNotAllowed:            "The repository doesn't allow merging this way.",
+			DraftCannotBeMerged:              "A draft can't be merged; mark it as ready for review first.",
+			MergeCommit:                      "Create a merge commit",
+			SquashAndMerge:                   "Squash and merge",
+			RebaseAndMerge:                   "Rebase and merge",
+			DisableAutoMerge:                 "Disable auto-merge",
+			DisablingAutoMerge:               "Disabling auto-merge…",
+			AutoMergeDisabled:                "Disabled auto-merge for #{{.number}}",
+			EnableAutoMerge:                  "Enable auto-merge",
+			EnableAutoMergeTooltip:           "Have GitHub merge the pull request by itself once its required reviews and checks are in.",
+			AutoMergeNotAllowed:              "The repository doesn't allow auto-merge.",
+			AutoMergeNotNeeded:               "The pull request can be merged right away.",
+			MergeTitle:                       "Merge #{{.number}} into {{.base}}",
+			MergeKeepBranch:                  "Merge, keeping the branch",
+			MergeDeleteBranch:                "Merge, and delete the branch",
+			MergeDeleteBranches:              "Merge, and delete the branch along with the local branch {{.branch}}",
+			MergeConfirmTitle:                "Merge #{{.number}} {{.title}}",
+			Merging:                          "Merging…",
+			Merged:                           "Merged #{{.number}}",
+			EnablingAutoMerge:                "Enabling auto-merge…",
+			AutoMergeEnabledToast:            "#{{.number}} will be merged once it's ready",
+			AlreadyMerged:                    "The pull request has been merged.",
+			Close:                            "Close the pull request",
+			CloseConfirm:                     "Close #{{.number}} {{.title}} without merging it?",
+			Closing:                          "Closing…",
+			Closed:                           "Closed #{{.number}}",
+			MarkReady:                        "Mark as ready for review",
+			Updating:                         "Updating…",
+			MarkedReady:                      "Marked #{{.number}} as ready for review",
+			ConvertToDraft:                   "Convert to draft",
+			ConvertedToDraft:                 "Converted #{{.number}} to a draft",
+			Reopen:                           "Reopen the pull request",
+			Reopening:                        "Reopening…",
+			Reopened:                         "Reopened #{{.number}}",
+			StateTitle:                       "#{{.number}} {{.title}}",
+			UpdatingBranch:                   "Updating branch…",
+			BranchUpdated:                    "Brought {{.head}} up to date with {{.base}}",
+			UpdateBranchTitle:                "Update {{.head}} with {{.base}}",
+			UpdateBranchPrompt:               "Bring the pull request's branch up to date with the latest changes of {{.base}} on GitHub.",
+			UpdateWithMerge:                  "Merge {{.base}} into it",
+			UpdateWithRebase:                 "Rebase it onto {{.base}}",
+			CommentTitle:                     "Comment on #{{.number}}",
+			TextContinued:                    "More (optional)",
+			Commenting:                       "Commenting…",
+			CommentAdded:                     "Commented on #{{.number}}",
+			SubmittingReview:                 "Submitting review…",
+			ReviewSubmitted:                  "Reviewed #{{.number}}",
+			CannotReviewOwnPullRequest:       "You can't approve your own pull request or request changes to it.",
+			Approve:                          "Approve",
+			ApproveWithComment:               "Approve with a comment",
+			RequestChanges:                   "Request changes",
+			ReviewComment:                    "Comment without approving",
+			SubmitPendingReview:              "Submit the pending review without a comment",
+			DiscardPendingReview:             "Discard the pending review ({{.count}} comment(s))",
+			DiscardPendingReviewTitle:        "Discard pending review",
+			DiscardPendingReviewPrompt:       "Discard your pending review, along with the comments you collected in it?",
+			PendingReviewDiscarded:           "Discarded the pending review",
+			ReviewTitle:                      "Review #{{.number}}",
+			SubmitPendingReviewTitle:         "Submit your pending review of #{{.number}} ({{.count}} comment(s))",
+			MergeKeyDescription:              "Merge",
+			MergeTooltip:                     "Merge the pull request on GitHub with a merge commit, by squashing or by rebasing, optionally deleting its branch, locally too; or have GitHub merge it once it's ready.",
+			StateKeyDescription:              "Close, reopen, or change draft state",
+			StateTooltip:                     "Close or reopen the pull request, mark it as ready for review, or convert it to a draft.",
+			UpdateBranch:                     "Update branch",
+			UpdateBranchTooltip:              "Bring the pull request's branch up to date with its base branch on GitHub, by merging the base branch into it or by rebasing it, like `gh pr update-branch` does.",
+			Comment:                          "Comment",
+			CommentTooltip:                   "Add a comment to the pull request's conversation.",
+			Review:                           "Review",
+			ReviewTooltip:                    "Approve the pull request, request changes, or comment on it, submitting the line comments you collected in a pending review along with it.",
 		},
 		GithubActions: GithubActions{
 			LoginTitle:                         "Log in to {{.host}}",
