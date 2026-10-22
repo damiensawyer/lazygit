@@ -255,6 +255,20 @@ func TestGetGithubRunListDisplayStringsDoesNotTruncateShortNames(t *testing.T) {
 	}, GetGithubRunListDisplayStrings(runs, false, now))
 }
 
+func TestGetGithubRunListDisplayStringsMeasuresAgeToNow(t *testing.T) {
+	withoutColors(t)
+
+	created := time.Date(2026, 1, 1, 12, 0, 0, 0, time.UTC)
+	run := &models.GithubRun{
+		Name: "CI", DisplayTitle: "One", HeadBranch: "main", Event: "push", Status: "in_progress",
+		CreatedAt: created, RunStartedAt: created,
+	}
+
+	assert.Equal(t, [][]string{
+		{"*", "5m", "CI", "main", "push", "5m0s", "One"},
+	}, GetGithubRunListDisplayStrings([]*models.GithubRun{run}, true, created.Add(5*time.Minute)))
+}
+
 func TestGetGithubRunListDisplayStringsIsEmptyForNoRuns(t *testing.T) {
 	assert.Empty(t, GetGithubRunListDisplayStrings(nil, false, time.Now()))
 }
