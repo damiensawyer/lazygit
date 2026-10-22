@@ -215,40 +215,28 @@ func TestPollDeviceToken(t *testing.T) {
 			status:   http.StatusBadRequest,
 			response: `{"error": "authorization_pending"}`,
 
-			/* EXPECTED:
 			expectedError: errAuthorizationPending,
-			ACTUAL: */
-			expectedText: "HTTP 400",
 		},
 		{
 			name:     "slow down, sent as a bad request",
 			status:   http.StatusBadRequest,
 			response: `{"error": "slow_down", "interval": 10}`,
 
-			/* EXPECTED:
 			expectedError: errSlowDown,
-			ACTUAL: */
-			expectedText: "HTTP 400",
 		},
 		{
 			name:     "expired token, sent as a bad request",
 			status:   http.StatusBadRequest,
 			response: `{"error": "expired_token"}`,
 
-			/* EXPECTED:
 			expectedText: "the code expired before the login was completed",
-			ACTUAL: */
-			expectedText: "HTTP 400",
 		},
 		{
 			name:     "access denied, sent as a bad request",
 			status:   http.StatusBadRequest,
 			response: `{"error": "access_denied"}`,
 
-			/* EXPECTED:
 			expectedText: "access was denied",
-			ACTUAL: */
-			expectedText: "HTTP 400",
 		},
 		{
 			name:         "bad request without an error",

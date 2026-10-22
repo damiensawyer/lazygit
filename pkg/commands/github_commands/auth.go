@@ -64,10 +64,17 @@ func postForm(ctx context.Context, u string, form url.Values, result any) error 
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("HTTP %d", resp.StatusCode)
+	switch resp.StatusCode {
+	case http.StatusOK:
+		return json.NewDecoder(resp.Body).Decode(result)
+	case http.StatusBadRequest:
+		// OAuth errors, like a device login that the user hasn't completed
+		// yet, are sent with this status, and a body saying what they are.
+		if err := json.NewDecoder(resp.Body).Decode(result); err == nil {
+			return nil
+		}
 	}
-	return json.NewDecoder(resp.Body).Decode(result)
+	return fmt.Errorf("HTTP %d", resp.StatusCode)
 }
 
 // RequestDeviceCode starts a device login.
