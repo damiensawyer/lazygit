@@ -52,7 +52,7 @@ func FormatGithubDuration(d time.Duration) string {
 
 func GetGithubRunListDisplayStrings(runs []*models.GithubRun, fullDescription bool, now time.Time) [][]string {
 	return lo.Map(runs, func(run *models.GithubRun, _ int) []string {
-		age := style.FgBlue.Sprint(utils.UnixToTimeAgo(run.CreatedAt.Unix()))
+		age := style.FgBlue.Sprint(utils.TimeAgo(run.CreatedAt, now))
 		// The title comes last because it's the one column that can be long.
 		if !fullDescription {
 			return []string{
@@ -133,7 +133,7 @@ func FormatGithubRunSummary(tr *i18n.TranslationSet, opts GithubRunSummaryOpts) 
 		b.WriteString(githubDim.Sprint(tr.GithubActions.NoJobs) + "\n")
 	default:
 		for _, job := range opts.Jobs {
-			b.WriteString(formatGithubJobLine(job, opts.Now))
+			b.WriteString(formatGithubItemLine(job.State(), job.Name, job.Duration(opts.Now)))
 			// Like gh, only spell out the steps of jobs that need attention.
 			if job.State().IsFailed() || job.State().IsActive() {
 				for i := range job.Steps {
@@ -168,7 +168,7 @@ func formatGithubRunMetadata(tr *i18n.TranslationSet, run *models.GithubRun, now
 	triggered := utils.ResolvePlaceholderString(tr.GithubActions.RunTriggered, map[string]string{
 		"event": run.Event,
 		"actor": run.Actor.Login,
-		"ago":   utils.UnixToTimeAgo(run.CreatedAt.Unix()),
+		"ago":   utils.TimeAgo(run.CreatedAt, now),
 	})
 	fmt.Fprintf(&b, "%s · %s", triggered, FormatGithubDuration(run.Duration(now)))
 	if run.Attempt > 1 {
@@ -182,9 +182,11 @@ func formatGithubRunMetadata(tr *i18n.TranslationSet, run *models.GithubRun, now
 	return b.String()
 }
 
-func formatGithubJobLine(job *models.GithubJob, now time.Time) string {
-	line := GithubActionsStateIcon(job.State()) + " " + job.Name
-	if duration := githubDurationColumn(job.State(), job.Duration(now)); duration != "" {
+// formatGithubItemLine shows a job or a step on a line of its own: its
+// state, its name, and how long it took, where that is known.
+func formatGithubItemLine(state models.GithubActionsState, name string, d time.Duration) string {
+	line := GithubActionsStateIcon(state) + " " + name
+	if duration := githubDurationColumn(state, d); duration != "" {
 		line += " " + duration
 	}
 	return line + "\n"
@@ -300,8 +302,7 @@ func FormatGithubJobDetails(tr *i18n.TranslationSet, opts GithubJobDetailsOpts) 
 	job := opts.Job
 	var b strings.Builder
 
-	fmt.Fprintf(&b, "%s %s %s\n", GithubActionsStateIcon(job.State()), style.AttrBold.Sprint(job.Name),
-		githubDurationColumn(job.State(), job.Duration(opts.Now)))
+	b.WriteString(formatGithubItemLine(job.State(), style.AttrBold.Sprint(job.Name), job.Duration(opts.Now)))
 	if job.RunnerName != "" {
 		b.WriteString(githubDim.Sprint(utils.ResolvePlaceholderString(tr.GithubActions.RanOn, map[string]string{
 			"runner": job.RunnerName,
@@ -313,11 +314,7 @@ func FormatGithubJobDetails(tr *i18n.TranslationSet, opts GithubJobDetailsOpts) 
 	b.WriteString("\n" + style.AttrBold.Sprint(tr.GithubActions.StepsSectionTitle) + "\n")
 	for i := range job.Steps {
 		step := &job.Steps[i]
-		line := GithubActionsStateIcon(step.State()) + " " + step.Name
-		if duration := githubDurationColumn(step.State(), step.Duration(opts.Now)); duration != "" {
-			line += " " + duration
-		}
-		b.WriteString(line + "\n")
+		b.WriteString(formatGithubItemLine(step.State(), step.Name, step.Duration(opts.Now)))
 	}
 
 	if len(opts.Annotations) > 0 {
@@ -374,8 +371,7 @@ func formatGithubJobLog(job *models.GithubJob, log *github_commands.JobLog, only
 // produced.
 func FormatGithubStepLog(tr *i18n.TranslationSet, job *models.GithubJob, step *models.GithubStep, log *github_commands.JobLog, now time.Time) string {
 	var b strings.Builder
-	fmt.Fprintf(&b, "%s %s %s\n", GithubActionsStateIcon(step.State()), style.AttrBold.Sprint(step.Name),
-		githubDurationColumn(step.State(), step.Duration(now)))
+	b.WriteString(formatGithubItemLine(step.State(), style.AttrBold.Sprint(step.Name), step.Duration(now)))
 	b.WriteString(githubDim.Sprint(job.Name) + "\n\n")
 
 	stepLog, found := lo.Find(log.Steps, func(stepLog github_commands.StepLog) bool {

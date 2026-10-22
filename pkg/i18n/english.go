@@ -1336,9 +1336,11 @@ type GithubActions struct {
 	WorkflowDisabled                   string
 	RunWorkflow                        string
 	RunWorkflowTooltip                 string
+	CantRunDisabledWorkflow            string
 	RunWorkflowRefPrompt               string
 	LoadingWorkflow                    string
 	NotDispatchable                    string
+	WorkflowFileNotAtRef               string
 	WorkflowInputPrompt                string
 	WorkflowInputPromptWithDescription string
 	StartingWorkflow                   string
@@ -2979,9 +2981,11 @@ func EnglishTranslationSet() *TranslationSet {
 			WorkflowDisabled:                   "disabled",
 			RunWorkflow:                        "Run workflow",
 			RunWorkflowTooltip:                 "Trigger the workflow on a branch or tag of your choice, asking for its inputs, like `gh workflow run` does. Only workflows with a workflow_dispatch trigger can be run this way.",
+			CantRunDisabledWorkflow:            "The workflow is disabled, so it can't be run until it is enabled again.",
 			RunWorkflowRefPrompt:               "Run {{.workflow}} on branch or tag",
 			LoadingWorkflow:                    "Loading workflow",
 			NotDispatchable:                    "{{.workflow}} can't be run manually: it has no workflow_dispatch trigger",
+			WorkflowFileNotAtRef:               "{{.path}} doesn't exist at {{.ref}}",
 			WorkflowInputPrompt:                "{{.name}}",
 			WorkflowInputPromptWithDescription: "{{.name}}: {{.description}}",
 			StartingWorkflow:                   "Starting workflow",

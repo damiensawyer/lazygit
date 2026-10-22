@@ -107,11 +107,12 @@ func (self *GithubActionsHelper) Open() error {
 	})
 }
 
-// RefreshRuns reloads the runs, keeping the selected one selected.
+// RefreshRuns reloads the runs, keeping the selected one selected, along
+// with the jobs being shown.
 func (self *GithubActionsHelper) RefreshRuns() error {
 	return self.withClient(func() error {
 		return self.c.WithWaitingStatus(self.c.Tr.GithubActions.LoadingRuns, func(gocui.Task) error {
-			return self.loadRuns(false, func() {})
+			return self.loadRuns(false, self.reloadChangedDetails)
 		})
 	})
 }
@@ -123,6 +124,12 @@ func (self *GithubActionsHelper) withClient(f func() error) error {
 		self.updateTitle()
 		return f()
 	})
+}
+
+// HandleError reports a failed API request, logging the user in again if
+// the token has stopped working. Must be called on the UI thread.
+func (self *GithubActionsHelper) HandleError(err error) error {
+	return self.handleError(err)
 }
 
 // handleError reports a failed API request. Must be called on the UI thread.

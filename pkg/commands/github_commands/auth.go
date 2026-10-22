@@ -64,10 +64,17 @@ func postForm(ctx context.Context, u string, form url.Values, result any) error 
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("HTTP %d", resp.StatusCode)
+	switch resp.StatusCode {
+	case http.StatusOK:
+		return json.NewDecoder(resp.Body).Decode(result)
+	case http.StatusBadRequest:
+		// OAuth errors, like a device login that the user hasn't completed
+		// yet, are sent with this status, and a body saying what they are.
+		if err := json.NewDecoder(resp.Body).Decode(result); err == nil {
+			return nil
+		}
 	}
-	return json.NewDecoder(resp.Body).Decode(result)
+	return fmt.Errorf("HTTP %d", resp.StatusCode)
 }
 
 // RequestDeviceCode starts a device login.
@@ -189,8 +196,28 @@ func StoreToken(host string, username string, token string) error {
 			return fmt.Errorf("couldn't parse %s: %w", path, err)
 		}
 	}
-	if doc.Kind == 0 {
+	var out bytes.Buffer
+	switch {
+	case doc.Kind == 0:
+		// yaml.v3 drops the comments of a file without a document, so keep
+		// them by writing them back verbatim ahead of the new one.
+		if len(bytes.TrimSpace(content)) > 0 {
+			out.Write(content)
+			if !bytes.HasSuffix(content, []byte("\n")) {
+				out.WriteByte('\n')
+			}
+		}
 		doc = yaml.Node{Kind: yaml.DocumentNode, Content: []*yaml.Node{{Kind: yaml.MappingNode}}}
+	case doc.Content[0].Tag == "!!null":
+		null := doc.Content[0]
+		doc.Content[0] = &yaml.Node{
+			Kind:        yaml.MappingNode,
+			HeadComment: null.HeadComment,
+			LineComment: null.LineComment,
+			FootComment: null.FootComment,
+		}
+	case doc.Content[0].Kind != yaml.MappingNode:
+		return fmt.Errorf("couldn't update %s: it doesn't map hosts to their settings", path)
 	}
 
 	inKeyring := storeTokenInKeyring(host, username, token)
@@ -212,7 +239,6 @@ func StoreToken(host string, username string, token string) error {
 	}
 	setOrRemoveToken(mappingEntry(mappingEntry(hostNode, "users"), username))
 
-	var out bytes.Buffer
 	encoder := yaml.NewEncoder(&out)
 	encoder.SetIndent(4)
 	if err := encoder.Encode(&doc); err != nil {

@@ -72,7 +72,7 @@ func (self *GithubWorkflowsAction) workflowMenu(workflow *models.GithubWorkflow)
 		OnPress: func() error { return self.promptForRef(workflow) },
 	}
 	if !workflow.IsActive() {
-		runItem.DisabledReason = &types.DisabledReason{Text: tr.WorkflowDisabled}
+		runItem.DisabledReason = &types.DisabledReason{Text: tr.CantRunDisabledWorkflow}
 	}
 
 	editItem := &types.MenuItem{
@@ -155,8 +155,14 @@ func (self *GithubWorkflowsAction) loadInputs(workflow *models.GithubWorkflow, r
 					"workflow": workflow.Name,
 				}))
 			}
+			if github_commands.IsNotFound(err) {
+				return errors.New(utils.ResolvePlaceholderString(tr.WorkflowFileNotAtRef, map[string]string{
+					"path": workflow.Path,
+					"ref":  ref,
+				}))
+			}
 			if err != nil {
-				return err
+				return self.c.Helpers().GithubActions.HandleError(err)
 			}
 			return self.askForInputs(workflow, ref, inputs, map[string]string{})
 		})

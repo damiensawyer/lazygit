@@ -210,6 +210,40 @@ func TestPollDeviceToken(t *testing.T) {
 			response:     `{"access_token": "gho_abc"}`,
 			expectedText: "HTTP 500",
 		},
+		{
+			name:     "authorization pending, sent as a bad request",
+			status:   http.StatusBadRequest,
+			response: `{"error": "authorization_pending"}`,
+
+			expectedError: errAuthorizationPending,
+		},
+		{
+			name:     "slow down, sent as a bad request",
+			status:   http.StatusBadRequest,
+			response: `{"error": "slow_down", "interval": 10}`,
+
+			expectedError: errSlowDown,
+		},
+		{
+			name:     "expired token, sent as a bad request",
+			status:   http.StatusBadRequest,
+			response: `{"error": "expired_token"}`,
+
+			expectedText: "the code expired before the login was completed",
+		},
+		{
+			name:     "access denied, sent as a bad request",
+			status:   http.StatusBadRequest,
+			response: `{"error": "access_denied"}`,
+
+			expectedText: "access was denied",
+		},
+		{
+			name:         "bad request without an error",
+			status:       http.StatusBadRequest,
+			response:     `Bad Request`,
+			expectedText: "HTTP 400",
+		},
 	}
 
 	for _, s := range scenarios {

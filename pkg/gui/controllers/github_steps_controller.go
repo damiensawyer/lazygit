@@ -10,7 +10,6 @@ import (
 	"github.com/jesseduffield/lazygit/pkg/gui/presentation"
 	"github.com/jesseduffield/lazygit/pkg/gui/style"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
-	"github.com/jesseduffield/lazygit/pkg/utils"
 	"github.com/samber/lo"
 )
 
@@ -129,10 +128,6 @@ func (self *GithubStepsController) copyStepLog(step *models.GithubStep) error {
 		stepLog, _ := lo.Find(log.Steps, func(stepLog github_commands.StepLog) bool {
 			return stepLog.StepNumber == step.Number
 		})
-		if err := self.c.OS().CopyToClipboard(utils.Decolorise(joinLogLines(stepLog.Lines))); err != nil {
-			return err
-		}
-		self.c.Toast(utils.ResolvePlaceholderString(tr.CopiedToClipboard, map[string]string{"what": tr.CopyStepLog}))
-		return nil
+		return copyGithubValue(self.c, tr.CopyStepLog, joinLogLines(stepLog.Lines))
 	})
 }

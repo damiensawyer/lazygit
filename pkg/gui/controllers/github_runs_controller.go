@@ -433,7 +433,7 @@ func (self *GithubRunsController) downloadArtifacts(run *models.GithubRun) error
 		artifacts, err := client.ListArtifacts(goContext.Background(), run.RunId)
 		self.c.OnUIThread(func() error {
 			if err != nil {
-				return err
+				return self.c.Helpers().GithubActions.HandleError(err)
 			}
 			if len(artifacts) == 0 {
 				return errors.New(tr.NoArtifacts)
@@ -492,7 +492,8 @@ func (self *GithubRunsController) promptForArtifactsDir(initialDir string, artif
 					}
 					archive, err := client.DownloadArtifact(goContext.Background(), artifact.ArtifactId)
 					if err != nil {
-						return err
+						self.c.OnUIThread(func() error { return self.c.Helpers().GithubActions.HandleError(err) })
+						return nil
 					}
 					if err := github_commands.ExtractArtifact(archive, artifactDir); err != nil {
 						return err
