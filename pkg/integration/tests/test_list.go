@@ -155,6 +155,7 @@ var tests = []*components.IntegrationTest{
 	commit.OverviewModeDuringRebase,
 	commit.OverviewModeFromLogMenuAndEscape,
 	commit.OverviewModeInFilteringMode,
+	commit.OverviewModeRefresh,
 	commit.OverviewModeWithNoVisibleCommits,
 	commit.PasteCommitMessage,
 	commit.PasteCommitMessageOverExisting,
