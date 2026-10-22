@@ -33,9 +33,8 @@ const (
 
 // GithubTokens remembers the tokens the user logged in with during this
 // session. It outlives repo switches, unlike the helpers, so that the user
-// doesn't have to log in again in every repo; and it covers for the token
-// lookup, which doesn't see a token we stored ourselves if gh isn't installed
-// (go-gh caches the config file it read on first use).
+// doesn't have to log in again in every repo; and it keeps a token that
+// couldn't be stored usable for the rest of the session.
 type GithubTokens struct {
 	mutex  sync.Mutex
 	byHost map[string]string
@@ -205,7 +204,8 @@ func (self *GithubActionsHelper) withClientForRemote(remote githubRemoteInfo, f 
 		return useToken(token)
 	}
 
-	// Asking gh for the token runs a subprocess, so do it off the UI thread.
+	// Looking the token up may have to wait for the system keyring, so do it
+	// off the UI thread.
 	self.c.OnWorker(func(gocui.Task) error {
 		token := self.c.Git().GitHub.GetAuthToken(host)
 		self.c.OnUIThread(func() error {

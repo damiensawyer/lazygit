@@ -41,6 +41,7 @@ require (
 	github.com/stefanhaller/git-todo-parser v0.0.7-0.20250905083220-c50528f08304
 	github.com/stretchr/testify v1.12.1
 	github.com/xo/terminfo v1.2.0
+	github.com/zalando/go-keyring v0.2.8
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
 	golang.org/x/sync v0.24.0
 	golang.org/x/sys v0.49.0
@@ -54,10 +55,12 @@ require (
 	github.com/cli/safeexec v1.0.1 // indirect
 	github.com/clipperhouse/displaywidth v0.11.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
+	github.com/danieljoos/wincred v1.2.3 // indirect
 	github.com/dlclark/regexp2/v2 v2.2.1 // indirect
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/gdamore/encoding v1.0.1 // indirect
 	github.com/go-logfmt/logfmt v0.5.0 // indirect
+	github.com/godbus/dbus/v5 v5.2.2 // indirect
 	github.com/hpcloud/tail v1.0.0 // indirect
 	github.com/invopop/jsonschema v0.10.0 // indirect
 	github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515 // indirect
