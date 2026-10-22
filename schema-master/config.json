@@ -2093,6 +2093,20 @@
             }
           ],
           "default": "f"
+        },
+        "viewWorkflows": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "w"
         }
       },
       "additionalProperties": false,

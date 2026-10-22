@@ -82,6 +82,10 @@ type GithubActionsHelper struct {
 	// before then knows it has been superseded
 	refreshGeneration int
 
+	// set when a run has been requested that GitHub hasn't created yet, so
+	// that the next refresh comes soon
+	expectingNewRun bool
+
 	// keyed by run ID; only touched on the UI thread
 	runDetails        map[int64]*GithubRunDetails
 	runDetailsLoading map[int64]bool
@@ -403,9 +407,10 @@ func (self *GithubActionsHelper) scheduleAutoRefresh() {
 	repoGeneration := self.c.State().GetRepoGeneration()
 
 	interval := githubIdleRefreshInterval
-	if lo.SomeBy(self.c.Model().GithubRuns, func(run *models.GithubRun) bool { return run.State().IsActive() }) {
+	if self.expectingNewRun || lo.SomeBy(self.c.Model().GithubRuns, func(run *models.GithubRun) bool { return run.State().IsActive() }) {
 		interval = githubActiveRefreshInterval
 	}
+	self.expectingNewRun = false
 
 	time.AfterFunc(interval, func() {
 		self.c.OnUIThreadBackground(func() error {
@@ -433,6 +438,13 @@ func (self *GithubActionsHelper) scheduleAutoRefresh() {
 func (self *GithubActionsHelper) reloadChangedDetails() {
 	self.markActiveRunDetailsStale()
 	self.reloadJobsIfRunChanged()
+}
+
+// ExpectNewRun makes the runs refresh soon, for after triggering a workflow:
+// GitHub takes a moment to create the run, so it isn't there to be shown
+// straight away.
+func (self *GithubActionsHelper) ExpectNewRun() {
+	self.expectingNewRun = true
 }
 
 // RunAction performs an action on the repository's runs, like cancelling one,

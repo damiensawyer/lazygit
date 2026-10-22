@@ -857,6 +857,7 @@ keybinding:
     rerun: r
     cancelRun: c
     filterRuns: f
+    viewWorkflows: w
 ```
 <!-- END CONFIG YAML -->
 

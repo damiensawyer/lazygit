@@ -87,6 +87,13 @@ func (self *GithubRunsController) GetKeybindings(opts types.KeybindingsOpts) []*
 			OpensMenu:   true,
 		},
 		{
+			Keys:        opts.GetKeys(opts.Config.GithubActions.ViewWorkflows),
+			Handler:     (&GithubWorkflowsAction{c: self.c}).Call,
+			Description: tr.Workflows,
+			Tooltip:     tr.WorkflowsTooltip,
+			OpensMenu:   true,
+		},
+		{
 			Keys:        opts.GetKeys(opts.Config.Universal.Refresh),
 			Handler:     self.c.Helpers().GithubActions.RefreshRuns,
 			Description: self.c.Tr.Refresh,
