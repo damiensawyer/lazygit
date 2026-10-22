@@ -262,6 +262,7 @@ var tests = []*components.IntegrationTest{
 	diff.StatUsesTheViewWidth,
 	diff.ToggleFullFileContext,
 	diff.ToggleFullFileContextFromAConfiguredFullFile,
+	diff.ToggleFullFileContextOfACommit,
 	diff.ToggleFullFileContextRestoresAChangedSize,
 	diff.ToggleShowFinalVersion,
 	file.ClickArrowToCollapse,
