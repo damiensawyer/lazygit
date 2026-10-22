@@ -146,3 +146,33 @@ func newFakeGithub() *FakeGithub {
 		},
 	}
 }
+
+const nightlyWorkflowId = 30
+
+// like newFakeGithub, but with a disabled workflow too, and with the
+// workflows' definitions
+func newFakeGithubWithWorkflowFiles() *FakeGithub {
+	fake := newFakeGithub()
+	fake.Workflows = append(fake.Workflows,
+		&models.GithubWorkflow{WorkflowId: nightlyWorkflowId, Name: "Nightly", Path: ".github/workflows/nightly.yml", State: "disabled_manually"})
+	fake.WorkflowFiles = map[string]string{
+		".github/workflows/ci.yml": "on: [push, pull_request]\n",
+		".github/workflows/release.yml": `on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Where to deploy
+        type: choice
+        options: [staging, production]
+        default: staging
+      version:
+        description: Version to release
+        required: true
+      dry_run:
+        type: boolean
+        default: "false"
+`,
+		".github/workflows/nightly.yml": "on: workflow_dispatch\n",
+	}
+	return fake
+}
