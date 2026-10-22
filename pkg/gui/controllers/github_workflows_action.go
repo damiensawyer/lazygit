@@ -72,7 +72,7 @@ func (self *GithubWorkflowsAction) workflowMenu(workflow *models.GithubWorkflow)
 		OnPress: func() error { return self.promptForRef(workflow) },
 	}
 	if !workflow.IsActive() {
-		runItem.DisabledReason = &types.DisabledReason{Text: tr.WorkflowDisabled}
+		runItem.DisabledReason = &types.DisabledReason{Text: tr.CantRunDisabledWorkflow}
 	}
 
 	editItem := &types.MenuItem{
