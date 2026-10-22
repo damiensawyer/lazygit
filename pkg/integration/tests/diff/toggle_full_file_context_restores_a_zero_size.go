@@ -30,15 +30,9 @@ var ToggleFullFileContextRestoresAZeroSize = NewIntegrationTest(NewIntegrationTe
 			Content(Contains("@@ -1,20 +1,20 @@"))
 
 		t.Views().Files().Press(keys.Universal.ToggleContextInDiffView)
-		/* EXPECTED:
 		t.ExpectToast(Equals("Restored context size to 0"))
-		ACTUAL: */
-		t.ExpectToast(Equals("Restored context size to 3"))
 
 		t.Views().Main().
-			/* EXPECTED:
 			Content(Contains("@@ -10 +10 @@"))
-			ACTUAL: */
-			Content(Contains("@@ -7,7 +7,7 @@"))
 	},
 })
