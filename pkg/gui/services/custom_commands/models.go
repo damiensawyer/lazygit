@@ -73,6 +73,23 @@ type RemoteBranch struct {
 	RemoteName string
 }
 
+// PullRequest is a pull request of the pull requests panel.
+type PullRequest struct {
+	Number int
+	Title  string
+	Url    string
+	// "OPEN", "DRAFT", "MERGED", or "CLOSED"
+	State  string
+	Author string
+	// the branch to merge, and, for a pull request from a fork, the fork's
+	// owner
+	HeadRefName       string
+	HeadOwner         string
+	IsCrossRepository bool
+	BaseRefName       string
+	HeadRefOid        string
+}
+
 type Remote struct {
 	Name     string
 	Urls     []string

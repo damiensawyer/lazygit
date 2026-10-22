@@ -372,6 +372,7 @@ SelectedTag
 SelectedStashEntry
 SelectedCommitFile
 SelectedWorktree
+SelectedPullRequest
 CheckedOutBranch
 ```
 

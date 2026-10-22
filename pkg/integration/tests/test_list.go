@@ -624,6 +624,7 @@ var tests = []*components.IntegrationTest{
 	pull_requests.CloseAndReopenPullRequest,
 	pull_requests.CommentOnDiffLines,
 	pull_requests.CreatePullRequest,
+	pull_requests.CustomCommandOnPullRequest,
 	pull_requests.EditPullRequest,
 	pull_requests.FilterPullRequests,
 	pull_requests.ListPullRequests,

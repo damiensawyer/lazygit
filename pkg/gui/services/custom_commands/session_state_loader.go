@@ -110,6 +110,25 @@ func remoteBranchShimFromModelRemoteBranch(remoteBranch *models.RemoteBranch) *R
 	}
 }
 
+func pullRequestShimFromModel(pr *models.GithubPullRequest) *PullRequest {
+	if pr == nil {
+		return nil
+	}
+
+	return &PullRequest{
+		Number:            pr.Number,
+		Title:             pr.Title,
+		Url:               pr.Url,
+		State:             pr.State,
+		Author:            pr.Author,
+		HeadRefName:       pr.HeadRefName,
+		HeadOwner:         pr.HeadRepositoryOwner.Login,
+		IsCrossRepository: pr.IsCrossRepository,
+		BaseRefName:       pr.BaseRefName,
+		HeadRefOid:        pr.HeadRefOid,
+	}
+}
+
 func remoteShimFromModelRemote(remote *models.Remote) *Remote {
 	if remote == nil {
 		return nil
@@ -209,6 +228,7 @@ type SessionState struct {
 	SelectedCommitFile     *CommitFile
 	SelectedCommitFilePath string
 	SelectedWorktree       *Worktree
+	SelectedPullRequest    *PullRequest
 	CheckedOutBranch       *Branch
 }
 
@@ -254,6 +274,7 @@ func (self *SessionStateLoader) call() *SessionState {
 		SelectedCommitFile:     commitFileShimFromModelRemote(self.c.Contexts().CommitFiles.GetSelectedFile()),
 		SelectedCommitFilePath: selectedCommitFilePath,
 		SelectedWorktree:       worktreeShimFromModelRemote(self.c.Contexts().Worktrees.GetSelected()),
+		SelectedPullRequest:    pullRequestShimFromModel(self.c.Contexts().PullRequests.GetSelected()),
 		CheckedOutBranch:       branchShimFromModelBranch(self.refsHelper.GetCheckedOutRef()),
 	}
 }
