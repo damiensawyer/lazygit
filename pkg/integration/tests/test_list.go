@@ -252,6 +252,7 @@ var tests = []*components.IntegrationTest{
 	demo.OverviewMode,
 	demo.RebaseOnto,
 	demo.RemoveHunkFromCommit,
+	demo.SidePanelWidth,
 	demo.StageHunksOrLines,
 	demo.Undo,
 	demo.WorktreeCreateFromBranches,
