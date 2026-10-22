@@ -165,6 +165,12 @@ func (gui *Gui) layout(g *gocui.Gui) error {
 	}
 	gui.Views.Tooltip.Visible = gui.Views.Menu.Visible && gui.Views.Tooltip.Buffer() != ""
 
+	if gui.c.InDemo() {
+		if err := gui.layoutKeycast(width, height); err != nil {
+			return err
+		}
+	}
+
 	for _, context := range gui.transientContexts() {
 		view, err := gui.g.View(context.GetViewName())
 		if err != nil && !errors.Is(err, gocui.ErrUnknownView) {

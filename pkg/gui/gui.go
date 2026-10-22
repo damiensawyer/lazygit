@@ -167,6 +167,9 @@ type Gui struct {
 
 	integrationTest integrationTypes.IntegrationTest
 
+	// The keys that a demo pressed most recently; see layoutKeycast
+	keycast string
+
 	afterLayoutFuncs chan func() error
 }
 

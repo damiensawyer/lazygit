@@ -8,6 +8,7 @@ import (
 	"github.com/jesseduffield/lazygit/pkg/config"
 	"github.com/jesseduffield/lazygit/pkg/gocui"
 	integrationTypes "github.com/jesseduffield/lazygit/pkg/integration/types"
+	"github.com/samber/lo"
 )
 
 type TestDriver struct {
@@ -19,15 +20,18 @@ type TestDriver struct {
 	*assertionHelper
 	shell      *Shell
 	fakeGithub *FakeGithub
+	// only set in demos, which show the keys being pressed
+	keycast *keycast
 }
 
-func NewTestDriver(gui integrationTypes.GuiDriver, shell *Shell, keys config.KeybindingConfig, inputDelay int) *TestDriver {
+func NewTestDriver(gui integrationTypes.GuiDriver, shell *Shell, keys config.KeybindingConfig, inputDelay int, isDemo bool) *TestDriver {
 	return &TestDriver{
 		gui:             gui,
 		keys:            keys,
 		inputDelay:      inputDelay,
 		assertionHelper: &assertionHelper{gui: gui},
 		shell:           shell,
+		keycast:         lo.Ternary(isDemo, &keycast{}, nil),
 	}
 }
 
@@ -35,6 +39,7 @@ func NewTestDriver(gui integrationTypes.GuiDriver, shell *Shell, keys config.Key
 // but instead to go through the default user config to get a more meaningful key name
 func (self *TestDriver) press(keyStr string) {
 	self.SetCaption(fmt.Sprintf("Pressing %s", keyStr))
+	self.castKeys(func(k *keycast, now time.Time) { k.press(keyStr, now) })
 	self.gui.PressKey(keyStr)
 	self.Wait(self.inputDelay)
 }
@@ -42,6 +47,11 @@ func (self *TestDriver) press(keyStr string) {
 // for use when typing or navigating, because in demos we want that to happen
 // faster
 func (self *TestDriver) pressFast(keyStr string) {
+	self.castKeys(func(k *keycast, now time.Time) { k.press(keyStr, now) })
+	self.pressFastWithoutKeycast(keyStr)
+}
+
+func (self *TestDriver) pressFastWithoutKeycast(keyStr string) {
 	self.SetCaption("")
 	self.gui.PressKey(keyStr)
 	self.Wait(self.inputDelay / 5)
@@ -52,8 +62,25 @@ func (self *TestDriver) pressFast(keyStr string) {
 // processes the input
 func (self *TestDriver) pressRapidly(keyStrs []string) {
 	self.SetCaption(fmt.Sprintf("Pressing %s", strings.Join(keyStrs, ", ")))
+	self.castKeys(func(k *keycast, now time.Time) {
+		for _, keyStr := range keyStrs {
+			k.press(keyStr, now)
+		}
+	})
 	self.gui.PressKeysRapidly(keyStrs...)
 	self.Wait(self.inputDelay)
+}
+
+// updates the keys that a demo shows as having been pressed, before the
+// keypress takes effect, so that the viewer sees the key together with what it
+// does
+func (self *TestDriver) castKeys(record func(k *keycast, now time.Time)) {
+	if self.keycast == nil {
+		return
+	}
+
+	record(self.keycast, time.Now())
+	self.gui.SetKeycast(self.keycast.render())
 }
 
 func (self *TestDriver) click(x, y int) {
@@ -145,7 +172,8 @@ func (self *TestDriver) focusInAndClick(x, y int) {
 
 func (self *TestDriver) typeContent(content string) {
 	for _, char := range content {
-		self.pressFast(string(char))
+		self.castKeys(func(k *keycast, now time.Time) { k.typeChar(string(char), now) })
+		self.pressFastWithoutKeycast(string(char))
 	}
 }
 
