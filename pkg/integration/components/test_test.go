@@ -23,6 +23,7 @@ type coordinate struct {
 
 type fakeGuiDriver struct {
 	failureMessage      string
+	captions            []string
 	pressedKeys         []string
 	clickedCoordinates  []coordinate
 	heldCoordinates     []coordinate
@@ -135,7 +136,8 @@ func (self *fakeGuiDriver) TopViewInWindow(windowName string) *gocui.View {
 	return nil
 }
 
-func (self *fakeGuiDriver) SetCaption(string) {
+func (self *fakeGuiDriver) SetCaption(caption string) {
+	self.captions = append(self.captions, caption)
 }
 
 func (self *fakeGuiDriver) SetCaptionPrefix(string) {
@@ -189,6 +191,22 @@ func TestSuccess(t *testing.T) {
 	assert.EqualValues(t, []coordinate{{2, 3}, {2, 3}}, driver.movedCoordinates)
 	assert.EqualValues(t, []coordinate{{2, 3}}, driver.releasedCoordinates)
 	assert.Equal(t, "", driver.failureMessage)
+}
+
+func TestCaptionsNameThePressedKeys(t *testing.T) {
+	driver := &fakeGuiDriver{}
+	testDriver := NewTestDriver(driver, nil, config.KeybindingConfig{}, 0, false)
+	testDriver.press("a")
+	testDriver.pressRapidly([]string{"b", "c"})
+	assert.Equal(t, []string{"Pressing a", "Pressing b, c"}, driver.captions)
+}
+
+func TestDemoCaptionsLeaveThePressedKeysToTheKeycast(t *testing.T) {
+	driver := &fakeGuiDriver{}
+	testDriver := NewTestDriver(driver, nil, config.KeybindingConfig{}, 0, true)
+	testDriver.press("a")
+	testDriver.pressRapidly([]string{"b", "c"})
+	assert.Equal(t, []string{"", ""}, driver.captions)
 }
 
 func TestViewDriverPointerCoordinates(t *testing.T) {

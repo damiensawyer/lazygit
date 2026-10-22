@@ -38,7 +38,7 @@ func NewTestDriver(gui integrationTypes.GuiDriver, shell *Shell, keys config.Key
 // key is something like 'w' or '<space>'. It's best not to pass a direct value,
 // but instead to go through the default user config to get a more meaningful key name
 func (self *TestDriver) press(keyStr string) {
-	self.SetCaption(fmt.Sprintf("Pressing %s", keyStr))
+	self.SetCaption(self.pressingCaption(keyStr))
 	self.castKeys(func(k *keycast, now time.Time) { k.press(keyStr, now) })
 	self.gui.PressKey(keyStr)
 	self.Wait(self.inputDelay)
@@ -61,7 +61,7 @@ func (self *TestDriver) pressFastWithoutKeycast(keyStr string) {
 // become idle in between, to simulate a user typing faster than lazygit
 // processes the input
 func (self *TestDriver) pressRapidly(keyStrs []string) {
-	self.SetCaption(fmt.Sprintf("Pressing %s", strings.Join(keyStrs, ", ")))
+	self.SetCaption(self.pressingCaption(strings.Join(keyStrs, ", ")))
 	self.castKeys(func(k *keycast, now time.Time) {
 		for _, keyStr := range keyStrs {
 			k.press(keyStr, now)
@@ -69,6 +69,16 @@ func (self *TestDriver) pressRapidly(keyStrs []string) {
 	})
 	self.gui.PressKeysRapidly(keyStrs...)
 	self.Wait(self.inputDelay)
+}
+
+// Demos show the keys being pressed in the keycast box, so their caption
+// needn't repeat them; it keeps showing the step that the demo is at.
+func (self *TestDriver) pressingCaption(keys string) string {
+	if self.keycast != nil {
+		return ""
+	}
+
+	return fmt.Sprintf("Pressing %s", keys)
 }
 
 // updates the keys that a demo shows as having been pressed, before the
