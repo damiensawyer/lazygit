@@ -582,6 +582,7 @@ var tests = []*components.IntegrationTest{
 	reflog.Reset,
 	remote.AddForkRemote,
 	repo_files.BrowseAllFilesAtCommit,
+	repo_files.ClickArrowToCollapse,
 	repo_files.CopyMenu,
 	repo_files.EnterFromBranches,
 	repo_files.EnterFromReflog,
