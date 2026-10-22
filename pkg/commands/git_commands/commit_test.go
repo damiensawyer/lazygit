@@ -1,8 +1,10 @@
 package git_commands
 
 import (
+	"errors"
 	"testing"
 
+	"github.com/jesseduffield/lazygit/pkg/commands/models"
 	"github.com/jesseduffield/lazygit/pkg/commands/oscommands"
 	"github.com/jesseduffield/lazygit/pkg/config"
 	"github.com/stretchr/testify/assert"
@@ -495,4 +497,148 @@ func TestAddCoAuthorToDescription(t *testing.T) {
 			assert.Equal(t, s.expectedResult, result)
 		})
 	}
+}
+
+func TestCommitResolveRefToCommitHash(t *testing.T) {
+	scenarios := []struct {
+		testName     string
+		runner       *oscommands.FakeCmdObjRunner
+		expectedHash string
+		expectedErr  string
+	}{
+		{
+			testName: "resolves and trims the hash",
+			runner: oscommands.NewFakeRunner(t).
+				ExpectGitArgs([]string{"rev-parse", "--verify", "--quiet", "v1.0^{commit}"}, "0123456789abcdef\n", nil),
+			expectedHash: "0123456789abcdef",
+		},
+		{
+			testName: "error",
+			runner: oscommands.NewFakeRunner(t).
+				ExpectGitArgs([]string{"rev-parse", "--verify", "--quiet", "v1.0^{commit}"}, "", errors.New("unknown ref")),
+			expectedErr: "unknown ref",
+		},
+	}
+
+	for _, s := range scenarios {
+		t.Run(s.testName, func(t *testing.T) {
+			instance := buildCommitCommands(commonDeps{runner: s.runner})
+
+			hash, err := instance.ResolveRefToCommitHash("v1.0")
+			if s.expectedErr != "" {
+				assert.EqualError(t, err, s.expectedErr)
+			} else {
+				assert.NoError(t, err)
+			}
+			assert.Equal(t, s.expectedHash, hash)
+			s.runner.CheckForMissingCalls()
+		})
+	}
+}
+
+func TestCommitIsFileBinary(t *testing.T) {
+	expectedArgs := []string{
+		"diff", "--no-ext-diff", "--numstat", models.EmptyTreeCommitHash, "abc123", "--", "dir/file name",
+	}
+	scenarios := []struct {
+		testName       string
+		runner         *oscommands.FakeCmdObjRunner
+		expectedBinary bool
+		expectedErr    string
+	}{
+		{
+			testName:       "binary file",
+			runner:         oscommands.NewFakeRunner(t).ExpectGitArgs(expectedArgs, "-\t-\tdir/file name\n", nil),
+			expectedBinary: true,
+		},
+		{
+			testName:       "text file",
+			runner:         oscommands.NewFakeRunner(t).ExpectGitArgs(expectedArgs, "3\t0\tdir/file name\n", nil),
+			expectedBinary: false,
+		},
+		{
+			testName:       "empty file",
+			runner:         oscommands.NewFakeRunner(t).ExpectGitArgs(expectedArgs, "", nil),
+			expectedBinary: false,
+		},
+		{
+			testName:    "error",
+			runner:      oscommands.NewFakeRunner(t).ExpectGitArgs(expectedArgs, "", errors.New("bad revision")),
+			expectedErr: "bad revision",
+		},
+	}
+
+	for _, s := range scenarios {
+		t.Run(s.testName, func(t *testing.T) {
+			instance := buildCommitCommands(commonDeps{runner: s.runner})
+
+			isBinary, err := instance.IsFileBinary("abc123", "dir/file name")
+			if s.expectedErr != "" {
+				assert.EqualError(t, err, s.expectedErr)
+			} else {
+				assert.NoError(t, err)
+			}
+			assert.Equal(t, s.expectedBinary, isBinary)
+			s.runner.CheckForMissingCalls()
+		})
+	}
+}
+
+func TestCommitGetBlobSize(t *testing.T) {
+	expectedArgs := []string{"cat-file", "-s", "abc123:dir/file.bin"}
+	scenarios := []struct {
+		testName     string
+		runner       *oscommands.FakeCmdObjRunner
+		expectedSize int64
+		expectError  bool
+	}{
+		{
+			testName:     "size",
+			runner:       oscommands.NewFakeRunner(t).ExpectGitArgs(expectedArgs, "2517630\n", nil),
+			expectedSize: 2517630,
+		},
+		{
+			testName:    "git error",
+			runner:      oscommands.NewFakeRunner(t).ExpectGitArgs(expectedArgs, "", errors.New("not found")),
+			expectError: true,
+		},
+		{
+			testName:    "unparseable output",
+			runner:      oscommands.NewFakeRunner(t).ExpectGitArgs(expectedArgs, "garbage\n", nil),
+			expectError: true,
+		},
+	}
+
+	for _, s := range scenarios {
+		t.Run(s.testName, func(t *testing.T) {
+			instance := buildCommitCommands(commonDeps{runner: s.runner})
+
+			size, err := instance.GetBlobSize("abc123", "dir/file.bin")
+			if s.expectError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, s.expectedSize, size)
+			}
+			s.runner.CheckForMissingCalls()
+		})
+	}
+}
+
+func TestCommitGetFilteredFileContent(t *testing.T) {
+	runner := oscommands.NewFakeRunner(t).
+		ExpectGitArgs([]string{"cat-file", "--filters", "abc123:dir/file.txt"}, "content\r\n", nil)
+	instance := buildCommitCommands(commonDeps{runner: runner})
+
+	content, err := instance.GetFilteredFileContent("abc123", "dir/file.txt")
+	assert.NoError(t, err)
+	assert.Equal(t, "content\r\n", content)
+	runner.CheckForMissingCalls()
+}
+
+func TestCommitShowFileContentCmdObj(t *testing.T) {
+	instance := buildCommitCommands(commonDeps{})
+
+	cmdObj := instance.ShowFileContentCmdObj("abc123", "dir/日本語 file.txt")
+	assert.Equal(t, []string{"git", "show", "abc123:dir/日本語 file.txt"}, cmdObj.Args())
 }
