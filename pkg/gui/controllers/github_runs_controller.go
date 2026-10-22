@@ -2,11 +2,14 @@ package controllers
 
 import (
 	goContext "context"
+	"errors"
 	"fmt"
+	"path/filepath"
 	"time"
 
 	"github.com/jesseduffield/lazygit/pkg/commands/github_commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
+	"github.com/jesseduffield/lazygit/pkg/gocui"
 	"github.com/jesseduffield/lazygit/pkg/gui/context"
 	"github.com/jesseduffield/lazygit/pkg/gui/controllers/helpers"
 	"github.com/jesseduffield/lazygit/pkg/gui/presentation"
@@ -85,6 +88,14 @@ func (self *GithubRunsController) GetKeybindings(opts types.KeybindingsOpts) []*
 			Description: tr.FilterRuns,
 			Tooltip:     tr.FilterRunsTooltip,
 			OpensMenu:   true,
+		},
+		{
+			Keys:              opts.GetKeys(opts.Config.GithubActions.DownloadArtifacts),
+			Handler:           self.withItem(self.downloadArtifacts),
+			GetDisabledReason: self.require(self.singleItemSelected()),
+			Description:       tr.DownloadArtifacts,
+			Tooltip:           tr.DownloadArtifactsTooltip,
+			OpensMenu:         true,
 		},
 		{
 			Keys:        opts.GetKeys(opts.Config.GithubActions.ViewWorkflows),
@@ -403,4 +414,89 @@ func (self *GithubRunsController) openInBrowser(run *models.GithubRun) error {
 
 func (self *GithubRunsController) context() *context.GithubRunsContext {
 	return self.c.Contexts().GithubRuns
+}
+
+func (self *GithubRunsController) downloadArtifacts(run *models.GithubRun) error {
+	tr := self.c.Tr.GithubActions
+	client := self.c.Helpers().GithubActions.Client()
+
+	return self.c.WithWaitingStatus(tr.LoadingArtifacts, func(gocui.Task) error {
+		artifacts, err := client.ListArtifacts(goContext.Background(), run.RunId)
+		self.c.OnUIThread(func() error {
+			if err != nil {
+				return err
+			}
+			if len(artifacts) == 0 {
+				return errors.New(tr.NoArtifacts)
+			}
+			return self.artifactsMenu(artifacts)
+		})
+		return nil
+	})
+}
+
+func (self *GithubRunsController) artifactsMenu(artifacts []*models.GithubArtifact) error {
+	tr := self.c.Tr.GithubActions
+
+	items := lo.Map(artifacts, func(artifact *models.GithubArtifact, _ int) *types.MenuItem {
+		item := &types.MenuItem{
+			LabelColumns: []string{artifact.Name, style.FgBlue.Sprint(utils.FormatBytes(artifact.SizeInBytes))},
+			OnPress: func() error {
+				return self.promptForArtifactsDir(artifact.Name, []*models.GithubArtifact{artifact})
+			},
+		}
+		if artifact.Expired {
+			item.LabelColumns[1] = style.FgYellow.Sprint(tr.ArtifactExpired)
+			item.DisabledReason = &types.DisabledReason{Text: tr.ArtifactHasExpired}
+		}
+		return item
+	})
+
+	// Like gh, download each artifact into its own directory when getting
+	// several of them.
+	available := lo.Filter(artifacts, func(artifact *models.GithubArtifact, _ int) bool { return !artifact.Expired })
+	if len(available) > 1 {
+		items = append([]*types.MenuItem{{
+			Label:   tr.DownloadAllArtifacts,
+			OnPress: func() error { return self.promptForArtifactsDir(".", available) },
+		}}, items...)
+	}
+
+	return self.c.Menu(types.CreateMenuOptions{Title: tr.DownloadArtifacts, Items: items})
+}
+
+func (self *GithubRunsController) promptForArtifactsDir(initialDir string, artifacts []*models.GithubArtifact) error {
+	tr := self.c.Tr.GithubActions
+
+	self.c.Prompt(types.PromptOpts{
+		Title:               tr.DownloadArtifactPrompt,
+		InitialContent:      initialDir,
+		FindSuggestionsFunc: self.c.Helpers().Suggestions.GetFilePathSuggestionsFunc(),
+		HandleConfirm: func(dir string) error {
+			dir = filepath.Join(self.c.Git().RepoPaths.WorktreePath(), dir)
+			client := self.c.Helpers().GithubActions.Client()
+			return self.c.WithWaitingStatus(tr.DownloadingArtifacts, func(gocui.Task) error {
+				for _, artifact := range artifacts {
+					artifactDir := dir
+					if len(artifacts) > 1 {
+						artifactDir = filepath.Join(dir, artifact.Name)
+					}
+					archive, err := client.DownloadArtifact(goContext.Background(), artifact.ArtifactId)
+					if err != nil {
+						return err
+					}
+					if err := github_commands.ExtractArtifact(archive, artifactDir); err != nil {
+						return err
+					}
+				}
+				self.c.RefreshFromWorker(types.RefreshOptions{Scope: []types.RefreshableView{types.FILES}})
+				self.c.OnUIThread(func() error {
+					self.c.Toast(utils.ResolvePlaceholderString(tr.ArtifactsDownloaded, map[string]string{"path": dir}))
+					return nil
+				})
+				return nil
+			})
+		},
+	})
+	return nil
 }

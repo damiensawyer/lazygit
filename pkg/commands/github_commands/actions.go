@@ -1,9 +1,15 @@
 package github_commands
 
 import (
+	"archive/zip"
+	"bytes"
 	"context"
+	"fmt"
+	"io"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
@@ -198,4 +204,53 @@ func (self *Client) GetFileContent(ctx context.Context, path string, ref string)
 		return "", err
 	}
 	return string(body), nil
+}
+
+// ExtractArtifact unpacks a downloaded artifact's zip archive into dir, the
+// way `gh run download` does.
+func ExtractArtifact(archive []byte, dir string) error {
+	reader, err := zip.NewReader(bytes.NewReader(archive), int64(len(archive)))
+	if err != nil {
+		return err
+	}
+
+	for _, file := range reader.File {
+		// Refuse paths that would escape dir, like "../../.bashrc".
+		target := filepath.Join(dir, filepath.FromSlash(file.Name))
+		if !strings.HasPrefix(target, filepath.Clean(dir)+string(filepath.Separator)) {
+			return fmt.Errorf("artifact contains an invalid path: %s", file.Name)
+		}
+
+		if file.FileInfo().IsDir() {
+			if err := os.MkdirAll(target, 0o755); err != nil {
+				return err
+			}
+			continue
+		}
+		if err := extractFile(file, target); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func extractFile(file *zip.File, target string) error {
+	if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
+		return err
+	}
+	src, err := file.Open()
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	dst, err := os.OpenFile(target, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, file.Mode().Perm()|0o600)
+	if err != nil {
+		return err
+	}
+	if _, err := io.Copy(dst, src); err != nil {
+		dst.Close()
+		return err
+	}
+	return dst.Close()
 }

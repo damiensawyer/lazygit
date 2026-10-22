@@ -2107,6 +2107,20 @@
             }
           ],
           "default": "w"
+        },
+        "downloadArtifacts": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "a"
         }
       },
       "additionalProperties": false,

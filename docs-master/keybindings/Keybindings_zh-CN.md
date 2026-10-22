@@ -68,6 +68,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` c `` | Cancel run | Cancel the run. Force cancelling also stops jobs that would otherwise keep running, e.g. because of an always() condition. |
 | `` d `` | Delete run | Delete the run along with its logs and artifacts. |
 | `` f `` | Filter runs | Only show the runs of a branch, a workflow, a commit, with a status, or triggered by an event, like the flags of `gh run list` do. |
+| `` a `` | Download artifacts | Download and unpack the files the run uploaded, like `gh run download` does. |
 | `` w `` | Workflows | Run a workflow, enable or disable it, or show only its runs, like `gh workflow` does. |
 | `` R `` | 刷新 |  |
 | `` / `` | 通过文本过滤当前视图 |  |

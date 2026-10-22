@@ -1,12 +1,16 @@
 package github_commands
 
 import (
+	"archive/zip"
+	"bytes"
 	"context"
 	"encoding/json"
 	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strconv"
 	"testing"
 
@@ -172,4 +176,36 @@ func TestLogRedirectDropsAuthorization(t *testing.T) {
 
 	assert.Equal(t, "the log", log)
 	assert.Empty(t, blobAuth)
+}
+
+func TestExtractArtifact(t *testing.T) {
+	var archive bytes.Buffer
+	writer := zip.NewWriter(&archive)
+	for name, content := range map[string]string{"report.txt": "ok", "logs/test.log": "PASS"} {
+		w, err := writer.Create(name)
+		assert.NoError(t, err)
+		_, _ = w.Write([]byte(content))
+	}
+	assert.NoError(t, writer.Close())
+
+	dir := filepath.Join(t.TempDir(), "artifact")
+	assert.NoError(t, ExtractArtifact(archive.Bytes(), dir))
+
+	content, err := os.ReadFile(filepath.Join(dir, "logs", "test.log"))
+	assert.NoError(t, err)
+	assert.Equal(t, "PASS", string(content))
+}
+
+func TestExtractArtifactRefusesPathsOutsideDir(t *testing.T) {
+	var archive bytes.Buffer
+	writer := zip.NewWriter(&archive)
+	_, err := writer.Create("../escaped.txt")
+	assert.NoError(t, err)
+	assert.NoError(t, writer.Close())
+
+	parent := t.TempDir()
+	err = ExtractArtifact(archive.Bytes(), filepath.Join(parent, "artifact"))
+
+	assert.EqualError(t, err, "artifact contains an invalid path: ../escaped.txt")
+	assert.NoFileExists(t, filepath.Join(parent, "escaped.txt"))
 }

@@ -1181,6 +1181,16 @@ type GithubActions struct {
 	EditWorkflowFile                   string
 	WorkflowFileNotInWorktree          string
 	OpenWorkflowInBrowser              string
+	DownloadArtifacts                  string
+	DownloadArtifactsTooltip           string
+	LoadingArtifacts                   string
+	NoArtifacts                        string
+	ArtifactExpired                    string
+	ArtifactHasExpired                 string
+	DownloadAllArtifacts               string
+	DownloadArtifactPrompt             string
+	DownloadingArtifacts               string
+	ArtifactsDownloaded                string
 }
 
 type Actions struct {
@@ -2634,6 +2644,16 @@ func EnglishTranslationSet() *TranslationSet {
 			EditWorkflowFile:                   "Edit workflow file",
 			WorkflowFileNotInWorktree:          "{{.path}} doesn't exist in the working tree",
 			OpenWorkflowInBrowser:              "Open in browser",
+			DownloadArtifacts:                  "Download artifacts",
+			DownloadArtifactsTooltip:           "Download and unpack the files the run uploaded, like `gh run download` does.",
+			LoadingArtifacts:                   "Loading artifacts",
+			NoArtifacts:                        "The run has no artifacts",
+			ArtifactExpired:                    "expired",
+			ArtifactHasExpired:                 "The artifact has expired",
+			DownloadAllArtifacts:               "Download all",
+			DownloadArtifactPrompt:             "Download to directory",
+			DownloadingArtifacts:               "Downloading artifacts",
+			ArtifactsDownloaded:                "Downloaded to {{.path}}",
 		},
 		BreakingChangesTitle: "Breaking Changes",
 		BreakingChangesMessage: `You are updating to a new version of lazygit which contains breaking changes. Please review the notes below and update your configuration if necessary.

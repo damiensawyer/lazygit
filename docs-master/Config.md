@@ -858,6 +858,7 @@ keybinding:
     cancelRun: c
     filterRuns: f
     viewWorkflows: w
+    downloadArtifacts: a
 ```
 <!-- END CONFIG YAML -->
 
