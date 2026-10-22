@@ -1,6 +1,6 @@
-// Package github_commands talks to the GitHub REST API about a repository's
-// GitHub Actions: its workflows, their runs, and the jobs, logs, and artifacts
-// those runs produce.
+// Package github_commands talks to the GitHub API about a repository: its pull
+// requests, and its GitHub Actions workflows, their runs, and the jobs, logs,
+// and artifacts those runs produce.
 package github_commands
 
 import (
@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/cli/go-gh/v2/pkg/auth"
+	"github.com/samber/lo"
 )
 
 // RestAPIBaseURL returns the REST API root for a GitHub host: github.com and
@@ -28,6 +29,16 @@ func RestAPIBaseURL(host string) string {
 		return fmt.Sprintf("https://%s/api/v3", host)
 	}
 	return fmt.Sprintf("https://api.%s", auth.NormalizeHostname(host))
+}
+
+// GraphQLURL returns the GraphQL API endpoint for a GitHub host. GitHub
+// Enterprise Server serves it from /api/graphql rather than next to the REST
+// API's /api/v3.
+func GraphQLURL(host string) string {
+	if auth.IsEnterprise(host) {
+		return fmt.Sprintf("https://%s/api/graphql", host)
+	}
+	return RestAPIBaseURL(host) + "/graphql"
 }
 
 // Repo identifies a repository on a GitHub instance, along with the token to
@@ -48,20 +59,26 @@ func (self Repo) FullName() string {
 type Client struct {
 	httpClient *http.Client
 	baseURL    string
+	graphQLURL string
 	repo       Repo
 }
 
 func NewClient(repo Repo) *Client {
-	return NewClientWithBaseURL(repo, RestAPIBaseURL(repo.Host))
+	client := NewClientWithBaseURL(repo, RestAPIBaseURL(repo.Host))
+	client.graphQLURL = GraphQLURL(repo.Host)
+	return client
 }
 
 // NewClientWithBaseURL is for tests, which point the client at a fake server.
+// It serves the GraphQL API from /graphql, the way github.com does.
 func NewClientWithBaseURL(repo Repo, baseURL string) *Client {
+	baseURL = strings.TrimSuffix(baseURL, "/")
 	return &Client{
 		// Downloading a large log or artifact can take a while, but a request
 		// that hangs indefinitely shouldn't leave a spinner up forever.
 		httpClient: &http.Client{Timeout: 2 * time.Minute},
-		baseURL:    strings.TrimSuffix(baseURL, "/"),
+		baseURL:    baseURL,
+		graphQLURL: baseURL + "/graphql",
 		repo:       repo,
 	}
 }
@@ -97,14 +114,17 @@ func (self *Client) repoPath(format string, args ...any) string {
 		fmt.Sprintf(format, args...)
 }
 
-// do sends a request and returns the response body of a successful response.
-// body, if non-nil, is sent as JSON.
+// do sends a request to the REST API and returns the response body of a
+// successful response. body, if non-nil, is sent as JSON.
 func (self *Client) do(ctx context.Context, method string, path string, query url.Values, body any, accept string) ([]byte, error) {
 	u := self.baseURL + path
 	if len(query) > 0 {
 		u += "?" + query.Encode()
 	}
+	return self.send(ctx, method, u, body, accept)
+}
 
+func (self *Client) send(ctx context.Context, method string, u string, body any, accept string) ([]byte, error) {
 	var reqBody io.Reader
 	if body != nil {
 		encoded, err := json.Marshal(body)
@@ -174,6 +194,49 @@ func (self *Client) post(ctx context.Context, path string, body any) error {
 func (self *Client) put(ctx context.Context, path string) error {
 	_, err := self.do(ctx, http.MethodPut, path, nil, nil, "")
 	return err
+}
+
+// GraphQLError is a GraphQL request that GitHub answered with errors, e.g.
+// because a mutation wasn't allowed.
+type GraphQLError struct {
+	Messages []string
+}
+
+func (self *GraphQLError) Error() string {
+	return "GitHub API request failed: " + strings.Join(self.Messages, "; ")
+}
+
+type graphQLErrorMessage struct {
+	Message string `json:"message"`
+}
+
+// graphQL sends a GraphQL query or mutation and decodes the data of the
+// response into result.
+func (self *Client) graphQL(ctx context.Context, query string, variables map[string]any, result any) error {
+	body, err := self.send(ctx, http.MethodPost, self.graphQLURL, map[string]any{
+		"query":     query,
+		"variables": variables,
+	}, "application/json")
+	if err != nil {
+		return err
+	}
+
+	var response struct {
+		Data   json.RawMessage       `json:"data"`
+		Errors []graphQLErrorMessage `json:"errors"`
+	}
+	if err := json.Unmarshal(body, &response); err != nil {
+		return err
+	}
+	if len(response.Errors) > 0 {
+		return &GraphQLError{Messages: lo.Map(response.Errors, func(e graphQLErrorMessage, _ int) string {
+			return e.Message
+		})}
+	}
+	if result == nil {
+		return nil
+	}
+	return json.Unmarshal(response.Data, result)
 }
 
 func (self *Client) delete(ctx context.Context, path string) error {
