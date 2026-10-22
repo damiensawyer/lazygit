@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/yaml.v3"
 )
 
 func TestStoreToken(t *testing.T) {
@@ -58,7 +59,129 @@ func TestStoreTokenWithoutExistingConfig(t *testing.T) {
 	assert.Equal(t, os.FileMode(0o600), info.Mode().Perm())
 }
 
+func TestStoreTokenUpdatesExistingEntries(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("GH_CONFIG_DIR", dir)
+	path := filepath.Join(dir, "hosts.yml")
+
+	existing := "github.com:\n" +
+		"    oauth_token: gho_old\n" +
+		"    user: octocat\n" +
+		"    git_protocol: ssh\n" +
+		"    users:\n" +
+		"        octocat:\n" +
+		"            oauth_token: gho_old\n" +
+		"        hubot:\n" +
+		"            oauth_token: gho_hubot\n"
+	assert.NoError(t, os.WriteFile(path, []byte(existing), 0o600))
+
+	assert.NoError(t, StoreToken("github.com", "octocat", "gho_new"))
+
+	content, err := os.ReadFile(path)
+	assert.NoError(t, err)
+	assert.Equal(t, "github.com:\n"+
+		"    oauth_token: gho_new\n"+
+		"    user: octocat\n"+
+		"    git_protocol: ssh\n"+
+		"    users:\n"+
+		"        octocat:\n"+
+		"            oauth_token: gho_new\n"+
+		"        hubot:\n"+
+		"            oauth_token: gho_hubot\n", string(content))
+}
+
+func TestStoreTokenReplacesEntriesThatAreNotMappings(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("GH_CONFIG_DIR", dir)
+	path := filepath.Join(dir, "hosts.yml")
+
+	assert.NoError(t, os.WriteFile(path, []byte("github.com:\n    users: [octocat]\n"), 0o600))
+
+	assert.NoError(t, StoreToken("github.com", "octocat", "gho_new"))
+
+	content, err := os.ReadFile(path)
+	assert.NoError(t, err)
+	assert.Equal(t, "github.com:\n"+
+		"    users:\n"+
+		"        octocat:\n"+
+		"            oauth_token: gho_new\n"+
+		"    oauth_token: gho_new\n"+
+		"    user: octocat\n"+
+		"    git_protocol: https\n", string(content))
+}
+
+func TestStoreTokenInEmptyConfig(t *testing.T) {
+	for name, existing := range map[string]string{"empty": "", "whitespace": "\n  \n"} {
+		t.Run(name, func(t *testing.T) {
+			dir := t.TempDir()
+			t.Setenv("GH_CONFIG_DIR", dir)
+			path := filepath.Join(dir, "hosts.yml")
+			assert.NoError(t, os.WriteFile(path, []byte(existing), 0o600))
+
+			assert.NoError(t, StoreToken("github.com", "octocat", "gho_new"))
+
+			content, err := os.ReadFile(path)
+			assert.NoError(t, err)
+			assert.Equal(t, "github.com:\n"+
+				"    oauth_token: gho_new\n"+
+				"    user: octocat\n"+
+				"    git_protocol: https\n"+
+				"    users:\n"+
+				"        octocat:\n"+
+				"            oauth_token: gho_new\n", string(content))
+		})
+	}
+}
+
+func TestStoreTokenInFlowStyleConfig(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("GH_CONFIG_DIR", dir)
+	path := filepath.Join(dir, "hosts.yml")
+	assert.NoError(t, os.WriteFile(path, []byte("{}\n"), 0o600))
+
+	assert.NoError(t, StoreToken("github.com", "octocat", "gho_new"))
+
+	content, err := os.ReadFile(path)
+	assert.NoError(t, err)
+	var hosts map[string]map[string]any
+	assert.NoError(t, yaml.Unmarshal(content, &hosts))
+	assert.Equal(t, map[string]map[string]any{
+		"github.com": {
+			"oauth_token":  "gho_new",
+			"user":         "octocat",
+			"git_protocol": "https",
+			"users":        map[string]any{"octocat": map[string]any{"oauth_token": "gho_new"}},
+		},
+	}, hosts)
+}
+
+func TestStoreTokenKeepsMalformedConfig(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("GH_CONFIG_DIR", dir)
+	path := filepath.Join(dir, "hosts.yml")
+	existing := "github.com:\n  oauth_token: [unterminated\n"
+	assert.NoError(t, os.WriteFile(path, []byte(existing), 0o600))
+
+	err := StoreToken("github.com", "octocat", "gho_new")
+
+	assert.ErrorContains(t, err, "couldn't parse "+path)
+	content, readErr := os.ReadFile(path)
+	assert.NoError(t, readErr)
+	assert.Equal(t, existing, string(content))
+}
+
+func TestStoreTokenFailsWhenConfigCannotBeRead(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("GH_CONFIG_DIR", dir)
+	assert.NoError(t, os.Mkdir(filepath.Join(dir, "hosts.yml"), 0o700))
+
+	assert.Error(t, StoreToken("github.com", "octocat", "gho_new"))
+}
+
 func TestSupportsDeviceLogin(t *testing.T) {
 	assert.True(t, SupportsDeviceLogin("github.com"))
+	assert.True(t, SupportsDeviceLogin("GitHub.com"))
+	assert.True(t, SupportsDeviceLogin("acme.ghe.com"))
 	assert.False(t, SupportsDeviceLogin("git.acme.com"))
+	assert.False(t, SupportsDeviceLogin("git.acme.com:8443"))
 }
