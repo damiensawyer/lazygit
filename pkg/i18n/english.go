@@ -882,6 +882,7 @@ type TranslationSet struct {
 	CopiedToClipboard                        string
 	ErrCannotEditDirectory                   string
 	ErrCannotCopyContentOfDirectory          string
+	ErrCannotCopyContentOfSubmodule          string
 	ErrStageDirWithInlineMergeConflicts      string
 	ErrRepositoryMovedOrDeleted              string
 	ErrWorktreeMovedOrRemoved                string
@@ -2301,6 +2302,7 @@ func EnglishTranslationSet() *TranslationSet {
 		CopiedToClipboard:                        "copied to clipboard",
 		ErrCannotEditDirectory:                   "Cannot edit directories: you can only edit individual files",
 		ErrCannotCopyContentOfDirectory:          "Cannot copy content of directories: you can only copy content of individual files",
+		ErrCannotCopyContentOfSubmodule:          "Cannot copy content of a submodule",
 		ErrStageDirWithInlineMergeConflicts:      "Cannot stage/unstage directory containing files with inline merge conflicts. Please fix up the merge conflicts first",
 		ErrRepositoryMovedOrDeleted:              "Cannot find repo. It might have been moved or deleted ¯\\_(ツ)_/¯",
 		CommandLog:                               "Command log",

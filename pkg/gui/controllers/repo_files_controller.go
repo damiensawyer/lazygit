@@ -279,6 +279,9 @@ func (self *RepoFilesController) canCopyContent(node *filetree.RepoFileNode) *ty
 			ShowErrorInPanel: true,
 		}
 	}
+	if node.File.IsSubmodule() {
+		return &types.DisabledReason{Text: self.c.Tr.ErrCannotCopyContentOfSubmodule}
+	}
 	return nil
 }
 
