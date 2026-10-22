@@ -381,9 +381,13 @@ func (self *RepoFilesController) saveNode(node *filetree.RepoFileNode, targetPat
 			if leaf.File.IsSubmodule() {
 				continue
 			}
+			relPath, err := filepath.Rel(filepath.FromSlash(node.GetPath()), filepath.FromSlash(leaf.File.Path))
+			if err != nil {
+				return err
+			}
 			filesToSave = append(filesToSave, fileToSave{
 				srcPath: leaf.File.Path,
-				dstPath: targetPath + strings.TrimPrefix(leaf.File.Path, node.GetPath()),
+				dstPath: filepath.Join(targetPath, relPath),
 			})
 		}
 	}

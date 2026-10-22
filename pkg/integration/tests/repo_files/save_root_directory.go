@@ -40,11 +40,7 @@ var SaveRootDirectory = NewIntegrationTest(NewIntegrationTestArgs{
 		t.ExpectToast(Equals("Saved to 'out'"))
 
 		t.FileSystem().
-			/* EXPECTED:
 			FileContent("out/a.txt", Equals("a\n")).
 			FileContent("out/dir/b.txt", Equals("b\n"))
-			ACTUAL: */
-			FileContent("outa.txt", Equals("a\n")).
-			FileContent("outdir/b.txt", Equals("b\n"))
 	},
 })
