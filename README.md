@@ -1,7 +1,3 @@
-<p align="center">
-  <img width="536" src="https://user-images.githubusercontent.com/8456633/174470852-339b5011-5800-4bb9-a628-ff230aa8cd4e.png">
-</p>
-
 <div align="center">
 
 A simple terminal UI for git commands — with GitHub Actions, a repo-files browser, and more
@@ -12,7 +8,6 @@ A simple terminal UI for git commands — with GitHub Actions, a repo-files brow
 ## Why this fork
 
 The upstream [lazygit](https://github.com/jesseduffield/lazygit) repository stopped accepting pull requests. This fork preserves the upstream codebase and adds features that the upstream maintainers declined to merge. It stays in sync with upstream's `master` branch — you can merge upstream changes in whenever you want.
-
 
 ## What's different from upstream
 
@@ -100,7 +95,6 @@ Confirmation popups can now choose what their copy keybinding copies — for exa
 - [Contributing](#contributing)
 - [FAQ](#faq)
 - [Alternatives](#alternatives)
-
 
 ## Features
 
@@ -293,7 +287,7 @@ sudo dnf copr enable dejan/lazygit
 sudo dnf install lazygit
 ```
 
-These packages are built using the RPM spec file located here: https://codeberg.org/dejan/rpm-lazygit
+These packages are built using the RPM spec file located here: <https://codeberg.org/dejan/rpm-lazygit>
 
 You should be able to build RPMs for Fedora 41 or older, and other Fedora derivatives using the
 SRPM (Source RPM) file that you can grab from the latest COPR build.
@@ -520,7 +514,7 @@ You can also use `go run main.go` to compile and run in one go (pun definitely i
 Call `lazygit` in your terminal inside a git repository.
 
 ```sh
-$ lazygit
+lazygit
 ```
 
 If you want, you can
@@ -576,6 +570,7 @@ Lazygit supports [Gitflow](https://github.com/nvie/gitflow) (or [git-flow-next](
 ## Contributing
 
 Check out the [contributing guide](CONTRIBUTING.md).
+
 ### Debugging Locally
 
 Run `lazygit --debug` in one terminal tab and `lazygit --logs` in another to view the program and its log output side by side
