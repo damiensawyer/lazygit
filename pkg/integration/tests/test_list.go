@@ -344,6 +344,7 @@ var tests = []*components.IntegrationTest{
 	filter_by_path.ShowDiffsForRenamedFile,
 	filter_by_path.TypeFile,
 	github_actions.CancelRun,
+	github_actions.CopyRunToClipboard,
 	github_actions.DeleteRun,
 	github_actions.DownloadArtifacts,
 	github_actions.EnableAndDisableWorkflow,
