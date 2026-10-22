@@ -347,6 +347,7 @@ var tests = []*components.IntegrationTest{
 	github_actions.ListRuns,
 	github_actions.OpenLogInEditor,
 	github_actions.OpenWithoutGithubRemote,
+	github_actions.RerunJob,
 	github_actions.RerunRun,
 	github_actions.ViewJobsAndSteps,
 	interactive_rebase.AdvancedInteractiveRebase,
