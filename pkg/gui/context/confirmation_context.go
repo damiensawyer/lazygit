@@ -14,6 +14,9 @@ type ConfirmationContext struct {
 type ConfirmationContextState struct {
 	OnConfirm func() error
 	OnClose   func() error
+	// Text placed on the clipboard by the popup's copy-to-clipboard
+	// keybinding. When empty, that keybinding copies the popup's whole text.
+	CopyableText string
 }
 
 var _ types.Context = (*ConfirmationContext)(nil)

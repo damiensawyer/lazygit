@@ -61,8 +61,12 @@ func (self *ConfirmationController) context() *context.ConfirmationContext {
 }
 
 func (self *ConfirmationController) handleCopyToClipboard() error {
-	confirmationView := self.c.Views().Confirmation
-	text := confirmationView.Buffer()
+	// popups can name the text worth copying (e.g. a device-login code);
+	// otherwise fall back to the whole popup text
+	text := self.context().State.CopyableText
+	if text == "" {
+		text = self.c.Views().Confirmation.Buffer()
+	}
 	if err := self.c.OS().CopyToClipboard(text); err != nil {
 		return err
 	}

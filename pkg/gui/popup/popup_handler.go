@@ -111,6 +111,7 @@ func (self *PopupHandler) Confirm(opts types.ConfirmOpts) {
 	self.createPopupPanelFn(context.Background(), types.CreatePopupPanelOpts{
 		Title:         opts.Title,
 		Prompt:        opts.Prompt,
+		CopyableText:  opts.CopyableText,
 		HandleConfirm: opts.HandleConfirm,
 		HandleClose:   opts.HandleClose,
 	})
@@ -121,6 +122,7 @@ func (self *PopupHandler) ConfirmIf(condition bool, opts types.ConfirmOpts) erro
 		self.createPopupPanelFn(context.Background(), types.CreatePopupPanelOpts{
 			Title:         opts.Title,
 			Prompt:        opts.Prompt,
+			CopyableText:  opts.CopyableText,
 			HandleConfirm: opts.HandleConfirm,
 			HandleClose:   opts.HandleClose,
 		})

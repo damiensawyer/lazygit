@@ -247,6 +247,7 @@ func (self *ConfirmationHelper) setConfirmationKeyBindings(cancel goContext.Canc
 
 	self.c.Contexts().Confirmation.State.OnConfirm = onConfirm
 	self.c.Contexts().Confirmation.State.OnClose = onClose
+	self.c.Contexts().Confirmation.State.CopyableText = opts.CopyableText
 }
 
 func (self *ConfirmationHelper) setPromptKeyBindings(cancel goContext.CancelFunc, opts types.CreatePopupPanelOpts) {
@@ -284,6 +285,7 @@ func (self *ConfirmationHelper) clearConfirmationViewKeyBindings() {
 	noop := func() error { return nil }
 	self.c.Contexts().Confirmation.State.OnConfirm = noop
 	self.c.Contexts().Confirmation.State.OnClose = noop
+	self.c.Contexts().Confirmation.State.CopyableText = ""
 }
 
 func (self *ConfirmationHelper) clearPromptViewKeyBindings() {
