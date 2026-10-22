@@ -1,15 +1,17 @@
 package helpers
 
 import (
-	"context"
+	goContext "context"
 	"errors"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/jesseduffield/lazygit/pkg/commands/github_commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
 	"github.com/jesseduffield/lazygit/pkg/gocui"
+	"github.com/jesseduffield/lazygit/pkg/gui/context"
 	"github.com/jesseduffield/lazygit/pkg/gui/style"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
 	"github.com/jesseduffield/lazygit/pkg/utils"
@@ -236,8 +238,86 @@ func (self *GithubActionsHelper) handleError(err error) error {
 }
 
 func (self *GithubActionsHelper) updateTitle() {
-	self.c.Views().GithubRuns.Title = utils.ResolvePlaceholderString(self.c.Tr.GithubActions.RunsTitleForRepo, map[string]string{
+	title := utils.ResolvePlaceholderString(self.c.Tr.GithubActions.RunsTitleForRepo, map[string]string{
 		"repo": self.client.Repo().FullName(),
+	})
+	if description := self.describeRunsFilter(); description != "" {
+		title += " · " + description
+	}
+	self.c.Views().GithubRuns.Title = title
+}
+
+func (self *GithubActionsHelper) describeRunsFilter() string {
+	tr := self.c.Tr.GithubActions
+	filter := self.c.Contexts().GithubRuns.GetRunsFilter()
+
+	parts := []string{}
+	add := func(template string, value string) {
+		if value != "" {
+			parts = append(parts, utils.ResolvePlaceholderString(template, map[string]string{"value": value}))
+		}
+	}
+	if filter.Workflow != nil {
+		add(tr.FilterDescriptionWorkflow, filter.Workflow.Name)
+	}
+	add(tr.FilterDescriptionBranch, filter.Branch)
+	if status, found := lo.Find(self.RunStatusFilters(), func(status GithubRunStatusFilter) bool {
+		return status.Value == filter.Status
+	}); found && filter.Status != "" {
+		add(tr.FilterDescriptionStatus, status.Label)
+	}
+	add(tr.FilterDescriptionEvent, filter.Event)
+	add(tr.FilterDescriptionCommit, utils.ShortHash(filter.HeadSha))
+	return strings.Join(parts, ", ")
+}
+
+// GithubRunStatusFilter is a value of the runs API's status parameter, which
+// takes conclusions as well as statuses.
+type GithubRunStatusFilter struct {
+	Value string
+	Label string
+}
+
+func (self *GithubActionsHelper) RunStatusFilters() []GithubRunStatusFilter {
+	tr := self.c.Tr.GithubActions
+	return []GithubRunStatusFilter{
+		{models.GithubConclusionFailure, tr.StatusFailure},
+		{"in_progress", tr.StatusInProgress},
+		{models.GithubStatusQueued, tr.StatusQueued},
+		{models.GithubConclusionActionRequired, tr.StatusActionRequired},
+		{models.GithubConclusionSuccess, tr.StatusSuccess},
+		{models.GithubConclusionCancelled, tr.StatusCancelled},
+	}
+}
+
+// SetRunsFilter changes which runs are shown, and reloads them.
+func (self *GithubActionsHelper) SetRunsFilter(filter context.GithubRunsFilter) error {
+	runsContext := self.c.Contexts().GithubRuns
+	runsContext.SetRunsFilter(filter)
+	self.updateTitle()
+	return self.c.WithWaitingStatus(self.c.Tr.GithubActions.LoadingRuns, func(gocui.Task) error {
+		return self.loadRuns(false, func() {
+			runsContext.SetSelection(0)
+			self.c.PostRefreshUpdate(runsContext)
+		})
+	})
+}
+
+// WithWorkflows loads the repository's workflows and passes them to f on the
+// UI thread.
+func (self *GithubActionsHelper) WithWorkflows(f func(workflows []*models.GithubWorkflow) error) error {
+	return self.withClient(func() error {
+		client := self.client
+		return self.c.WithWaitingStatus(self.c.Tr.GithubActions.LoadingWorkflows, func(gocui.Task) error {
+			workflows, err := client.ListWorkflows(goContext.Background())
+			self.c.OnUIThread(func() error {
+				if err != nil {
+					return self.handleError(err)
+				}
+				return f(workflows)
+			})
+			return nil
+		})
 	})
 }
 
@@ -248,7 +328,18 @@ func (self *GithubActionsHelper) loadRuns(background bool, then func()) error {
 	client := self.client
 	generation := self.c.State().GetRepoGeneration()
 
-	runs, err := client.ListRuns(context.Background(), github_commands.ListRunsOptions{Limit: githubRunsLimit})
+	filter := self.c.Contexts().GithubRuns.GetRunsFilter()
+	opts := github_commands.ListRunsOptions{
+		Branch:  filter.Branch,
+		Status:  filter.Status,
+		Event:   filter.Event,
+		HeadSha: filter.HeadSha,
+		Limit:   githubRunsLimit,
+	}
+	if filter.Workflow != nil {
+		opts.WorkflowId = filter.Workflow.WorkflowId
+	}
+	runs, err := client.ListRuns(goContext.Background(), opts)
 
 	onUIThread := self.c.OnUIThread
 	if background {
@@ -346,11 +437,11 @@ func (self *GithubActionsHelper) reloadChangedDetails() {
 
 // RunAction performs an action on the repository's runs, like cancelling one,
 // and then reloads the runs to show its effect.
-func (self *GithubActionsHelper) RunAction(waitingStatus string, doneToast string, action func(ctx context.Context, client *github_commands.Client) error) error {
+func (self *GithubActionsHelper) RunAction(waitingStatus string, doneToast string, action func(ctx goContext.Context, client *github_commands.Client) error) error {
 	return self.withClient(func() error {
 		client := self.client
 		return self.c.WithWaitingStatus(waitingStatus, func(gocui.Task) error {
-			if err := action(context.Background(), client); err != nil {
+			if err := action(goContext.Background(), client); err != nil {
 				self.c.OnUIThread(func() error { return self.handleError(err) })
 				return nil
 			}
@@ -526,7 +617,7 @@ func (self *GithubActionsHelper) loadRunDetailsInBackground(run *models.GithubRu
 func loadRunDetails(client *github_commands.Client, run *models.GithubRun) *GithubRunDetails {
 	details := &GithubRunDetails{updatedAt: run.UpdatedAt, Annotations: map[int64][]*models.GithubAnnotation{}}
 
-	ctx := context.Background()
+	ctx := goContext.Background()
 	details.Jobs, details.Err = client.ListJobs(ctx, run.RunId)
 	if details.Err != nil {
 		return details
@@ -586,7 +677,7 @@ func (self *GithubActionsHelper) GetJobLog(job *models.GithubJob) *GithubJobLog 
 }
 
 func loadJobLog(client *github_commands.Client, job *models.GithubJob) *GithubJobLog {
-	ctx := context.Background()
+	ctx := goContext.Background()
 	log, err := client.GetJobLog(ctx, job.JobId)
 	if err != nil {
 		return &GithubJobLog{Err: err}

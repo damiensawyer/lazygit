@@ -18,6 +18,7 @@ type ListRunsOptions struct {
 	// One of the statuses or conclusions the API accepts, e.g. "failure" or
 	// "in_progress".
 	Status  string
+	Event   string
 	HeadSha string
 	Limit   int
 }
@@ -40,6 +41,9 @@ func (self *Client) ListRuns(ctx context.Context, opts ListRunsOptions) ([]*mode
 	}
 	if opts.Status != "" {
 		query.Set("status", opts.Status)
+	}
+	if opts.Event != "" {
+		query.Set("event", opts.Event)
 	}
 	if opts.HeadSha != "" {
 		query.Set("head_sha", opts.HeadSha)

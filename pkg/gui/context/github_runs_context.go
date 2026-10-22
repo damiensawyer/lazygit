@@ -14,6 +14,22 @@ import (
 type GithubRunsContext struct {
 	*FilteredListViewModel[*models.GithubRun]
 	*ListContextTrait
+
+	runsFilter GithubRunsFilter
+}
+
+// GithubRunsFilter narrows down which runs are loaded. Zero values mean
+// "don't filter by this".
+type GithubRunsFilter struct {
+	Branch   string
+	Status   string
+	Event    string
+	HeadSha  string
+	Workflow *models.GithubWorkflow
+}
+
+func (self GithubRunsFilter) IsActive() bool {
+	return self != GithubRunsFilter{}
 }
 
 var _ types.IListContext = (*GithubRunsContext)(nil)
@@ -53,4 +69,12 @@ func NewGithubRunsContext(c *ContextCommon) *GithubRunsContext {
 			c: c,
 		},
 	}
+}
+
+func (self *GithubRunsContext) GetRunsFilter() GithubRunsFilter {
+	return self.runsFilter
+}
+
+func (self *GithubRunsContext) SetRunsFilter(filter GithubRunsFilter) {
+	self.runsFilter = filter
 }

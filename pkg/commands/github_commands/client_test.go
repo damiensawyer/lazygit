@@ -76,11 +76,11 @@ func TestListRuns(t *testing.T) {
 func TestListRunsForWorkflow(t *testing.T) {
 	client, requests := newTestClient(t, http.StatusOK, `{"workflow_runs": []}`)
 
-	_, err := client.ListRuns(context.Background(), ListRunsOptions{WorkflowId: 7, Status: "failure"})
+	_, err := client.ListRuns(context.Background(), ListRunsOptions{WorkflowId: 7, Status: "failure", Event: "push"})
 	assert.NoError(t, err)
 
 	assert.Equal(t, "/repos/owner/repo/actions/workflows/7/runs", (*requests)[0].path)
-	assert.Equal(t, "per_page=100&status=failure", (*requests)[0].query)
+	assert.Equal(t, "event=push&per_page=100&status=failure", (*requests)[0].query)
 }
 
 func TestListJobsFollowsPages(t *testing.T) {

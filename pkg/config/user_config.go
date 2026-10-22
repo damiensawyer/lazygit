@@ -677,6 +677,7 @@ type KeybindingGithubActionsConfig struct {
 	OpenInBrowser Keybinding `yaml:"openInBrowser"`
 	Rerun         Keybinding `yaml:"rerun"`
 	CancelRun     Keybinding `yaml:"cancelRun"`
+	FilterRuns    Keybinding `yaml:"filterRuns"`
 }
 
 type KeybindingCommitFilesConfig struct {
@@ -1211,6 +1212,7 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 				OpenInBrowser: Keybinding{"o"},
 				Rerun:         Keybinding{"r"},
 				CancelRun:     Keybinding{"c"},
+				FilterRuns:    Keybinding{"f"},
 			},
 			RepoFiles: KeybindingRepoFilesConfig{
 				Restore:  Keybinding{"c"},

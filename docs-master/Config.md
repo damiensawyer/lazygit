@@ -856,6 +856,7 @@ keybinding:
     openInBrowser: o
     rerun: r
     cancelRun: c
+    filterRuns: f
 ```
 <!-- END CONFIG YAML -->
 

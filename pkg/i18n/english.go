@@ -1130,6 +1130,34 @@ type GithubActions struct {
 	DeleteRunPrompt            string
 	DeletingRun                string
 	RunDeleted                 string
+	LoadingWorkflows           string
+	FilterDescriptionWorkflow  string
+	FilterDescriptionBranch    string
+	FilterDescriptionStatus    string
+	FilterDescriptionEvent     string
+	FilterDescriptionCommit    string
+	FilterRuns                 string
+	FilterRunsTooltip          string
+	FilterByCurrentBranch      string
+	FilterByBranch             string
+	FilterBranchPrompt         string
+	FilterByStatus             string
+	FilterByWorkflow           string
+	FilterByEvent              string
+	FilterBySelectedCommit     string
+	NoCommitSelected           string
+	ClearRunsFilter            string
+	AnyStatus                  string
+	AnyWorkflow                string
+	AnyEvent                   string
+	StatusFailure              string
+	StatusSuccess              string
+	StatusInProgress           string
+	StatusQueued               string
+	StatusCancelled            string
+	StatusActionRequired       string
+	NotOnABranch               string
+	NoRunsFilter               string
 }
 
 type Actions struct {
@@ -2532,6 +2560,34 @@ func EnglishTranslationSet() *TranslationSet {
 			DeleteRunPrompt:            "Delete {{.workflow}} #{{.number}} ({{.title}}) along with its logs and artifacts? This cannot be undone.",
 			DeletingRun:                "Deleting run",
 			RunDeleted:                 "Run deleted",
+			LoadingWorkflows:           "Loading workflows",
+			FilterDescriptionWorkflow:  "{{.value}}",
+			FilterDescriptionBranch:    "branch {{.value}}",
+			FilterDescriptionStatus:    "{{.value}}",
+			FilterDescriptionEvent:     "on {{.value}}",
+			FilterDescriptionCommit:    "commit {{.value}}",
+			FilterRuns:                 "Filter runs",
+			FilterRunsTooltip:          "Only show the runs of a branch, a workflow, a commit, with a status, or triggered by an event, like the flags of `gh run list` do.",
+			FilterByCurrentBranch:      "Runs on the current branch ({{.branch}})",
+			FilterByBranch:             "Runs on branch",
+			FilterBranchPrompt:         "Branch",
+			FilterByStatus:             "Runs with status",
+			FilterByWorkflow:           "Runs of workflow",
+			FilterByEvent:              "Runs triggered by",
+			FilterBySelectedCommit:     "Runs for the commit selected in the commits panel ({{.hash}})",
+			NoCommitSelected:           "No commit is selected in the commits panel",
+			ClearRunsFilter:            "Show all runs",
+			AnyStatus:                  "Any status",
+			AnyWorkflow:                "Any workflow",
+			AnyEvent:                   "Any event",
+			StatusFailure:              "Failed",
+			StatusSuccess:              "Succeeded",
+			StatusInProgress:           "In progress",
+			StatusQueued:               "Queued",
+			StatusCancelled:            "Cancelled",
+			StatusActionRequired:       "Waiting for approval",
+			NotOnABranch:               "HEAD is detached, so there is no current branch",
+			NoRunsFilter:               "The runs aren't filtered",
 		},
 		BreakingChangesTitle: "Breaking Changes",
 		BreakingChangesMessage: `You are updating to a new version of lazygit which contains breaking changes. Please review the notes below and update your configuration if necessary.
