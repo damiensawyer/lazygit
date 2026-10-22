@@ -47,6 +47,12 @@ type RepoFileTree struct {
 	textFilter     string
 	useFuzzySearch bool
 
+	// While a filter is active, collapsedPaths holds the collapse state of
+	// the filtered tree, which starts out fully expanded so that the matches
+	// show; this holds the collapse state to return to once the filter is
+	// cleared.
+	unfilteredCollapsedPaths *CollapsedPaths
+
 	flattened []FlattenedRepoFileNode
 }
 
@@ -138,6 +144,14 @@ func (self *RepoFileTree) SetTree() {
 }
 
 func (self *RepoFileTree) SetTextFilter(filter string, useFuzzySearch bool) {
+	if filter != "" && self.textFilter == "" {
+		self.unfilteredCollapsedPaths = self.collapsedPaths
+		self.collapsedPaths = NewCollapsedPaths()
+	} else if filter == "" && self.textFilter != "" {
+		self.collapsedPaths = self.unfilteredCollapsedPaths
+		self.unfilteredCollapsedPaths = nil
+	}
+
 	self.textFilter = filter
 	self.useFuzzySearch = useFuzzySearch
 	self.SetTree()

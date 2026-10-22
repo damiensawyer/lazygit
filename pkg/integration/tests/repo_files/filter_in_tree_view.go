@@ -33,14 +33,10 @@ var FilterInTreeView = NewIntegrationTest(NewIntegrationTestArgs{
 			FilterOrSearch("apple").
 			Lines(
 				Equals("▼ /").IsSelected(),
-				/* EXPECTED:
 				Equals("  ▼ dir1"),
 				Equals("    apple.txt"),
 				Equals("  ▼ dir2"),
 				Equals("    apple-pie.txt"),
-				ACTUAL: */
-				Equals("  ▶ dir1"),
-				Equals("  ▶ dir2"),
 			)
 	},
 })

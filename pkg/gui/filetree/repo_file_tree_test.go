@@ -720,18 +720,12 @@ func TestRepoFileTreeViewModelClearFilterExpandsCollapsedParents(t *testing.T) {
 	viewModel.SetFilter("cherry", false)
 	viewModel.SelectPath("dir2/sub/cherry", true)
 	assert.Equal(t,
-		/* EXPECTED:
 		"dir2/sub/cherry",
-		ACTUAL: */
-		"dir2/sub",
 		viewModel.GetSelectedPath())
 
 	viewModel.ClearFilter()
 	assert.Equal(t,
-		/* EXPECTED:
 		"dir2/sub/cherry",
-		ACTUAL: */
-		"dir2/sub",
 		viewModel.GetSelectedPath())
 	assert.False(t, viewModel.IsCollapsed("./dir2"))
 	assert.False(t, viewModel.IsCollapsed("./dir2/sub"))
