@@ -96,6 +96,31 @@ func TestPullRequestMutations(t *testing.T) {
 			expectedVariables: map[string]any{"input": map[string]any{"pullRequestReviewId": "R_1", "event": "REQUEST_CHANGES", "body": "Please fix"}},
 		},
 		{
+			name: "comment on a range of lines",
+			call: func(client *Client) error {
+				return client.AddReviewComment(context.Background(), "R_1", ReviewComment{
+					Path: "a.go", Side: "RIGHT", Line: 9, StartLine: 7, StartSide: "RIGHT", Body: "Why?",
+				})
+			},
+			expectedOperation: "PullRequestReviewThreadAdd",
+			expectedVariables: map[string]any{"input": map[string]any{
+				"pullRequestReviewId": "R_1", "path": "a.go", "side": "RIGHT", "line": float64(9),
+				"startLine": float64(7), "startSide": "RIGHT", "body": "Why?",
+			}},
+		},
+		{
+			name: "comment on one line",
+			call: func(client *Client) error {
+				return client.AddReviewComment(context.Background(), "R_1", ReviewComment{
+					Path: "a.go", Side: "LEFT", Line: 3, StartLine: 3, StartSide: "LEFT", Body: "Gone?",
+				})
+			},
+			expectedOperation: "PullRequestReviewThreadAdd",
+			expectedVariables: map[string]any{"input": map[string]any{
+				"pullRequestReviewId": "R_1", "path": "a.go", "side": "LEFT", "line": float64(3), "body": "Gone?",
+			}},
+		},
+		{
 			name:              "discard pending review",
 			call:              func(client *Client) error { return client.DeletePendingReview(context.Background(), "R_1") },
 			expectedOperation: "PullRequestReviewDelete",
@@ -126,4 +151,11 @@ func TestDeleteBranch(t *testing.T) {
 	assert.NoError(t, client.DeleteBranch(context.Background(), "feature/a b"))
 	assert.Equal(t, "DELETE", (*requests)[0].method)
 	assert.Equal(t, "/repos/owner/repo/git/refs/heads/feature/a b", (*requests)[0].path)
+}
+
+func TestStartPendingReview(t *testing.T) {
+	client, _ := newTestClient(t, http.StatusOK, `{"data": {"addPullRequestReview": {"pullRequestReview": {"id": "R_9"}}}}`)
+	id, err := client.StartPendingReview(context.Background(), "PR_1")
+	assert.NoError(t, err)
+	assert.Equal(t, "R_9", id)
 }

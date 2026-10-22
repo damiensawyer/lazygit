@@ -92,6 +92,22 @@ it as a draft. If the branch hasn't been pushed, or has commits that
 haven't, it is pushed first: to the remote it tracks, or if it doesn't track
 one, to `origin`, setting it up to track the branch there.
 
+## Commenting on lines
+
+In the focused main view, select lines of the diff of a pull request (with
+`v`, or by dragging) and press `r` to comment on them. The comment goes into
+your pending review of the pull request, which is started if you haven't
+one, the way GitHub's "Start a review" does; nobody sees it until you submit
+the review, with `r` in the pull requests panel, approving, requesting
+changes, or just commenting. The main view of the pull request says when you
+have a pending review, and how many comments are in it.
+
+GitHub places a comment on a line of the pull request's diff as a whole, so
+this works on the diff of all of a pull request's commits up to its latest
+one: entered from the pull requests panel, the diff of its single commit or
+of the range of all of them; or the same from the commits panel when its
+branch is checked out and pushed.
+
 ## Writing comments
 
 Comments, and the bodies of reviews, are written in the commit message

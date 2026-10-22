@@ -80,6 +80,10 @@ func (self *FakeGithub) serveGraphQL(w http.ResponseWriter, body []byte) {
 			return
 		}
 		writeJSON(w, map[string]any{"data": self.pullRequestDetailsData(pr)})
+	case "PullRequestReviewStart":
+		writeJSON(w, map[string]any{"data": map[string]any{
+			"addPullRequestReview": map[string]any{"pullRequestReview": map[string]any{"id": "PRR_1"}},
+		}})
 	default:
 		writeJSON(w, map[string]any{"data": map[string]any{}})
 	}

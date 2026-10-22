@@ -155,6 +155,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` N `` | Go to previous file |  |
 | `` n `` | Go to next file |  |
 | `` <ctrl+g> `` | Jump to file |  |
+| `` r `` | Comment on the selected lines in the pull request | Write a comment on the selected lines of the diff, adding it to your pending review of the pull request, which is started if you haven't one. The comments are published when you submit the review (with the review key in the pull requests panel). This needs the diff of the whole pull request as GitHub has it: all of its commits, up to its latest. |
 | `` G `` | Open pull request at selected line | Open the branch's pull request in your browser, at the line the selection is on, so that you can comment on it there. Only pull requests on GitHub are found. |
 | `` <esc> `` | 退出回到側邊面板 |  |
 | `` c `` | 提交變更 | 提交暫存區變更 |
@@ -438,6 +439,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` N `` | Go to previous file |  |
 | `` n `` | Go to next file |  |
 | `` <ctrl+g> `` | Jump to file |  |
+| `` r `` | Comment on the selected lines in the pull request | Write a comment on the selected lines of the diff, adding it to your pending review of the pull request, which is started if you haven't one. The comments are published when you submit the review (with the review key in the pull requests panel). This needs the diff of the whole pull request as GitHub has it: all of its commits, up to its latest. |
 | `` G `` | Open pull request at selected line | Open the branch's pull request in your browser, at the line the selection is on, so that you can comment on it there. Only pull requests on GitHub are found. |
 | `` <esc> `` | 退出回到側邊面板 |  |
 | `` c `` | 提交變更 | 提交暫存區變更 |

@@ -729,6 +729,7 @@ type KeybindingRepoFilesConfig struct {
 }
 
 type KeybindingMainConfig struct {
+	AddReviewComment Keybinding `yaml:"addReviewComment"`
 	PrevHunk         Keybinding `yaml:"prevHunk"`
 	NextHunk         Keybinding `yaml:"nextHunk"`
 	PrevFile         Keybinding `yaml:"prevFile"`
@@ -1280,6 +1281,7 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 				SaveFile: Keybinding{"S"},
 			},
 			Main: KeybindingMainConfig{
+				AddReviewComment: Keybinding{"r"},
 				PrevHunk:         Keybinding{"<left>", "h"},
 				NextHunk:         Keybinding{"<right>", "l"},
 				PrevFile:         Keybinding{"N"},

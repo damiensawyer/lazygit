@@ -170,6 +170,13 @@ func (self *MainViewController) GetKeybindings(opts types.KeybindingsOpts) []*ty
 			DisplayOnScreen:   true,
 		},
 		{
+			Keys:              opts.GetKeys(opts.Config.Main.AddReviewComment),
+			Handler:           self.addReviewComment,
+			Description:       self.c.Tr.PullRequests.AddReviewComment,
+			Tooltip:           self.c.Tr.PullRequests.AddReviewCommentTooltip,
+			GetDisabledReason: self.reviewCommentDisabledReason,
+		},
+		{
 			Keys:              opts.GetKeys(opts.Config.Commits.OpenPullRequestInBrowser),
 			Handler:           self.openPullRequestAtSelectedLine,
 			Description:       self.c.Tr.OpenPullRequestAtSelectedLine,

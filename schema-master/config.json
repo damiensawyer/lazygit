@@ -2576,6 +2576,20 @@
     },
     "KeybindingMainConfig": {
       "properties": {
+        "addReviewComment": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "r"
+        },
         "prevHunk": {
           "oneOf": [
             {

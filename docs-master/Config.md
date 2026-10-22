@@ -883,6 +883,7 @@ keybinding:
     restore: c
     saveFile: S
   main:
+    addReviewComment: r
     prevHunk: [<left>, h]
     nextHunk: [<right>, l]
     prevFile: "N"

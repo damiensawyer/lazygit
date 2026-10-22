@@ -1341,6 +1341,15 @@ type PullRequests struct {
 	ChecksTitle                      string
 	ViewChecks                       string
 	ViewChecksTooltip                string
+	AddReviewComment                 string
+	AddReviewCommentTooltip          string
+	CommentNeedsWholePullRequest     string
+	CommentNeedsLatestCommit         string
+	CommentNeedsDiffLines            string
+	CommentNeedsOneFile              string
+	ReviewCommentTitle               string
+	AddingReviewComment              string
+	ReviewCommentAdded               string
 }
 
 type GithubActions struct {
@@ -3110,6 +3119,15 @@ func EnglishTranslationSet() *TranslationSet {
 			ChecksTitle:                      "Checks of #{{.number}}",
 			ViewChecks:                       "View checks",
 			ViewChecksTooltip:                "List the pull request's checks, failing ones first, like `gh pr checks` does. A GitHub Actions job opens in the GitHub Actions view, at its log; any other check opens in the browser. Failed GitHub Actions jobs can be re-run from here.",
+			AddReviewComment:                 "Comment on the selected lines in the pull request",
+			AddReviewCommentTooltip:          "Write a comment on the selected lines of the diff, adding it to your pending review of the pull request, which is started if you haven't one. The comments are published when you submit the review (with the review key in the pull requests panel). This needs the diff of the whole pull request as GitHub has it: all of its commits, up to its latest.",
+			CommentNeedsWholePullRequest:     "Comments go on the diff of the whole pull request: select all of its commits, from its first.",
+			CommentNeedsLatestCommit:         "Comments go on the diff of the whole pull request as GitHub has it, up to its latest commit {{.head}}; fetch or push to bring the diff up to date.",
+			CommentNeedsDiffLines:            "Select lines of the diff, not a file's or hunk's header.",
+			CommentNeedsOneFile:              "Select lines of one file.",
+			ReviewCommentTitle:               "Comment on {{.path}}:{{.lines}}",
+			AddingReviewComment:              "Adding comment…",
+			ReviewCommentAdded:               "Added the comment to your pending review",
 		},
 		GithubActions: GithubActions{
 			LoginTitle:                         "Log in to {{.host}}",

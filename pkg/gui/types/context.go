@@ -251,6 +251,11 @@ type PullRequestDiff struct {
 	// oldest of the commits, where the pull request has that parent as one of its own
 	// commits, and "" where the diff starts where the pull request itself does.
 	BaseHash string
+
+	// PullRequestNumber identifies the pull request where the commits are those of a
+	// pull request that was entered from the pull requests panel rather than from a
+	// local branch; Branch is "" then.
+	PullRequestNumber int
 }
 
 // BranchDiffContext is implemented by the side panel contexts that show, in their

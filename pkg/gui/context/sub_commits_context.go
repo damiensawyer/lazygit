@@ -38,16 +38,45 @@ func (self *SubCommitsContext) GetDiffMainViewType() types.DiffMainViewType {
 // branches. The panel is also entered from a tag, a remote branch and the reflog, none of
 // which a pull request is made from.
 func (self *SubCommitsContext) PullRequestDiff() types.PullRequestDiff {
-	branch, ok := self.GetRef().(*models.Branch)
-	if !ok {
-		return types.PullRequestDiff{}
-	}
-
 	_, selectionStart, selectionEnd := self.GetSelectedItems()
 	startIdx, endIdx := commitRangeShownInDiff(
 		selectionStart, selectionEnd, self.GetSelectedLineIdx(), self.GetSelectedRefRangeForDiffFiles())
-	return pullRequestDiff(
-		self.GetCommits(), startIdx, endIdx, branch.Name, self.c.Model().Branches, self.c.Model().PullRequestsMap)
+
+	switch ref := self.GetRef().(type) {
+	case *models.Branch:
+		return pullRequestDiff(
+			self.GetCommits(), startIdx, endIdx, ref.Name, self.c.Model().Branches, self.c.Model().PullRequestsMap)
+	case models.GithubPullRequestRef:
+		return pullRequestRefDiff(self.GetCommits(), startIdx, endIdx, ref.Number)
+	default:
+		return types.PullRequestDiff{}
+	}
+}
+
+// pullRequestRefDiff is the PullRequestDiff of the commits from startIdx to endIdx of
+// a pull request entered from the pull requests panel. Its commits are the ones at the
+// top of the list that its base branch doesn't have yet, which, its base branch being a
+// main branch, are the ones that aren't merged.
+func pullRequestRefDiff(commits []*models.Commit, startIdx int, endIdx int, number int) types.PullRequestDiff {
+	if startIdx < 0 || endIdx >= len(commits) {
+		return types.PullRequestDiff{}
+	}
+	diffCommits := commits[startIdx : endIdx+1]
+	if lo.SomeBy(diffCommits, func(commit *models.Commit) bool { return commit.Status == models.StatusMerged }) {
+		return types.PullRequestDiff{}
+	}
+
+	diff := types.PullRequestDiff{Commits: diffCommits, PullRequestNumber: number}
+	oldest := commits[endIdx]
+	if oldest.IsFirstCommit() {
+		return diff
+	}
+	parentHash := oldest.Parents()[0]
+	if parent, found := lo.Find(commits, func(commit *models.Commit) bool { return commit.Hash() == parentHash }); found &&
+		parent.Status != models.StatusMerged {
+		diff.BaseHash = parentHash
+	}
+	return diff
 }
 
 // BranchOfDiff is nil if the panel was entered from a tag, a remote branch or the
