@@ -372,13 +372,13 @@ func (self *RepoFilesController) openSaveMenu(node *filetree.RepoFileNode) error
 // Asks for confirmation if the target path already exists.
 func (self *RepoFilesController) saveNode(node *filetree.RepoFileNode, targetPath string) error {
 	type fileToSave struct {
-		srcPath string
+		file    *models.TreeFile
 		dstPath string
 	}
 
 	var filesToSave []fileToSave
 	if node.File != nil {
-		filesToSave = []fileToSave{{srcPath: node.GetPath(), dstPath: targetPath}}
+		filesToSave = []fileToSave{{file: node.File, dstPath: targetPath}}
 	} else {
 		for _, leaf := range node.GetLeaves() {
 			if leaf.File.IsSubmodule() {
@@ -389,7 +389,7 @@ func (self *RepoFilesController) saveNode(node *filetree.RepoFileNode, targetPat
 				return err
 			}
 			filesToSave = append(filesToSave, fileToSave{
-				srcPath: leaf.File.Path,
+				file:    leaf.File,
 				dstPath: filepath.Join(targetPath, relPath),
 			})
 		}
@@ -410,11 +410,7 @@ func (self *RepoFilesController) saveNode(node *filetree.RepoFileNode, targetPat
 		HandleConfirm: func() error {
 			self.c.LogAction(self.c.Tr.Actions.SaveFilesFromCommit)
 			for _, file := range filesToSave {
-				content, err := self.c.Git().Commit.GetFilteredFileContent(hash, file.srcPath)
-				if err != nil {
-					return err
-				}
-				if err := self.c.OS().CreateFileWithContent(file.dstPath, content); err != nil {
+				if err := self.saveFile(hash, file.file, file.dstPath); err != nil {
 					return err
 				}
 			}
@@ -426,6 +422,14 @@ func (self *RepoFilesController) saveNode(node *filetree.RepoFileNode, targetPat
 			return nil
 		},
 	})
+}
+
+func (self *RepoFilesController) saveFile(hash string, file *models.TreeFile, dstPath string) error {
+	content, err := self.c.Git().Commit.GetFilteredFileContent(hash, file.Path)
+	if err != nil {
+		return err
+	}
+	return self.c.OS().CreateFileWithContent(dstPath, content)
 }
 
 func (self *RepoFilesController) GetOnRenderToMain() func() {
