@@ -427,7 +427,7 @@ func (self *GithubRunsController) context() *context.GithubRunsContext {
 
 func (self *GithubRunsController) downloadArtifacts(run *models.GithubRun) error {
 	tr := self.c.Tr.GithubActions
-	client := self.c.Helpers().GithubActions.Client()
+	client := self.c.Helpers().GithubClient.Client()
 
 	return self.c.WithWaitingStatus(tr.LoadingArtifacts, func(gocui.Task) error {
 		artifacts, err := client.ListArtifacts(goContext.Background(), run.RunId)
@@ -483,7 +483,7 @@ func (self *GithubRunsController) promptForArtifactsDir(initialDir string, artif
 		FindSuggestionsFunc: self.c.Helpers().Suggestions.GetFilePathSuggestionsFunc(),
 		HandleConfirm: func(dir string) error {
 			dir = filepath.Join(self.c.Git().RepoPaths.WorktreePath(), dir)
-			client := self.c.Helpers().GithubActions.Client()
+			client := self.c.Helpers().GithubClient.Client()
 			return self.c.WithWaitingStatus(tr.DownloadingArtifacts, func(gocui.Task) error {
 				for _, artifact := range artifacts {
 					artifactDir := dir

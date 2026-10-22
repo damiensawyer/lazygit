@@ -55,6 +55,7 @@ type Helpers struct {
 	SubCommits        *SubCommitsHelper
 	FinalVersion      *FinalVersionHelper
 	GithubLogin       *GithubLoginHelper
+	GithubClient      *GithubClientHelper
 	GithubActions     *GithubActionsHelper
 }
 
@@ -95,6 +96,7 @@ func NewStubHelpers() *Helpers {
 		SubCommits:        &SubCommitsHelper{},
 		FinalVersion:      &FinalVersionHelper{},
 		GithubLogin:       &GithubLoginHelper{},
+		GithubClient:      &GithubClientHelper{},
 		GithubActions:     &GithubActionsHelper{},
 	}
 }

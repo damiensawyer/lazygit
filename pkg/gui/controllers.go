@@ -88,6 +88,7 @@ func (gui *Gui) resetHelpersAndControllers() {
 	)
 
 	githubLoginHelper := helpers.NewGithubLoginHelper(helperCommon)
+	githubClientHelper := helpers.NewGithubClientHelper(helperCommon, githubLoginHelper, gui.githubTokens)
 
 	gui.helpers = &helpers.Helpers{
 		Refs:            refsHelper,
@@ -132,11 +133,11 @@ func (gui *Gui) resetHelpersAndControllers() {
 		SubCommits:   helpers.NewSubCommitsHelper(helperCommon, refreshHelper),
 		FinalVersion: helpers.NewFinalVersionHelper(helperCommon),
 		GithubLogin:  githubLoginHelper,
+		GithubClient: githubClientHelper,
 		GithubActions: helpers.NewGithubActionsHelper(
 			helperCommon,
 			windowHelper,
-			githubLoginHelper,
-			gui.githubTokens,
+			githubClientHelper,
 		),
 	}
 

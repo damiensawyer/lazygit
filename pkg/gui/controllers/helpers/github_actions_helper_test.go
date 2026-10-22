@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"sync"
@@ -12,42 +11,6 @@ import (
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
 	"github.com/stretchr/testify/assert"
 )
-
-func TestGithubTokens(t *testing.T) {
-	var tokens GithubTokens
-	assert.Empty(t, tokens.get("github.com"))
-
-	tokens.set("github.com", "gho_one")
-	tokens.set("git.acme.com", "ghe_two")
-	assert.Equal(t, "gho_one", tokens.get("github.com"))
-	assert.Equal(t, "ghe_two", tokens.get("git.acme.com"))
-	assert.Empty(t, tokens.get("GitHub.com"))
-
-	tokens.set("github.com", "gho_three")
-	assert.Equal(t, "gho_three", tokens.get("github.com"))
-
-	// Forgetting a token that turned out to be invalid.
-	tokens.set("github.com", "")
-	assert.Empty(t, tokens.get("github.com"))
-	assert.Equal(t, "ghe_two", tokens.get("git.acme.com"))
-}
-
-func TestGithubTokensConcurrentAccess(t *testing.T) {
-	var tokens GithubTokens
-	var wg sync.WaitGroup
-	for i := range 20 {
-		host := fmt.Sprintf("host%d", i%4)
-		wg.Go(func() {
-			tokens.set(host, "token")
-			_ = tokens.get(host)
-		})
-	}
-	wg.Wait()
-
-	for i := range 4 {
-		assert.Equal(t, "token", tokens.get(fmt.Sprintf("host%d", i)))
-	}
-}
 
 // newFakeGithubClient returns a client talking to a fake server that answers
 // each path with the response given for it, and 404 for any other, and the
