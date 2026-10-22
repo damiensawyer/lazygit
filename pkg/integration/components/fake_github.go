@@ -17,8 +17,8 @@ import (
 	"github.com/samber/lo"
 )
 
-// FakeGithub stands in for the GitHub REST API in tests of the GitHub Actions
-// view. While a test that has one runs, it is served over HTTP, and lazygit
+// FakeGithub stands in for the GitHub API in tests of the GitHub Actions view
+// and of the pull requests panel. While a test that has one runs, it is served over HTTP, and lazygit
 // talks to it instead of to GitHub, without needing a token.
 //
 // It serves the canned data below for any repository, and records the
@@ -43,6 +43,10 @@ type FakeGithub struct {
 	// the content of each artifact's archive: keyed by artifact ID, and then
 	// by the path of a file in the archive
 	ArtifactFiles map[int64]map[string]string
+	// the repository's pull requests, as the GraphQL API lists them
+	PullRequests []*models.GithubPullRequest
+	// keyed by pull request number
+	PullRequestDetails map[int]*models.GithubPullRequestDetails
 	// responses to give instead of the canned data, keyed by method and path,
 	// e.g. "GET /repos/owner/repo/actions/runs"
 	Errors map[string]FakeGithubError
@@ -100,7 +104,9 @@ func (self *FakeGithub) record(r *http.Request, body []byte) {
 	if len(r.URL.Query()) > 0 {
 		description += "?" + r.URL.Query().Encode()
 	}
-	if len(body) > 0 {
+	if r.URL.Path == "/graphql" {
+		description = describeGraphQLRequest(body)
+	} else if len(body) > 0 {
 		description += " " + string(body)
 	}
 
@@ -195,6 +201,10 @@ func (self *FakeGithub) handler() http.Handler {
 		defer self.dataMutex.Unlock()
 		if response, found := self.Errors[r.Method+" "+r.URL.Path]; found {
 			writeError(w, response.StatusCode, response.Message)
+			return
+		}
+		if r.Method == http.MethodPost && r.URL.Path == "/graphql" {
+			self.serveGraphQL(w, body)
 			return
 		}
 		mux.ServeHTTP(w, r)
