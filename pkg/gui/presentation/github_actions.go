@@ -302,8 +302,7 @@ func FormatGithubJobDetails(tr *i18n.TranslationSet, opts GithubJobDetailsOpts) 
 	job := opts.Job
 	var b strings.Builder
 
-	fmt.Fprintf(&b, "%s %s %s\n", GithubActionsStateIcon(job.State()), style.AttrBold.Sprint(job.Name),
-		githubDurationColumn(job.State(), job.Duration(opts.Now)))
+	b.WriteString(formatGithubItemLine(job.State(), style.AttrBold.Sprint(job.Name), job.Duration(opts.Now)))
 	if job.RunnerName != "" {
 		b.WriteString(githubDim.Sprint(utils.ResolvePlaceholderString(tr.GithubActions.RanOn, map[string]string{
 			"runner": job.RunnerName,
@@ -372,8 +371,7 @@ func formatGithubJobLog(job *models.GithubJob, log *github_commands.JobLog, only
 // produced.
 func FormatGithubStepLog(tr *i18n.TranslationSet, job *models.GithubJob, step *models.GithubStep, log *github_commands.JobLog, now time.Time) string {
 	var b strings.Builder
-	fmt.Fprintf(&b, "%s %s %s\n", GithubActionsStateIcon(step.State()), style.AttrBold.Sprint(step.Name),
-		githubDurationColumn(step.State(), step.Duration(now)))
+	b.WriteString(formatGithubItemLine(step.State(), style.AttrBold.Sprint(step.Name), step.Duration(now)))
 	b.WriteString(githubDim.Sprint(job.Name) + "\n\n")
 
 	stepLog, found := lo.Find(log.Steps, func(stepLog github_commands.StepLog) bool {

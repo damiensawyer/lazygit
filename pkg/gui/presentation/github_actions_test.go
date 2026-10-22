@@ -663,10 +663,6 @@ func TestFormatGithubJobDetailsAndStepLogHeadersWithoutDuration(t *testing.T) {
 	details := FormatGithubJobDetails(tr, GithubJobDetailsOpts{Job: job, Now: time.Now()})
 	stepLog := FormatGithubStepLog(tr, job, step, &github_commands.JobLog{}, time.Now())
 
-	/* EXPECTED:
 	assert.True(t, strings.HasPrefix(details, "• build\n"))
 	assert.True(t, strings.HasPrefix(stepLog, "- Skipped\n"))
-	ACTUAL: */
-	assert.True(t, strings.HasPrefix(details, "• build \n"))
-	assert.True(t, strings.HasPrefix(stepLog, "- Skipped \n"))
 }
