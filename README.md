@@ -1,11 +1,18 @@
-# lazygit (damiensawyer fork)
+# lazygit (bots are going to kill us all edition)
 
 A fork of [jesseduffield/lazygit](https://github.com/jesseduffield/lazygit) with extra features that aren't in upstream. Upstream stopped accepting pull requests, so these live here instead. The fork tracks upstream's `master`, so everything upstream lazygit does still works the same way. For the basics (installation, configuration, all the standard keybindings) see the [upstream README](https://github.com/jesseduffield/lazygit#readme).
+
+It should be pretty obvious I didn't write any of this. I'm an old coder who misses the old ways of vim key map coffee mugs, water cooler chats about the pros and cons of monads, multiple viewings of [Silicon Valley](https://www.youtube.com/watch?v=30WTWkFe910) and actually have to think about something slowly and carefully before the computer would do what you wanted.
+
+But hey - the times are be changing.
+
+So, with that, here's *Lazygit - crazy bot edition*.
+Go wild my brothers and sisters in digital arms. If we can dream it, we can have it.
 
 This page covers only what this fork adds.
 
 - [GitHub Actions](#github-actions)
-- [Browse all files at a commit](#browse-all-files-at-a-commit)
+- [Browse all files at a commit (killer feature that git extensions on Windows had!)](#browse-all-files-at-a-commit)
 - [Commit overview mode](#commit-overview-mode)
 - [Show the final version of changed files](#show-the-final-version-of-changed-files)
 - [Full-file diff toggle](#full-file-diff-toggle)
@@ -126,7 +133,7 @@ Press `?`, then type. The keybindings menu filters as you type, so you don't nee
 | Key | Action |
 |-----|--------|
 | `?` | Open the keybindings menu |
-| _type_ | Filter the list |
+| *type* | Filter the list |
 | `<backspace>` | Delete the last character of the filter |
 | `<esc>` | Clear the filter. Press it again to close the menu |
 
