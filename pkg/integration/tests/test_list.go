@@ -344,6 +344,7 @@ var tests = []*components.IntegrationTest{
 	filter_by_path.ShowDiffsForRenamedFile,
 	filter_by_path.TypeFile,
 	github_actions.ApiErrorLoadingRuns,
+	github_actions.ApiErrorOnAction,
 	github_actions.ApiErrorRepoNotFound,
 	github_actions.ApiErrorUnauthorized,
 	github_actions.CancelRun,
