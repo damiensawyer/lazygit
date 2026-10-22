@@ -257,6 +257,10 @@ func FormatGithubLogLines(lines []string) string {
 }
 
 func formatGithubLogLine(line string) string {
+	// how actions log the commands they run
+	if command, found := strings.CutPrefix(line, "[command]"); found {
+		return style.FgCyan.Sprint(command)
+	}
 	if !strings.HasPrefix(line, "##[") {
 		return line
 	}
@@ -275,8 +279,6 @@ func formatGithubLogLine(line string) string {
 		return style.FgBlue.Sprint("Notice: " + rest)
 	case "debug":
 		return githubDim.Sprint(rest)
-	case "command":
-		return style.FgCyan.Sprint(rest)
 	}
 	return line
 }

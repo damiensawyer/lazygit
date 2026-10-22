@@ -101,9 +101,10 @@ func TestFormatGithubLogLines(t *testing.T) {
 	defer color.ForceSetColorLevel(oldColorLevel)
 
 	assert.Equal(t,
-		"▾ Run make\nmake: *** Error 1\nError: Process completed with exit code 2.\n",
+		"▾ Run make\n/usr/bin/make\nmake: *** Error 1\nError: Process completed with exit code 2.\n",
 		FormatGithubLogLines([]string{
 			"##[group]Run make",
+			"[command]/usr/bin/make",
 			"make: *** Error 1",
 			"##[endgroup]",
 			"##[error]Process completed with exit code 2.",
