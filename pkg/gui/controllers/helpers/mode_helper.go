@@ -193,11 +193,11 @@ func (self *ModeHelper) ExitFilterMode() error {
 	return self.ClearFiltering()
 }
 
-// updateCommitsViewTitle gives the commits view's title and tab label an
+// UpdateCommitsViewTitle gives the commits view's title and tab label an
 // "(overview)" suffix while overview mode is on. The tab strip is shared by
 // all views of the panel, so updating the commits view's own tab entry is
 // enough for the label to show whichever tab is selected.
-func (self *ModeHelper) updateCommitsViewTitle() {
+func (self *ModeHelper) UpdateCommitsViewTitle() {
 	view := self.c.Views().Commits
 	title := lo.Ternary(self.c.Contexts().LocalCommits.GetOverviewMode(),
 		self.c.Tr.CommitsOverviewTitle, self.c.Tr.CommitsTitle)
@@ -228,7 +228,7 @@ func (self *ModeHelper) EnterOverviewMode() error {
 	}
 
 	commitsContext.SetOverviewMode(true)
-	self.updateCommitsViewTitle()
+	self.UpdateCommitsViewTitle()
 	// The condensed list can have far fewer rows than the threshold of the
 	// "load more commits when the selection approaches the end of the list"
 	// heuristic, which would then never kick in; load the whole history
@@ -264,7 +264,7 @@ func (self *ModeHelper) ExitOverviewMode() error {
 
 	commitsContext.SetOverviewMode(false)
 	commitsContext.SetOverviewReturnHashes("", "")
-	self.updateCommitsViewTitle()
+	self.UpdateCommitsViewTitle()
 
 	self.c.Refresh(types.RefreshOptions{
 		Scope: []types.RefreshableView{types.COMMITS},
