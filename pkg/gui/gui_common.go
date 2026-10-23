@@ -115,6 +115,14 @@ func (self *guiCommon) SaveHalfScreenModeSidePanelWidth() {
 	}
 }
 
+func (self *guiCommon) ResetSidePanelWidth() error {
+	return self.gui.resetSavedSidePanelWidth(self.gui.Config.RemoveSidePanelWidth)
+}
+
+func (self *guiCommon) ResetHalfScreenModeSidePanelWidth() error {
+	return self.gui.resetSavedSidePanelWidth(self.gui.Config.RemoveHalfScreenModeSidePanelWidth)
+}
+
 func (self *guiCommon) GetConfig() config.AppConfigurer {
 	return self.gui.Config
 }

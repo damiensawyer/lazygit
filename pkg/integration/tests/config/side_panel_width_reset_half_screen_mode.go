@@ -22,9 +22,6 @@ var SidePanelWidthResetHalfScreenMode = NewIntegrationTest(NewIntegrationTestArg
 		t.ExpectToast(Equals("Reset side panel width"))
 		t.GlobalPress(keys.Universal.DecreaseSidePanelWidth)
 		t.ExpectToast(
-			/* EXPECTED:
 			Equals("Side panel width: 0.35"))
-			ACTUAL: */
-			Equals("Side panel width: 0.45"))
 	},
 })

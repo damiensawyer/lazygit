@@ -100,6 +100,11 @@ type IGuiCommon interface {
 	SaveAppStateAndLogError()
 	SaveSidePanelWidth()
 	SaveHalfScreenModeSidePanelWidth()
+	// ResetSidePanelWidth and ResetHalfScreenModeSidePanelWidth remove the
+	// width saved to the per-repo config and reload the config, so that the
+	// configured width applies again
+	ResetSidePanelWidth() error
+	ResetHalfScreenModeSidePanelWidth() error
 
 	// Runs the given function on the UI thread (this is for things like showing a popup asking a user for input).
 	// Only necessary to call if you're not already on the UI thread i.e. you're inside a goroutine.

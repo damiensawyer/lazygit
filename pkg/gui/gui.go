@@ -741,6 +741,22 @@ func (gui *Gui) applySidePanelWidthConfig() {
 	gui.State.HalfScreenModeSidePanelWidth = gui.UserConfig().Gui.HalfScreenModeSidePanelWidth
 }
 
+// resetSavedSidePanelWidth removes a side panel width that was saved to the
+// per-repo config, using remove, and reloads the config so that the width
+// from the other config files, or the default, applies again.
+func (gui *Gui) resetSavedSidePanelWidth(remove func(path string) error) error {
+	oldConfig := gui.Config.GetUserConfig()
+	if err := remove(gui.repoConfigFilePath()); err != nil {
+		return err
+	}
+
+	if err := gui.Config.ReloadUserConfigForRepo(gui.getPerRepoConfigFiles()); err != nil {
+		return err
+	}
+
+	return gui.onUserConfigReloaded(oldConfig)
+}
+
 func (gui *Gui) loadCachedPullRequests() []*models.GithubPullRequest {
 	repoPath := gui.git.RepoPaths.RepoPath()
 	cachedPRs, err := gui.Config.GetCachedGithubPullRequests(repoPath)

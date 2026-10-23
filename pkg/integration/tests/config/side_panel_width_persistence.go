@@ -46,10 +46,7 @@ var SidePanelWidthPersistence = NewIntegrationTest(NewIntegrationTestArgs{
 		t.GlobalPress(keys.Universal.ResetSidePanelWidth)
 		t.ExpectToast(Equals("Reset side panel width"))
 		t.FileSystem().FileContent(".git/lazygit.yml",
-			/* EXPECTED:
 			Equals("gui:\n  sidePanelWidth: 0.3333\n"))
-			ACTUAL: */
-			Equals("gui:\n  sidePanelWidth: 0.3333\n  halfScreenModeSidePanelWidth: 0.5\n"))
 
 		// Resetting in normal mode likewise leaves the half screen mode width alone
 		t.GlobalPress(keys.Universal.PrevScreenMode)
@@ -62,9 +59,6 @@ var SidePanelWidthPersistence = NewIntegrationTest(NewIntegrationTestArgs{
 		t.GlobalPress(keys.Universal.ResetSidePanelWidth)
 		t.ExpectToast(Equals("Reset side panel width"))
 		t.FileSystem().FileContent(".git/lazygit.yml",
-			/* EXPECTED:
 			Equals("gui:\n  halfScreenModeSidePanelWidth: 0.55\n"))
-			ACTUAL: */
-			Equals("gui:\n  sidePanelWidth: 0.3333\n  halfScreenModeSidePanelWidth: 0.55\n"))
 	},
 })

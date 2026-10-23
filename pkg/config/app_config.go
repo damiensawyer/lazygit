@@ -60,6 +60,12 @@ type AppConfigurer interface {
 	// SaveHalfScreenModeSidePanelWidth writes halfScreenModeSidePanelWidth
 	// to the given per-repo config file path.
 	SaveHalfScreenModeSidePanelWidth(path string, value float64) error
+	// RemoveSidePanelWidth removes a saved sidePanelWidth from the given
+	// per-repo config file path.
+	RemoveSidePanelWidth(path string) error
+	// RemoveHalfScreenModeSidePanelWidth removes a saved
+	// halfScreenModeSidePanelWidth from the given per-repo config file path.
+	RemoveHalfScreenModeSidePanelWidth(path string) error
 	GetCachedGithubPullRequests(repoPath string) ([]CachedPullRequest, error)
 	SaveCachedGithubPullRequests(repoPath string, pullRequests []CachedPullRequest) error
 }
@@ -866,6 +872,18 @@ func (c *AppConfig) SaveHalfScreenModeSidePanelWidth(path string, value float64)
 	return saveRepoGuiValue(path, "halfScreenModeSidePanelWidth", value)
 }
 
+// RemoveSidePanelWidth removes a saved side panel width from the given
+// per-repo config file path.
+func (c *AppConfig) RemoveSidePanelWidth(path string) error {
+	return removeRepoGuiValue(path, "sidePanelWidth")
+}
+
+// RemoveHalfScreenModeSidePanelWidth removes a saved half screen mode side
+// panel width from the given per-repo config file path.
+func (c *AppConfig) RemoveHalfScreenModeSidePanelWidth(path string) error {
+	return removeRepoGuiValue(path, "halfScreenModeSidePanelWidth")
+}
+
 // saveRepoGuiValue sets the given key in the gui section of the per-repo
 // config file at path to the given value, preserving the file's other
 // content. The file is created if it doesn't exist yet.
@@ -896,6 +914,35 @@ func saveRepoGuiValue(path string, key string, value float64) error {
 	} else {
 		valueNode.Value = valueString
 		valueNode.Tag = "!!float"
+	}
+
+	return writeRepoConfig(path, rootNode)
+}
+
+// removeRepoGuiValue removes the given key from the gui section of the
+// per-repo config file at path, preserving the file's other content. A gui
+// section that is left empty is removed too, and so is a file that is left
+// with nothing in it. The file isn't touched if the key isn't in it.
+func removeRepoGuiValue(path string, key string) error {
+	rootNode, body, err := loadRepoConfig(path)
+	if err != nil {
+		return err
+	}
+
+	_, guiNode := yaml_utils.LookupKey(body, "gui")
+	if guiNode == nil || guiNode.Kind != yaml.MappingNode {
+		return nil
+	}
+	if keyNode, _ := yaml_utils.RemoveKey(guiNode, key); keyNode == nil {
+		return nil
+	}
+	if len(guiNode.Content) == 0 {
+		yaml_utils.RemoveKey(body, "gui")
+	}
+
+	if len(body.Content) == 0 && body.HeadComment == "" && body.FootComment == "" &&
+		rootNode.HeadComment == "" && rootNode.FootComment == "" {
+		return os.Remove(path)
 	}
 
 	return writeRepoConfig(path, rootNode)
