@@ -226,56 +226,87 @@ func (self *PullRequestsController) viewCommits(pr *models.GithubPullRequest) er
 func (self *PullRequestsController) checkOut(pr *models.GithubPullRequest) error {
 	tr := self.c.Tr.PullRequests
 	helper := self.c.Helpers().GithubPullRequests
+	items := self.checkOutItems(pr, false, func(opts helpers.PullRequestCheckoutOpts) error {
+		return helper.CheckOut(pr, opts)
+	})
+	worktreeItem := &types.MenuItem{
+		Label:     tr.CheckOutInWorktree,
+		Keys:      menuKey('w'),
+		OpensMenu: true,
+		OnPress: func() error {
+			return self.checkOutInWorktree(pr)
+		},
+	}
 	return self.c.Menu(types.CreateMenuOptions{
 		Title: utils.ResolvePlaceholderString(tr.CheckOutOptionsTitle, map[string]string{"number": fmt.Sprint(pr.Number)}),
-		Items: []*types.MenuItem{
-			{
-				Label:   tr.CheckOut,
-				Tooltip: tr.CheckOutTooltip,
-				Keys:    menuKey('c'),
-				OnPress: func() error {
-					return helper.CheckOut(pr, helpers.PullRequestCheckoutOpts{})
-				},
-			},
-			{
-				Label: tr.CheckOutAsBranch,
-				Keys:  menuKey('b'),
-				OnPress: func() error {
-					self.c.Prompt(types.PromptOpts{
-						Title:          tr.CheckOutAsBranchPrompt,
-						InitialContent: pr.HeadRefName,
-						HandleConfirm: func(name string) error {
-							return helper.CheckOut(pr, helpers.PullRequestCheckoutOpts{BranchName: strings.TrimSpace(name)})
-						},
-					})
-					return nil
-				},
-			},
-			{
-				Label: tr.CheckOutDetached,
-				Keys:  menuKey('d'),
-				OnPress: func() error {
-					return helper.CheckOut(pr, helpers.PullRequestCheckoutOpts{Detach: true})
-				},
-			},
-			{
-				Label:     tr.CheckOutInWorktree,
-				Keys:      menuKey('w'),
-				OpensMenu: true,
-				OnPress: func() error {
-					return helper.CheckOutInWorktree(pr, self.c.Helpers().Worktree, helpers.PullRequestCheckoutOpts{})
-				},
-			},
-			{
-				Label:   tr.CheckOutForce,
-				Tooltip: tr.CheckOutForceTooltip,
-				Keys:    menuKey('f'),
-				OnPress: func() error {
-					return helper.CheckOut(pr, helpers.PullRequestCheckoutOpts{Force: true})
-				},
+		// before the forced checkout, which is the one to think twice about
+		Items: slices.Insert(items, len(items)-1, worktreeItem),
+	})
+}
+
+func (self *PullRequestsController) checkOutInWorktree(pr *models.GithubPullRequest) error {
+	helper := self.c.Helpers().GithubPullRequests
+	return self.c.Menu(types.CreateMenuOptions{
+		Title: self.c.Tr.PullRequests.CheckOutInWorktreeTitle,
+		Items: self.checkOutItems(pr, true, func(opts helpers.PullRequestCheckoutOpts) error {
+			return helper.CheckOutInWorktree(pr, self.c.Helpers().Worktree, opts)
+		}),
+	})
+}
+
+// The ways of checking a pull request out, each passing its options to
+// checkOut. opensMenu says whether checkOut goes on to a menu, as it does when
+// it asks where to check the pull request out.
+func (self *PullRequestsController) checkOutItems(
+	pr *models.GithubPullRequest,
+	opensMenu bool,
+	checkOut func(helpers.PullRequestCheckoutOpts) error,
+) []*types.MenuItem {
+	tr := self.c.Tr.PullRequests
+	return []*types.MenuItem{
+		{
+			Label:     tr.CheckOut,
+			Tooltip:   tr.CheckOutTooltip,
+			Keys:      menuKey('c'),
+			OpensMenu: opensMenu,
+			OnPress: func() error {
+				return checkOut(helpers.PullRequestCheckoutOpts{})
 			},
 		},
-	})
+		{
+			// The ellipsis that marks the menu to come stands for the prompt too.
+			Label:     lo.Ternary(opensMenu, tr.CheckOutAsBranchNamed, tr.CheckOutAsBranch),
+			Keys:      menuKey('b'),
+			OpensMenu: opensMenu,
+			OnPress: func() error {
+				self.c.Prompt(types.PromptOpts{
+					Title:          tr.CheckOutAsBranchPrompt,
+					InitialContent: pr.HeadRefName,
+					HandleConfirm: func(name string) error {
+						return checkOut(helpers.PullRequestCheckoutOpts{BranchName: strings.TrimSpace(name)})
+					},
+				})
+				return nil
+			},
+		},
+		{
+			Label:     tr.CheckOutDetached,
+			Keys:      menuKey('d'),
+			OpensMenu: opensMenu,
+			OnPress: func() error {
+				return checkOut(helpers.PullRequestCheckoutOpts{Detach: true})
+			},
+		},
+		{
+			Label:     tr.CheckOutForce,
+			Tooltip:   tr.CheckOutForceTooltip,
+			Keys:      menuKey('f'),
+			OpensMenu: opensMenu,
+			OnPress: func() error {
+				return checkOut(helpers.PullRequestCheckoutOpts{Force: true})
+			},
+		},
+	}
 }
 
 func (self *PullRequestsController) openInBrowser(pr *models.GithubPullRequest) error {
