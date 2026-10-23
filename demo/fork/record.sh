@@ -18,7 +18,7 @@
 
 set -e
 
-DEMOS="browse_files final_version full_file_diff keybindings_search overview_mode side_panel_width"
+DEMOS="browse_files final_version full_file_diff github_actions keybindings_search overview_mode side_panel_width"
 
 # The non-Mono Nerd Font variant; the Mono variant renders the icons too small
 FONT=${DEMO_FONT:-CaskaydiaMono Nerd Font}

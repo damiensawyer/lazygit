@@ -249,6 +249,7 @@ var tests = []*components.IntegrationTest{
 	demo.Filter,
 	demo.FinalVersion,
 	demo.FullFileDiff,
+	demo.GithubActions,
 	demo.InteractiveRebase,
 	demo.KeybindingsSearch,
 	demo.NukeWorkingTree,
