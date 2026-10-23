@@ -17,6 +17,12 @@ type MenuContext struct {
 
 	*MenuViewModel
 	*ListContextTrait
+
+	// The menu that an item opening a submenu was pressed in, waiting for the
+	// submenu to open. The submenu may only open after a prompt or a background
+	// task, so it waits until then, unless the user gives up on the submenu
+	// first.
+	pendingParent *parentMenu
 }
 
 var _ types.IListContext = (*MenuContext)(nil)
@@ -58,6 +64,8 @@ func NewMenuContext(
 
 type MenuViewModel struct {
 	c                         *ContextCommon
+	title                     string
+	parent                    *parentMenu
 	menuItems                 []*types.MenuItem
 	prompt                    string
 	promptLines               []string
@@ -68,6 +76,21 @@ type MenuViewModel struct {
 	filterStarted             bool
 	onCancel                  func() error
 	*FilteredListViewModel[*types.MenuItem]
+}
+
+// A menu that the user went from into a submenu, kept so that they can go back
+// to it.
+type parentMenu struct {
+	title                     string
+	parent                    *parentMenu
+	menuItems                 []*types.MenuItem
+	prompt                    string
+	columnAlignment           []utils.Alignment
+	allowFilteringKeybindings bool
+	keybindingsTakePrecedence bool
+	filterAsYouType           bool
+	onCancel                  func() error
+	selectedItem              *types.MenuItem
 }
 
 func NewMenuViewModel(c *ContextCommon) *MenuViewModel {
@@ -113,6 +136,39 @@ func NewMenuViewModel(c *ContextCommon) *MenuViewModel {
 func (self *MenuViewModel) SetMenuItems(items []*types.MenuItem, columnAlignment []utils.Alignment) {
 	self.menuItems = items
 	self.columnAlignment = columnAlignment
+}
+
+func (self *MenuViewModel) SetTitle(title string) {
+	self.title = title
+}
+
+// The titles of the menus the user went through to get to this one, followed
+// by the title of this one.
+func (self *MenuViewModel) Breadcrumbs() []string {
+	breadcrumbs := []string{self.title}
+	for parent := self.parent; parent != nil; parent = parent.parent {
+		breadcrumbs = utils.Prepend(breadcrumbs, parent.title)
+	}
+	return breadcrumbs
+}
+
+func (self *MenuViewModel) HasParent() bool {
+	return self.parent != nil
+}
+
+func (self *MenuViewModel) asParent(selectedItem *types.MenuItem) *parentMenu {
+	return &parentMenu{
+		title:                     self.title,
+		parent:                    self.parent,
+		menuItems:                 self.menuItems,
+		prompt:                    self.prompt,
+		columnAlignment:           self.columnAlignment,
+		allowFilteringKeybindings: self.allowFilteringKeybindings,
+		keybindingsTakePrecedence: self.keybindingsTakePrecedence,
+		filterAsYouType:           self.filterAsYouType,
+		onCancel:                  self.onCancel,
+		selectedItem:              selectedItem,
+	}
 }
 
 func (self *MenuViewModel) SetOnCancel(onCancel func() error) {
@@ -304,11 +360,50 @@ func (self *MenuContext) OnMenuPress(selectedItem *types.MenuItem) error {
 		return nil
 	}
 
+	if selectedItem.OpensMenu {
+		self.pendingParent = self.asParent(selectedItem)
+	}
+
 	if err := selectedItem.OnPress(); err != nil {
+		self.pendingParent = nil
 		return err
 	}
 
 	return nil
+}
+
+// Makes the menu that is about to be shown a submenu of the one whose item
+// opened it, if there is one.
+func (self *MenuContext) AdoptPendingParent() {
+	self.parent = self.pendingParent
+	self.pendingParent = nil
+}
+
+// For when the user does something else than waiting for a submenu to open,
+// so that the next menu they open isn't taken for it.
+func (self *MenuContext) ForgetPendingParent() {
+	self.pendingParent = nil
+}
+
+// Shows the menu that this one is a submenu of again, as it was when the user
+// left it.
+func (self *MenuContext) GoBack() {
+	parent := self.parent
+	self.title = parent.title
+	self.parent = parent.parent
+	self.menuItems = parent.menuItems
+	self.columnAlignment = parent.columnAlignment
+	self.SetPrompt(parent.prompt)
+	self.allowFilteringKeybindings = parent.allowFilteringKeybindings
+	self.keybindingsTakePrecedence = parent.keybindingsTakePrecedence
+	self.SetFilterAsYouType(parent.filterAsYouType)
+	self.onCancel = parent.onCancel
+
+	self.FilteredList.ClearFilter()
+	self.SetSelection(max(0, lo.IndexOf(self.menuItems, parent.selectedItem)))
+
+	self.c.Views().MenuFilter.ClearTextArea()
+	self.c.Views().MenuFilter.RenderTextArea()
 }
 
 // There is currently no need to use range-select in a menu so we're disabling it.

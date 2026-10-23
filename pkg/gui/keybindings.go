@@ -394,10 +394,28 @@ func (gui *Gui) SetKeybinding(binding *types.Binding) {
 }
 
 func (gui *Gui) SetMouseKeybinding(binding *gocui.ViewMouseBinding) {
-	gui.g.SetViewClickBinding(binding)
+	handler := binding.Handler
+	wrappedBinding := *binding
+	wrappedBinding.Handler = func(opts gocui.ViewMouseBindingOpts) error {
+		gui.forgetPendingSubmenuUnlessInPopup()
+		return handler(opts)
+	}
+	gui.g.SetViewClickBinding(&wrappedBinding)
+}
+
+// A submenu can open after a prompt or a background task; if the user does
+// something outside of popups in the meantime, the next menu that opens is not
+// that submenu, and must not offer to go back to the menu the submenu was
+// chosen in.
+func (gui *Gui) forgetPendingSubmenuUnlessInPopup() {
+	if !gui.helpers.Confirmation.IsPopupPanel(gui.c.Context().Current()) {
+		gui.State.Contexts.Menu.ForgetPendingParent()
+	}
 }
 
 func (gui *Gui) callKeybindingHandler(binding *types.Binding) error {
+	gui.forgetPendingSubmenuUnlessInPopup()
+
 	if binding.GetDisabledReason != nil {
 		if disabledReason := binding.GetDisabledReason(); disabledReason != nil {
 			if disabledReason.AllowFurtherDispatching {

@@ -451,6 +451,8 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 |-----|--------|-------------|
 | `` <enter> `` | 执行 |  |
 | `` <esc> `` | 关闭 |  |
+| `` <left> `` | Back to previous menu |  |
+| `` <right> `` | Open submenu |  |
 | `` / `` | 通过文本过滤当前视图 |  |
 
 ## 贮藏

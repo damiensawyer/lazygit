@@ -233,6 +233,8 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 |-----|--------|-------------|
 | `` <enter> `` | Wykonaj |  |
 | `` <esc> `` | Zamknij/Anuluj |  |
+| `` <left> `` | Back to previous menu |  |
+| `` <right> `` | Open submenu |  |
 | `` / `` | Filtruj bieżący widok po tekście |  |
 
 ## Panel główny (normalny)

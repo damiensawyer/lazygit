@@ -36,6 +36,8 @@ func (gui *Gui) createMenu(opts types.CreateMenuOptions) error {
 		config.GetValidatedKeyBindingKeys(gui.c.UserConfig().Keybinding.Universal.Return)[0],
 		config.GetValidatedKeyBindingKeys(gui.c.UserConfig().Keybinding.Universal.PrevItem)[0],
 		config.GetValidatedKeyBindingKeys(gui.c.UserConfig().Keybinding.Universal.NextItem)[0],
+		config.GetValidatedKeyBindingKeys(gui.c.UserConfig().Keybinding.Universal.PrevBlock)[0],
+		config.GetValidatedKeyBindingKeys(gui.c.UserConfig().Keybinding.Universal.NextBlock)[0],
 	}
 
 	for _, item := range opts.Items {
@@ -65,6 +67,8 @@ func (gui *Gui) createMenu(opts types.CreateMenuOptions) error {
 		}
 	}
 
+	gui.State.Contexts.Menu.AdoptPendingParent()
+	gui.State.Contexts.Menu.SetTitle(opts.Title)
 	gui.State.Contexts.Menu.SetMenuItems(opts.Items, opts.ColumnAlignment)
 	gui.State.Contexts.Menu.SetPrompt(opts.Prompt)
 	gui.State.Contexts.Menu.SetAllowFilteringKeybindings(opts.AllowFilteringKeybindings)
@@ -76,7 +80,6 @@ func (gui *Gui) createMenu(opts types.CreateMenuOptions) error {
 	gui.Views.MenuFilter.ClearTextArea()
 	gui.Views.MenuFilter.RenderTextArea()
 
-	gui.Views.Menu.Title = opts.Title
 	gui.Views.Menu.FgColor = theme.GocuiDefaultTextColor
 
 	gui.Views.Tooltip.Wrap = true

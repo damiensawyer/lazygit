@@ -244,6 +244,8 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 |-----|--------|-------------|
 | `` <enter> `` | Uitvoeren |  |
 | `` <esc> `` | Sluiten |  |
+| `` <left> `` | Back to previous menu |  |
+| `` <right> `` | Open submenu |  |
 | `` / `` | Filter the current view by text |  |
 
 ## Mergen

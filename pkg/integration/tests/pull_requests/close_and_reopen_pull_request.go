@@ -69,7 +69,7 @@ var CloseAndReopenPullRequest = NewIntegrationTest(NewIntegrationTestArgs{
 			Confirm()
 
 		t.ExpectPopup().Menu().
-			Title(Equals("State")).
+			Title(Equals("Filter pull requests › State")).
 			Select(Contains("Closed")).
 			Confirm()
 

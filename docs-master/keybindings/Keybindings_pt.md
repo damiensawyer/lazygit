@@ -266,6 +266,8 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 |-----|--------|-------------|
 | `` <enter> `` | Executar |  |
 | `` <esc> `` | Fechar/Cancelar |  |
+| `` <left> `` | Back to previous menu |  |
+| `` <right> `` | Open submenu |  |
 | `` / `` | Filtrar a visualização atual por texto |  |
 
 ## Painel Principal (Normal)

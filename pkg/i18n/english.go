@@ -50,6 +50,8 @@ type TranslationSet struct {
 	StatusTitle                           string
 	GlobalTitle                           string
 	Execute                               string
+	BackToPreviousMenu                    string
+	OpenSubmenu                           string
 	Stage                                 string
 	StageTooltip                          string
 	ToggleStagedAll                       string
@@ -1718,6 +1720,8 @@ func EnglishTranslationSet() *TranslationSet {
 		HunksWithOnlyAddedLinesWarning:       "There are ranges of only added lines in the diff; be careful to check that these belong in the found base commit.\n\nProceed?",
 		StatusTitle:                          "Status",
 		Execute:                              "Execute",
+		BackToPreviousMenu:                   "Back to previous menu",
+		OpenSubmenu:                          "Open submenu",
 		Stage:                                "Stage",
 		StageTooltip:                         "Toggle staged for selected file.",
 		ToggleStagedAll:                      "Stage all",

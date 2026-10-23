@@ -33,7 +33,7 @@ var RunWorkflowOnRefWithoutIt = NewIntegrationTest(NewIntegrationTestArgs{
 			Confirm()
 
 		t.ExpectPopup().Menu().
-			Title(Equals("CI")).
+			Title(Equals("Workflows › CI")).
 			Select(Contains("Run workflow")).
 			Confirm()
 

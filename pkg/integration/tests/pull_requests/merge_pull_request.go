@@ -53,7 +53,7 @@ var MergePullRequest = NewIntegrationTest(NewIntegrationTestArgs{
 			Confirm()
 
 		t.ExpectPopup().Menu().
-			Title(Equals("Merge #12 Add a widget")).
+			Title(Equals("Merge #12 into master › Merge #12 Add a widget")).
 			Lines(
 				Contains("Merge, keeping the branch").IsSelected(),
 				Contains("Merge, and delete the branch"),

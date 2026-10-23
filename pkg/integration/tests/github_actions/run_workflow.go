@@ -33,7 +33,7 @@ var RunWorkflow = NewIntegrationTest(NewIntegrationTestArgs{
 			Confirm()
 
 		t.ExpectPopup().Menu().
-			Title(Equals("Release")).
+			Title(Equals("Workflows › Release")).
 			Lines(
 				Contains("Run workflow").IsSelected(),
 				Contains("Show only its runs"),

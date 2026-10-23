@@ -187,6 +187,8 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 |-----|--------|-------------|
 | `` <enter> `` | 執行 |  |
 | `` <esc> `` | 關閉/取消 |  |
+| `` <left> `` | Back to previous menu |  |
+| `` <right> `` | Open submenu |  |
 | `` / `` | 搜尋 |  |
 
 ## 子提交

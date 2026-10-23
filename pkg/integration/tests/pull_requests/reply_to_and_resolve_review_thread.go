@@ -30,7 +30,7 @@ var ReplyToAndResolveReviewThread = NewIntegrationTest(NewIntegrationTestArgs{
 			Confirm()
 
 		t.ExpectPopup().Menu().
-			Title(Equals("widget.go:7")).
+			Title(Equals("Review threads of #12 › widget.go:7")).
 			Select(Contains("Reply…")).
 			Confirm()
 
@@ -50,7 +50,7 @@ var ReplyToAndResolveReviewThread = NewIntegrationTest(NewIntegrationTestArgs{
 			Confirm()
 
 		t.ExpectPopup().Menu().
-			Title(Equals("widget.go:7")).
+			Title(Equals("Review threads of #12 › widget.go:7")).
 			Select(Contains("Resolve the conversation")).
 			Confirm()
 

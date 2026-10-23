@@ -243,6 +243,8 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 |-----|--------|-------------|
 | `` <enter> `` | 실행 |  |
 | `` <esc> `` | 닫기/취소 |  |
+| `` <left> `` | Back to previous menu |  |
+| `` <right> `` | Open submenu |  |
 | `` / `` | Filter the current view by text |  |
 
 ## 메인 패널 (Merging)

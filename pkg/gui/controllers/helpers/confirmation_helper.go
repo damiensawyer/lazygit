@@ -376,6 +376,8 @@ func (self *ConfirmationHelper) resizeMenu(parentPopupContext types.Context) {
 	offset := 3
 	panelWidth := self.getPopupPanelWidth(menuMaxWidth)
 	contentWidth := panelWidth - 2 // minus 2 for the frame
+	// The title leaves two columns of the frame on either side of it.
+	self.c.Views().Menu.Title = menuTitle(menuContext.Breadcrumbs(), panelWidth-4)
 	promptLinesCount := self.layoutMenuPrompt(contentWidth)
 	// The row is reserved for the whole time the menu is open, even though it only
 	// becomes visible once the user starts typing, so that revealing it doesn't
@@ -410,6 +412,23 @@ func (self *ConfirmationHelper) resizeMenu(parentPopupContext types.Context) {
 	}
 	tooltipHeight := getMessageHeight(true, false, tooltip, contentWidth, self.c.Views().Menu.TabWidth) + 2 // plus 2 for the frame
 	_, _ = self.c.GocuiGui().SetView(self.c.Views().Tooltip.Name(), x0, tooltipTop, x1, tooltipTop+tooltipHeight-1, 0)
+}
+
+// Joins the titles of the menus leading to the current one, leaving out as
+// many of the first ones as it takes to make the title fit, so that the title
+// of the current menu stays visible.
+func menuTitle(breadcrumbs []string, width int) string {
+	const separator = " › "
+	for i := range breadcrumbs {
+		title := strings.Join(breadcrumbs[i:], separator)
+		if i > 0 {
+			title = "…" + separator + title
+		}
+		if i == len(breadcrumbs)-1 || utils.StringWidth(title) <= width {
+			return title
+		}
+	}
+	return ""
 }
 
 // Wraps the lines of the menu prompt to the available width and rerenders the

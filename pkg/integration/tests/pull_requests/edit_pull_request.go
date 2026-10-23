@@ -52,7 +52,7 @@ var EditPullRequest = NewIntegrationTest(NewIntegrationTestArgs{
 			Confirm()
 
 		t.ExpectPopup().Menu().
-			Title(Equals("Labels")).
+			Title(Equals("Edit #12 › Labels")).
 			Lines(
 				Contains("bug").IsSelected(),
 				Contains("enhancement"),
@@ -72,7 +72,7 @@ var EditPullRequest = NewIntegrationTest(NewIntegrationTestArgs{
 			Confirm()
 
 		t.ExpectPopup().Menu().
-			Title(Equals("Reviewers")).
+			Title(Equals("Edit #12 › Reviewers")).
 			Select(Contains("Request a review from…")).
 			Confirm()
 

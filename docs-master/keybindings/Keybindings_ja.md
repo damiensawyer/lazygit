@@ -402,6 +402,8 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 |-----|--------|-------------|
 | `` <enter> `` | 実行 |  |
 | `` <esc> `` | 閉じる/キャンセル |  |
+| `` <left> `` | Back to previous menu |  |
+| `` <right> `` | Open submenu |  |
 | `` / `` | 現在のビューをテキストでフィルタリング |  |
 
 ## リフログ

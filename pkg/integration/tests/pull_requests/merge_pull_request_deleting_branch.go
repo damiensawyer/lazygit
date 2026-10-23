@@ -34,7 +34,7 @@ var MergePullRequestDeletingBranch = NewIntegrationTest(NewIntegrationTestArgs{
 			Confirm()
 
 		t.ExpectPopup().Menu().
-			Title(Equals("Merge #12 Add a widget")).
+			Title(Equals("Merge #12 into master › Merge #12 Add a widget")).
 			Lines(
 				Contains("Merge, and delete the branch along with the local branch widget").IsSelected(),
 				Contains("Merge, keeping the branch"),

@@ -49,7 +49,7 @@ var GithubActions = NewIntegrationTest(NewIntegrationTestArgs{
 					Confirm()
 
 				t.ExpectPopup().Menu().
-					Title(Equals("Runs with status")).
+					Title(Equals("Filter runs › Runs with status")).
 					Wait(600).
 					Select(Contains("Failed")).
 					Wait(600).
@@ -102,7 +102,7 @@ var GithubActions = NewIntegrationTest(NewIntegrationTestArgs{
 					Confirm()
 
 				t.ExpectPopup().Menu().
-					Title(Equals("Release")).
+					Title(Equals("Workflows › Release")).
 					Wait(2500).
 					Cancel()
 			}).
