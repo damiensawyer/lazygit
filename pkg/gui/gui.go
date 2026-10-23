@@ -518,12 +518,18 @@ func (gui *Gui) onNewRepo(startArgs appTypes.StartArgs, contextKey types.Context
 	return nil
 }
 
+// repoConfigFilePath is the path of the per-repo config file in the git dir,
+// which is also where lazygit saves settings that are adjusted per repo.
+func (gui *Gui) repoConfigFilePath() string {
+	return filepath.Join(gui.git.RepoPaths.RepoGitDirPath(), "lazygit.yml")
+}
+
 func (gui *Gui) getPerRepoConfigFiles() []*config.ConfigFile {
 	repoConfigFiles := []*config.ConfigFile{
 		// TODO: add filepath.Join(gui.git.RepoPaths.RepoPath(), ".lazygit.yml"),
 		// with trust prompt
 		{
-			Path:   filepath.Join(gui.git.RepoPaths.RepoGitDirPath(), "lazygit.yml"),
+			Path:   gui.repoConfigFilePath(),
 			Policy: config.ConfigFilePolicySkipIfMissing,
 		},
 	}
