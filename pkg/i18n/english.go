@@ -904,6 +904,7 @@ type TranslationSet struct {
 	DiffContextSizeChanged                   string
 	RestoreDiffContextSize                   string
 	FullFileDiffView                         string
+	AlreadyShowingFullFileDiff               string
 	IncreaseRenameSimilarityThreshold        string
 	IncreaseRenameSimilarityThresholdTooltip string
 	DecreaseRenameSimilarityThreshold        string
@@ -2577,6 +2578,7 @@ func EnglishTranslationSet() *TranslationSet {
 		DiffContextSizeChanged:                   "Changed diff context size to %d",
 		RestoreDiffContextSize:                   "Restored context size to {{.size}}",
 		FullFileDiffView:                         "Showing full file diff",
+		AlreadyShowingFullFileDiff:               "Already showing the full file diff",
 		IncreaseRenameSimilarityThresholdTooltip: "Increase the similarity threshold for a deletion and addition pair to be treated as a rename.\n\nThe default can be changed in the config file with the key 'git.renameSimilarityThreshold'.",
 		IncreaseRenameSimilarityThreshold:        "Increase rename similarity threshold",
 		DecreaseRenameSimilarityThresholdTooltip: "Decrease the similarity threshold for a deletion and addition pair to be treated as a rename.\n\nThe default can be changed in the config file with the key 'git.renameSimilarityThreshold'.",

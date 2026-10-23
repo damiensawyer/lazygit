@@ -25,10 +25,7 @@ var IncreaseContextSizeInFullFileDiff = NewIntegrationTest(NewIntegrationTestArg
 
 		t.Views().Files().Press(keys.Universal.IncreaseContextInDiffView)
 		t.ExpectToast(
-			/* EXPECTED:
 			Equals("Already showing the full file diff"))
-			ACTUAL: */
-			Equals("Changed diff context size to 18446744073709551615"))
 
 		t.Views().Main().
 			Content(Contains("@@ -1,20 +1,20 @@"))

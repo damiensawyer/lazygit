@@ -57,13 +57,24 @@ func (self *ContextLinesController) Context() types.Context {
 }
 
 func (self *ContextLinesController) Increase() error {
-	if self.c.UserConfig().Git.DiffContextSize < math.MaxUint64 {
-		self.c.UserConfig().Git.DiffContextSize++
+	// The full-file diff already shows as much context as there is
+	if self.c.UserConfig().Git.DiffContextSize == math.MaxUint64 {
+		self.c.Toast(self.c.Tr.AlreadyShowingFullFileDiff)
+		return nil
 	}
+
+	self.c.UserConfig().Git.DiffContextSize++
 	return self.applyChange()
 }
 
 func (self *ContextLinesController) Decrease() error {
+	// Less than the full file is what the full-file diff was toggled on from
+	if self.c.UserConfig().Git.DiffContextSize == math.MaxUint64 {
+		self.restoreSavedSize()
+		self.rerender()
+		return nil
+	}
+
 	if self.c.UserConfig().Git.DiffContextSize > 0 {
 		self.c.UserConfig().Git.DiffContextSize--
 	}
