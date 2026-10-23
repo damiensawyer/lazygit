@@ -4,7 +4,7 @@ A fork of [jesseduffield/lazygit](https://github.com/jesseduffield/lazygit) with
 
 It should be pretty obvious I didn't write any of this. I'm an old coder who misses the old ways of vim key map coffee mugs, water cooler chats about the pros and cons of monads, multiple viewings of Silicon Valley and actually having to think about something slowly and carefully before the computer would do what you wanted.
 
-But hey - the times are be changing.
+But hey - the times, they be changing.
 
 So, with that, here's *Lazygit - crazy bot edition*.
 Go wild my brothers and sisters in digital arms. If we can dream it, we can have it.
