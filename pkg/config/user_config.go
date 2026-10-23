@@ -704,20 +704,18 @@ type KeybindingGithubActionsConfig struct {
 }
 
 type KeybindingPullRequestsConfig struct {
-	CheckOut           Keybinding `yaml:"checkOut"`
-	CheckOutOptions    Keybinding `yaml:"checkOutOptions"`
-	CheckOutInWorktree Keybinding `yaml:"checkOutInWorktree"`
-	Merge              Keybinding `yaml:"merge"`
-	ChangeState        Keybinding `yaml:"changeState"`
-	UpdateBranch       Keybinding `yaml:"updateBranch"`
-	Comment            Keybinding `yaml:"comment"`
-	Review             Keybinding `yaml:"review"`
-	Edit               Keybinding `yaml:"edit"`
-	ViewChecks         Keybinding `yaml:"viewChecks"`
-	ReviewThreads      Keybinding `yaml:"reviewThreads"`
-	OpenInBrowser      Keybinding `yaml:"openInBrowser"`
-	CopyToClipboard    Keybinding `yaml:"copyToClipboard"`
-	Filter             Keybinding `yaml:"filter"`
+	CheckOut        Keybinding `yaml:"checkOut"`
+	Merge           Keybinding `yaml:"merge"`
+	ChangeState     Keybinding `yaml:"changeState"`
+	UpdateBranch    Keybinding `yaml:"updateBranch"`
+	Comment         Keybinding `yaml:"comment"`
+	Review          Keybinding `yaml:"review"`
+	Edit            Keybinding `yaml:"edit"`
+	ViewChecks      Keybinding `yaml:"viewChecks"`
+	ReviewThreads   Keybinding `yaml:"reviewThreads"`
+	OpenInBrowser   Keybinding `yaml:"openInBrowser"`
+	CopyToClipboard Keybinding `yaml:"copyToClipboard"`
+	Filter          Keybinding `yaml:"filter"`
 }
 
 type KeybindingCommitFilesConfig struct {
@@ -1263,20 +1261,18 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 				CopyToClipboard:   Keybinding{"y"},
 			},
 			PullRequests: KeybindingPullRequestsConfig{
-				CheckOut:           Keybinding{"<space>"},
-				CheckOutOptions:    Keybinding{"c"},
-				CheckOutInWorktree: Keybinding{"w"},
-				Merge:              Keybinding{"M"},
-				ChangeState:        Keybinding{"d"},
-				UpdateBranch:       Keybinding{"u"},
-				Comment:            Keybinding{"C"},
-				Review:             Keybinding{"r"},
-				Edit:               Keybinding{"e"},
-				ViewChecks:         Keybinding{"t"},
-				ReviewThreads:      Keybinding{"T"},
-				OpenInBrowser:      Keybinding{"o"},
-				CopyToClipboard:    Keybinding{"y"},
-				Filter:             Keybinding{"f"},
+				CheckOut:        Keybinding{"c"},
+				Merge:           Keybinding{"M"},
+				ChangeState:     Keybinding{"d"},
+				UpdateBranch:    Keybinding{"u"},
+				Comment:         Keybinding{"C"},
+				Review:          Keybinding{"r"},
+				Edit:            Keybinding{"e"},
+				ViewChecks:      Keybinding{"t"},
+				ReviewThreads:   Keybinding{"T"},
+				OpenInBrowser:   Keybinding{"o"},
+				CopyToClipboard: Keybinding{"y"},
+				Filter:          Keybinding{"f"},
 			},
 			RepoFiles: KeybindingRepoFilesConfig{
 				Restore:  Keybinding{"c"},

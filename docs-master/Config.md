@@ -906,9 +906,7 @@ keybinding:
     downloadArtifacts: a
     copyToClipboard: "y"
   pullRequests:
-    checkOut: <space>
-    checkOutOptions: c
-    checkOutInWorktree: w
+    checkOut: c
     merge: M
     changeState: d
     updateBranch: u

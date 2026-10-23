@@ -35,6 +35,13 @@ var CheckOutPullRequestFromFork = NewIntegrationTest(NewIntegrationTestArgs{
 			).
 			Press(keys.PullRequests.CheckOut)
 
+		t.ExpectPopup().Menu().
+			Title(Equals("Check out #11")).
+			TopLines(
+				Contains("Check out").IsSelected(),
+			).
+			Confirm()
+
 		t.ExpectToast(Equals("Checked out #11 as docs"))
 
 		t.Views().Commits().

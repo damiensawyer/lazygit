@@ -30,6 +30,13 @@ var CheckOutPullRequest = NewIntegrationTest(NewIntegrationTestArgs{
 			).
 			Press(keys.PullRequests.CheckOut)
 
+		t.ExpectPopup().Menu().
+			Title(Equals("Check out #12")).
+			TopLines(
+				Contains("Check out").IsSelected(),
+			).
+			Confirm()
+
 		t.ExpectToast(Equals("Checked out #12 as widget"))
 
 		t.Views().PullRequests().
@@ -64,6 +71,13 @@ var CheckOutPullRequest = NewIntegrationTest(NewIntegrationTestArgs{
 		t.Views().PullRequests().
 			Focus().
 			Press(keys.PullRequests.CheckOut)
+
+		t.ExpectPopup().Menu().
+			Title(Equals("Check out #12")).
+			TopLines(
+				Contains("Check out").IsSelected(),
+			).
+			Confirm()
 
 		t.ExpectToast(Equals("Checked out #12 as widget"))
 

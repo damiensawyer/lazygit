@@ -61,23 +61,9 @@ func (self *PullRequestsController) GetKeybindings(opts types.KeybindingsOpts) [
 			Handler:           self.withItem(self.checkOut),
 			GetDisabledReason: self.require(self.singleItemSelected()),
 			Description:       tr.CheckOut,
-			Tooltip:           tr.CheckOutTooltip,
-			DisplayOnScreen:   true,
-		},
-		{
-			Keys:              opts.GetKeys(opts.Config.PullRequests.CheckOutOptions),
-			Handler:           self.withItem(self.checkOutOptions),
-			GetDisabledReason: self.require(self.singleItemSelected()),
-			Description:       tr.CheckOutOptions,
 			Tooltip:           tr.CheckOutOptionsTooltip,
 			OpensMenu:         true,
-		},
-		{
-			Keys:              opts.GetKeys(opts.Config.PullRequests.CheckOutInWorktree),
-			Handler:           self.withItem(self.checkOutInWorktree),
-			GetDisabledReason: self.require(self.singleItemSelected()),
-			Description:       tr.CheckOutInWorktree,
-			OpensMenu:         true,
+			DisplayOnScreen:   true,
 		},
 		{
 			Keys:              opts.GetKeys(opts.Config.PullRequests.Merge),
@@ -238,27 +224,22 @@ func (self *PullRequestsController) viewCommits(pr *models.GithubPullRequest) er
 }
 
 func (self *PullRequestsController) checkOut(pr *models.GithubPullRequest) error {
-	return self.c.Helpers().GithubPullRequests.CheckOut(pr, helpers.PullRequestCheckoutOpts{})
-}
-
-func (self *PullRequestsController) checkOutInWorktree(pr *models.GithubPullRequest) error {
-	return self.c.Helpers().GithubPullRequests.CheckOutInWorktree(pr, self.c.Helpers().Worktree, helpers.PullRequestCheckoutOpts{})
-}
-
-func (self *PullRequestsController) checkOutOptions(pr *models.GithubPullRequest) error {
 	tr := self.c.Tr.PullRequests
 	helper := self.c.Helpers().GithubPullRequests
 	return self.c.Menu(types.CreateMenuOptions{
 		Title: utils.ResolvePlaceholderString(tr.CheckOutOptionsTitle, map[string]string{"number": fmt.Sprint(pr.Number)}),
 		Items: []*types.MenuItem{
 			{
-				Label: tr.CheckOut,
+				Label:   tr.CheckOut,
+				Tooltip: tr.CheckOutTooltip,
+				Keys:    menuKey('c'),
 				OnPress: func() error {
 					return helper.CheckOut(pr, helpers.PullRequestCheckoutOpts{})
 				},
 			},
 			{
 				Label: tr.CheckOutAsBranch,
+				Keys:  menuKey('b'),
 				OnPress: func() error {
 					self.c.Prompt(types.PromptOpts{
 						Title:          tr.CheckOutAsBranchPrompt,
@@ -272,20 +253,23 @@ func (self *PullRequestsController) checkOutOptions(pr *models.GithubPullRequest
 			},
 			{
 				Label: tr.CheckOutDetached,
+				Keys:  menuKey('d'),
 				OnPress: func() error {
 					return helper.CheckOut(pr, helpers.PullRequestCheckoutOpts{Detach: true})
 				},
 			},
 			{
 				Label:     tr.CheckOutInWorktree,
+				Keys:      menuKey('w'),
 				OpensMenu: true,
 				OnPress: func() error {
-					return self.checkOutInWorktree(pr)
+					return helper.CheckOutInWorktree(pr, self.c.Helpers().Worktree, helpers.PullRequestCheckoutOpts{})
 				},
 			},
 			{
 				Label:   tr.CheckOutForce,
 				Tooltip: tr.CheckOutForceTooltip,
+				Keys:    menuKey('f'),
 				OnPress: func() error {
 					return helper.CheckOut(pr, helpers.PullRequestCheckoutOpts{Force: true})
 				},

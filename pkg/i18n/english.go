@@ -1217,7 +1217,6 @@ type PullRequests struct {
 	WorktreeLocationPrompt           string
 	CheckOut                         string
 	CheckOutTooltip                  string
-	CheckOutOptions                  string
 	CheckOutOptionsTooltip           string
 	CheckOutAsBranch                 string
 	CheckOutAsBranchPrompt           string
@@ -3011,8 +3010,7 @@ func EnglishTranslationSet() *TranslationSet {
 			WorktreeLocationPrompt:           "Where to check out #{{.number}}?",
 			CheckOut:                         "Check out",
 			CheckOutTooltip:                  "Check out the pull request the way `gh pr checkout` does: on a local branch named like its head branch (fast-forwarding it if it exists), set up to pull new commits of the pull request, and, where maintainers may push to it, to push to it. A pull request from a fork without a remote of its own is fetched from the base repository.",
-			CheckOutOptions:                  "Check out",
-			CheckOutOptionsTooltip:           "Check the pull request out under another branch name, detached, in a new worktree, or reset the local branch to it rather than only fast-forwarding it.",
+			CheckOutOptionsTooltip:           "Check the pull request out the way `gh pr checkout` does, or under another branch name, detached, in a new worktree, or resetting the local branch to it rather than only fast-forwarding it.",
 			CheckOutAsBranch:                 "Check out as a branch named…",
 			CheckOutAsBranchPrompt:           "Local branch name",
 			CheckOutDetached:                 "Check out detached",
