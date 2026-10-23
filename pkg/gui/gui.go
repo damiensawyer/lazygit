@@ -434,14 +434,7 @@ func (gui *Gui) onNewRepo(startArgs appTypes.StartArgs, contextKey types.Context
 			reloadErr, didChange := gui.Config.ReloadChangedUserConfigFiles()
 			if didChange && reloadErr == nil {
 				gui.c.Log.Info("User config changed - reloading")
-				reloadErr = gui.onUserConfigLoaded()
-				gui.applySidePanelWidthConfig()
-				gui.reloadSidePanels()
-				gui.resetKeybindings()
-
-				if err := gui.checkForChangedConfigsThatDontAutoReload(oldConfig, gui.Config.GetUserConfig()); err != nil {
-					return err
-				}
+				reloadErr = gui.onUserConfigReloaded(oldConfig)
 			}
 
 			gui.c.Log.Info("Receiving focus - refreshing")
@@ -546,6 +539,22 @@ func (gui *Gui) getPerRepoConfigFiles() []*config.ConfigFile {
 		dir = filepath.Dir(dir)
 	}
 	return repoConfigFiles
+}
+
+// onUserConfigReloaded applies a config that was reloaded while lazygit is
+// running, so that the changes take effect without a restart; oldConfig is
+// the config from before the reload.
+func (gui *Gui) onUserConfigReloaded(oldConfig *config.UserConfig) error {
+	loadErr := gui.onUserConfigLoaded()
+	gui.applySidePanelWidthConfig()
+	gui.reloadSidePanels()
+	gui.resetKeybindings()
+
+	if err := gui.checkForChangedConfigsThatDontAutoReload(oldConfig, gui.Config.GetUserConfig()); err != nil {
+		return err
+	}
+
+	return loadErr
 }
 
 func (gui *Gui) onUserConfigLoaded() error {
