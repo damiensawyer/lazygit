@@ -715,15 +715,18 @@ func TestRepoFileTreeViewModelClearFilterExpandsCollapsedParents(t *testing.T) {
 	viewModel.CollapseAllToTopLevel()
 
 	// while filtering, the root item, dir2 and sub are compressed into a
-	// single node, so expanding it doesn't expand dir2 itself
+	// single node, so clearing the filter has to expand both dir2 and sub to
+	// keep the selection visible
 	viewModel.SetFilter("cherry", false)
-	viewModel.ToggleCollapsed("./dir2/sub")
 	viewModel.SelectPath("dir2/sub/cherry", true)
-	assert.Equal(t, "dir2/sub/cherry", viewModel.GetSelectedPath())
-	assert.True(t, viewModel.IsCollapsed("./dir2"))
+	assert.Equal(t,
+		"dir2/sub/cherry",
+		viewModel.GetSelectedPath())
 
 	viewModel.ClearFilter()
-	assert.Equal(t, "dir2/sub/cherry", viewModel.GetSelectedPath())
+	assert.Equal(t,
+		"dir2/sub/cherry",
+		viewModel.GetSelectedPath())
 	assert.False(t, viewModel.IsCollapsed("./dir2"))
 	assert.False(t, viewModel.IsCollapsed("./dir2/sub"))
 	assert.True(t, viewModel.IsCollapsed("./dir1"))

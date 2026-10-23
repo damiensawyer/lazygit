@@ -60,6 +60,12 @@ type AppConfigurer interface {
 	// SaveHalfScreenModeSidePanelWidth writes halfScreenModeSidePanelWidth
 	// to the given per-repo config file path.
 	SaveHalfScreenModeSidePanelWidth(path string, value float64) error
+	// RemoveSidePanelWidth removes a saved sidePanelWidth from the given
+	// per-repo config file path.
+	RemoveSidePanelWidth(path string) error
+	// RemoveHalfScreenModeSidePanelWidth removes a saved
+	// halfScreenModeSidePanelWidth from the given per-repo config file path.
+	RemoveHalfScreenModeSidePanelWidth(path string) error
 	GetCachedGithubPullRequests(repoPath string) ([]CachedPullRequest, error)
 	SaveCachedGithubPullRequests(repoPath string, pullRequests []CachedPullRequest) error
 }
@@ -866,29 +872,25 @@ func (c *AppConfig) SaveHalfScreenModeSidePanelWidth(path string, value float64)
 	return saveRepoGuiValue(path, "halfScreenModeSidePanelWidth", value)
 }
 
+// RemoveSidePanelWidth removes a saved side panel width from the given
+// per-repo config file path.
+func (c *AppConfig) RemoveSidePanelWidth(path string) error {
+	return removeRepoGuiValue(path, "sidePanelWidth")
+}
+
+// RemoveHalfScreenModeSidePanelWidth removes a saved half screen mode side
+// panel width from the given per-repo config file path.
+func (c *AppConfig) RemoveHalfScreenModeSidePanelWidth(path string) error {
+	return removeRepoGuiValue(path, "halfScreenModeSidePanelWidth")
+}
+
 // saveRepoGuiValue sets the given key in the gui section of the per-repo
 // config file at path to the given value, preserving the file's other
 // content. The file is created if it doesn't exist yet.
 func saveRepoGuiValue(path string, key string, value float64) error {
-	rootNode := &yaml.Node{Kind: yaml.DocumentNode}
-	existing, err := os.ReadFile(path)
-	if err == nil && len(existing) > 0 {
-		if err := yaml.Unmarshal(existing, rootNode); err != nil {
-			return err
-		}
-	} else if err != nil && !errors.Is(err, os.ErrNotExist) {
+	rootNode, body, err := loadRepoConfig(path)
+	if err != nil {
 		return err
-	}
-
-	var body *yaml.Node
-	if rootNode.Kind == yaml.DocumentNode && len(rootNode.Content) > 0 {
-		body = rootNode.Content[0]
-		if body.Kind != yaml.MappingNode {
-			return errors.New("top-level element of the config file is not a mapping")
-		}
-	} else {
-		body = &yaml.Node{Kind: yaml.MappingNode}
-		rootNode.Content = []*yaml.Node{body}
 	}
 
 	// Get the gui section, creating it if necessary
@@ -914,6 +916,67 @@ func saveRepoGuiValue(path string, key string, value float64) error {
 		valueNode.Tag = "!!float"
 	}
 
+	return writeRepoConfig(path, rootNode)
+}
+
+// removeRepoGuiValue removes the given key from the gui section of the
+// per-repo config file at path, preserving the file's other content. A gui
+// section that is left empty is removed too, and so is a file that is left
+// with nothing in it. The file isn't touched if the key isn't in it.
+func removeRepoGuiValue(path string, key string) error {
+	rootNode, body, err := loadRepoConfig(path)
+	if err != nil {
+		return err
+	}
+
+	_, guiNode := yaml_utils.LookupKey(body, "gui")
+	if guiNode == nil || guiNode.Kind != yaml.MappingNode {
+		return nil
+	}
+	if keyNode, _ := yaml_utils.RemoveKey(guiNode, key); keyNode == nil {
+		return nil
+	}
+	if len(guiNode.Content) == 0 {
+		yaml_utils.RemoveKey(body, "gui")
+	}
+
+	if len(body.Content) == 0 && body.HeadComment == "" && body.FootComment == "" &&
+		rootNode.HeadComment == "" && rootNode.FootComment == "" {
+		return os.Remove(path)
+	}
+
+	return writeRepoConfig(path, rootNode)
+}
+
+// loadRepoConfig reads the per-repo config file at path, returning its
+// document node and the top-level mapping in it. A file that doesn't exist
+// or is empty gives an empty mapping.
+func loadRepoConfig(path string) (*yaml.Node, *yaml.Node, error) {
+	rootNode := &yaml.Node{Kind: yaml.DocumentNode}
+	existing, err := os.ReadFile(path)
+	if err == nil && len(existing) > 0 {
+		if err := yaml.Unmarshal(existing, rootNode); err != nil {
+			return nil, nil, err
+		}
+	} else if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return nil, nil, err
+	}
+
+	var body *yaml.Node
+	if rootNode.Kind == yaml.DocumentNode && len(rootNode.Content) > 0 {
+		body = rootNode.Content[0]
+		if body.Kind != yaml.MappingNode {
+			return nil, nil, errors.New("top-level element of the config file is not a mapping")
+		}
+	} else {
+		body = &yaml.Node{Kind: yaml.MappingNode}
+		rootNode.Content = []*yaml.Node{body}
+	}
+
+	return rootNode, body, nil
+}
+
+func writeRepoConfig(path string, rootNode *yaml.Node) error {
 	marshalled, err := yaml_utils.YamlMarshal(rootNode)
 	if err != nil {
 		return err

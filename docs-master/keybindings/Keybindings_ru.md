@@ -94,6 +94,27 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` R `` | Обновить |  |
 | `` / `` | Filter the current view by text |  |
 
+## Pull requests
+
+| Key | Action | Info |
+|-----|--------|-------------|
+| `` <enter> `` | View commits | Fetch the pull request from GitHub and show its commits, without checking it out. From there, view the files a commit changed, or select a range of commits to see their combined diff. |
+| `` c `` | Check out | Check the pull request out the way `gh pr checkout` does, or under another branch name, detached, in a new worktree, or resetting the local branch to it rather than only fast-forwarding it. |
+| `` M `` | Merge | Merge the pull request on GitHub with a merge commit, by squashing or by rebasing, optionally deleting its branch, locally too; or have GitHub merge it once it's ready. |
+| `` r `` | Review | Approve the pull request, request changes, or comment on it, submitting the line comments you collected in a pending review along with it. |
+| `` C `` | Comment | Add a comment to the pull request's conversation. |
+| `` t `` | View checks | List the pull request's checks, failing ones first, like `gh pr checks` does. A GitHub Actions job opens in the GitHub Actions view, at its log; any other check opens in the browser. Failed GitHub Actions jobs can be re-run from here. |
+| `` T `` | Review threads | List the conversations about lines of the pull request, unresolved ones first, to reply to them or resolve them. To start one, select lines of the pull request's diff in the main view and press the key for commenting there. |
+| `` e `` | Edit | Edit the pull request's title and description, change its base branch, and add or remove labels, assignees and requested reviewers, like `gh pr edit` does. |
+| `` d `` | Close, reopen, or change draft state | Close or reopen the pull request, mark it as ready for review, or convert it to a draft. |
+| `` u `` | Update branch | Bring the pull request's branch up to date with its base branch on GitHub, by merging the base branch into it or by rebasing it, like `gh pr update-branch` does. |
+| `` o `` | Open in browser | Open the pull request on GitHub. |
+| `` y `` | Copy to clipboard |  |
+| `` n `` | New pull request | Open a pull request for the checked out branch, without leaving lazygit, the way `gh pr create` does: choose the base branch, write the title and description (starting from the branch's commits or the repository's pull request template), and it is pushed first if needed. |
+| `` f `` | Filter pull requests | Choose which pull requests to load: open, closed, merged or all of them, and only those by an author, assigned to someone, awaiting someone's review, with a label, against a base branch, or matching a search. |
+| `` R `` | Refresh pull requests | Load the pull requests again; this logs you in to GitHub first if needed. They also reload by themselves every minute while the list is shown. |
+| `` / `` | Filter the current view by text |  |
+
 ## Repo files
 
 | Key | Action | Info |
@@ -148,6 +169,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` N `` | Go to previous file |  |
 | `` n `` | Go to next file |  |
 | `` <ctrl+g> `` | Jump to file |  |
+| `` r `` | Comment on the selected lines in the pull request | Write a comment on the selected lines of the diff, adding it to your pending review of the pull request, which is started if you haven't one. The comments are published when you submit the review (with the review key in the pull requests panel). This needs the diff of the whole pull request as GitHub has it: all of its commits, up to its latest. |
 | `` G `` | Open pull request at selected line | Open the branch's pull request in your browser, at the line the selection is on, so that you can comment on it there. Only pull requests on GitHub are found. |
 | `` <esc> `` | Exit back to side panel |  |
 | `` c `` | Сохранить изменения | Commit staged changes. |
@@ -175,6 +197,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` N `` | Go to previous file |  |
 | `` n `` | Go to next file |  |
 | `` <ctrl+g> `` | Jump to file |  |
+| `` r `` | Comment on the selected lines in the pull request | Write a comment on the selected lines of the diff, adding it to your pending review of the pull request, which is started if you haven't one. The comments are published when you submit the review (with the review key in the pull requests panel). This needs the diff of the whole pull request as GitHub has it: all of its commits, up to its latest. |
 | `` G `` | Open pull request at selected line | Open the branch's pull request in your browser, at the line the selection is on, so that you can comment on it there. Only pull requests on GitHub are found. |
 | `` <esc> `` | Exit back to side panel |  |
 | `` c `` | Сохранить изменения | Commit staged changes. |
@@ -302,6 +325,8 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 |-----|--------|-------------|
 | `` <enter> `` | Выполнить |  |
 | `` <esc> `` | Закрыть/отменить |  |
+| `` <left> `` | Back to previous menu |  |
+| `` <right> `` | Open submenu |  |
 | `` / `` | Filter the current view by text |  |
 
 ## Панель Подтверждения

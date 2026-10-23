@@ -125,6 +125,10 @@ type OpenCommitMessagePanelOpts struct {
 	OnConfirm        func(summary string, description string) error
 	OnSwitchToEditor func(string) error
 	InitialMessage   string
+	// Pass OnConfirm the description as typed, without the line breaks that
+	// wrapping it in the panel added: for text that isn't a commit message,
+	// like a comment on GitHub, where they would show.
+	UnwrapDescription bool
 
 	// The following two fields are only for the display of the "(hooks
 	// disabled)" display in the commit message panel. They have no effect on
@@ -137,6 +141,9 @@ type OpenCommitMessagePanelOpts struct {
 
 func (self *CommitsHelper) OpenCommitMessagePanel(opts *OpenCommitMessagePanelOpts) {
 	onConfirm := func(summary string, description string) error {
+		if opts.UnwrapDescription {
+			description = self.getUnwrappedCommitDescription()
+		}
 		self.CloseCommitMessagePanel()
 
 		return opts.OnConfirm(summary, description)

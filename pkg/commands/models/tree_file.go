@@ -12,9 +12,10 @@ type TreeFile struct {
 }
 
 const (
-	treeFileModeDir       int32 = 0o040000
-	treeFileModeSymlink   int32 = 0o120000
-	treeFileModeSubmodule int32 = 0o160000
+	treeFileModeDir        int32 = 0o040000
+	treeFileModeExecutable int32 = 0o100755
+	treeFileModeSymlink    int32 = 0o120000
+	treeFileModeSubmodule  int32 = 0o160000
 )
 
 func (f *TreeFile) ID() string {
@@ -41,4 +42,8 @@ func (f *TreeFile) IsDir() bool {
 
 func (f *TreeFile) IsSymlink() bool {
 	return f.Mode == treeFileModeSymlink
+}
+
+func (f *TreeFile) IsExecutable() bool {
+	return f.Mode == treeFileModeExecutable
 }

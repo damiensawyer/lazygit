@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/cli/go-gh/v2/pkg/auth"
-	ghconfig "github.com/cli/go-gh/v2/pkg/config"
 	"gopkg.in/yaml.v3"
 )
 
@@ -65,10 +64,17 @@ func postForm(ctx context.Context, u string, form url.Values, result any) error 
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("HTTP %d", resp.StatusCode)
+	switch resp.StatusCode {
+	case http.StatusOK:
+		return json.NewDecoder(resp.Body).Decode(result)
+	case http.StatusBadRequest:
+		// OAuth errors, like a device login that the user hasn't completed
+		// yet, are sent with this status, and a body saying what they are.
+		if err := json.NewDecoder(resp.Body).Decode(result); err == nil {
+			return nil
+		}
 	}
-	return json.NewDecoder(resp.Body).Decode(result)
+	return fmt.Errorf("HTTP %d", resp.StatusCode)
 }
 
 // RequestDeviceCode starts a device login.
@@ -170,11 +176,12 @@ func FetchUsername(ctx context.Context, host string, token string) (string, erro
 	return user.Login, nil
 }
 
-// StoreToken saves a token in the GitHub CLI's hosts.yml, the same way
-// `gh auth login --insecure-storage` does, so that it is found next time,
-// both by us and by gh.
+// StoreToken saves a token where the GitHub CLI keeps its own, the same way
+// `gh auth login` does, so that it is found next time, both by us and by gh:
+// in the system keyring, with hosts.yml recording whose it is, or, where there
+// is no keyring to use, in hosts.yml itself.
 func StoreToken(host string, username string, token string) error {
-	path := filepath.Join(ghconfig.ConfigDir(), "hosts.yml")
+	path := hostsConfigPath()
 
 	// Read the file afresh rather than through go-gh's config package, which
 	// keeps the first version it read for the rest of the process: writing
@@ -189,19 +196,49 @@ func StoreToken(host string, username string, token string) error {
 			return fmt.Errorf("couldn't parse %s: %w", path, err)
 		}
 	}
-	if doc.Kind == 0 {
+	var out bytes.Buffer
+	switch {
+	case doc.Kind == 0:
+		// yaml.v3 drops the comments of a file without a document, so keep
+		// them by writing them back verbatim ahead of the new one.
+		if len(bytes.TrimSpace(content)) > 0 {
+			out.Write(content)
+			if !bytes.HasSuffix(content, []byte("\n")) {
+				out.WriteByte('\n')
+			}
+		}
 		doc = yaml.Node{Kind: yaml.DocumentNode, Content: []*yaml.Node{{Kind: yaml.MappingNode}}}
+	case doc.Content[0].Tag == "!!null":
+		null := doc.Content[0]
+		doc.Content[0] = &yaml.Node{
+			Kind:        yaml.MappingNode,
+			HeadComment: null.HeadComment,
+			LineComment: null.LineComment,
+			FootComment: null.FootComment,
+		}
+	case doc.Content[0].Kind != yaml.MappingNode:
+		return fmt.Errorf("couldn't update %s: it doesn't map hosts to their settings", path)
+	}
+
+	inKeyring := storeTokenInKeyring(host, username, token)
+	// A token left in the file from before would take precedence over one in
+	// the keyring.
+	setOrRemoveToken := func(node *yaml.Node) {
+		if inKeyring {
+			removeKey(node, "oauth_token")
+		} else {
+			setScalar(node, "oauth_token", token)
+		}
 	}
 
 	hostNode := mappingEntry(doc.Content[0], host)
-	setScalar(hostNode, "oauth_token", token)
+	setOrRemoveToken(hostNode)
 	setScalar(hostNode, "user", username)
 	if mappingValue(hostNode, "git_protocol") == nil {
 		setScalar(hostNode, "git_protocol", "https")
 	}
-	setScalar(mappingEntry(mappingEntry(hostNode, "users"), username), "oauth_token", token)
+	setOrRemoveToken(mappingEntry(mappingEntry(hostNode, "users"), username))
 
-	var out bytes.Buffer
 	encoder := yaml.NewEncoder(&out)
 	encoder.SetIndent(4)
 	if err := encoder.Encode(&doc); err != nil {
@@ -212,6 +249,13 @@ func StoreToken(host string, username string, token string) error {
 		return err
 	}
 	return os.WriteFile(path, out.Bytes(), 0o600)
+}
+
+// storeTokenInKeyring stores a user's token in the keyring, and makes it the
+// host's active one, reporting whether that worked.
+func storeTokenInKeyring(host string, username string, token string) bool {
+	service := keyringServiceName(host)
+	return keyringSet(service, username, token) == nil && keyringSet(service, "", token) == nil
 }
 
 func mappingValue(mapping *yaml.Node, key string) *yaml.Node {
@@ -234,6 +278,15 @@ func mappingEntry(mapping *yaml.Node, key string) *yaml.Node {
 	value := &yaml.Node{Kind: yaml.MappingNode}
 	mapping.Content = append(mapping.Content, &yaml.Node{Kind: yaml.ScalarNode, Value: key}, value)
 	return value
+}
+
+func removeKey(mapping *yaml.Node, key string) {
+	for i := 0; i+1 < len(mapping.Content); i += 2 {
+		if mapping.Content[i].Value == key {
+			mapping.Content = append(mapping.Content[:i], mapping.Content[i+2:]...)
+			return
+		}
+	}
 }
 
 func setScalar(mapping *yaml.Node, key string, value string) {

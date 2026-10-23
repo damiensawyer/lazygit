@@ -50,6 +50,8 @@ type TranslationSet struct {
 	StatusTitle                           string
 	GlobalTitle                           string
 	Execute                               string
+	BackToPreviousMenu                    string
+	OpenSubmenu                           string
 	Stage                                 string
 	StageTooltip                          string
 	ToggleStagedAll                       string
@@ -882,6 +884,7 @@ type TranslationSet struct {
 	CopiedToClipboard                        string
 	ErrCannotEditDirectory                   string
 	ErrCannotCopyContentOfDirectory          string
+	ErrCannotCopyContentOfSubmodule          string
 	ErrStageDirWithInlineMergeConflicts      string
 	ErrRepositoryMovedOrDeleted              string
 	ErrWorktreeMovedOrRemoved                string
@@ -903,6 +906,7 @@ type TranslationSet struct {
 	DiffContextSizeChanged                   string
 	RestoreDiffContextSize                   string
 	FullFileDiffView                         string
+	AlreadyShowingFullFileDiff               string
 	IncreaseRenameSimilarityThreshold        string
 	IncreaseRenameSimilarityThresholdTooltip string
 	DecreaseRenameSimilarityThreshold        string
@@ -1072,6 +1076,7 @@ type TranslationSet struct {
 	Bisect                                   Bisect
 	Log                                      Log
 	GithubActions                            GithubActions
+	PullRequests                             PullRequests
 	BreakingChangesTitle                     string
 	BreakingChangesMessage                   string
 	BreakingChangesByVersion                 map[string]string
@@ -1110,11 +1115,258 @@ type Log struct {
 	CopyToClipboard          string
 	Remove                   string
 	CreateFileWithContent    string
+	CreateSymlink            string
 	AppendingLineToFile      string
 	EditRebaseFromBaseCommit string
 	DroppingStash            string
 	PoppingStash             string
 	DeletingBranch           string
+}
+
+type PullRequests struct {
+	ChooseRepository                 string
+	Title                            string
+	MainTitle                        string
+	HeadIntoBase                     string
+	CreatedAndUpdated                string
+	CheckedOutAs                     string
+	Labels                           string
+	DetailsError                     string
+	LoadingDetails                   string
+	Milestone                        string
+	Assignees                        string
+	Reviewers                        string
+	Checks                           string
+	MergeStatus                      string
+	PendingReviewNotice              string
+	NoDescription                    string
+	FailingChecks                    string
+	Required                         string
+	Conversation                     string
+	ReviewThreadsHeading             string
+	NoChecks                         string
+	ChecksFailed                     string
+	ChecksPending                    string
+	ChecksPassed                     string
+	ChecksSkipped                    string
+	MergedBy                         string
+	ClosedAgo                        string
+	MergeConflicts                   string
+	MergeBehind                      string
+	MergeBlocked                     string
+	MergeUnstable                    string
+	MergeReady                       string
+	MergeDraft                       string
+	MergeUnknown                     string
+	AutoMergeEnabled                 string
+	Commented                        string
+	Approved                         string
+	RequestedChanges                 string
+	ReviewDismissed                  string
+	Reviewed                         string
+	Resolved                         string
+	Outdated                         string
+	Pending                          string
+	NoGithubRemote                   string
+	NotLoggedIn                      string
+	NoPullRequests                   string
+	Loading                          string
+	LoadError                        string
+	Refresh                          string
+	RefreshTooltip                   string
+	OpenInBrowser                    string
+	OpenInBrowserTooltip             string
+	CopyToClipboard                  string
+	CopyShort                        string
+	CopyURL                          string
+	CopyNumber                       string
+	CopyTitle                        string
+	CopyHeadBranch                   string
+	CopyDescription                  string
+	CopiedToClipboard                string
+	Filter                           string
+	FilterShort                      string
+	FilterTooltip                    string
+	FilterOpen                       string
+	FilterClosed                     string
+	FilterMerged                     string
+	FilterAll                        string
+	FilterState                      string
+	FilterMine                       string
+	FilterReviewRequested            string
+	FilterAssigned                   string
+	FilterAuthor                     string
+	FilterAuthorPrompt               string
+	FilterLabel                      string
+	FilterLabelPrompt                string
+	FilterBase                       string
+	FilterBasePrompt                 string
+	FilterSearch                     string
+	FilterSearchPrompt               string
+	ClearFilter                      string
+	FilterDescriptionAuthor          string
+	FilterDescriptionAssignee        string
+	FilterDescriptionReviewRequested string
+	FilterDescriptionLabel           string
+	FilterDescriptionBase            string
+	FilterDescriptionSearch          string
+	NoFilter                         string
+	CheckingOut                      string
+	CheckedOut                       string
+	CheckedOutDetached               string
+	WorktreeLocationPrompt           string
+	CheckOut                         string
+	CheckOutTooltip                  string
+	CheckOutOptionsTooltip           string
+	CheckOutAsBranch                 string
+	CheckOutAsBranchNamed            string
+	CheckOutAsBranchPrompt           string
+	CheckOutDetached                 string
+	CheckOutInWorktree               string
+	CheckOutInWorktreeTitle          string
+	CheckOutForce                    string
+	CheckOutForceTooltip             string
+	CheckOutOptionsTitle             string
+	ViewCommits                      string
+	ViewCommitsTooltip               string
+	FetchingPullRequest              string
+	NotOpen                          string
+	DefaultMethod                    string
+	MergeMethodNotAllowed            string
+	DraftCannotBeMerged              string
+	MergeCommit                      string
+	SquashAndMerge                   string
+	RebaseAndMerge                   string
+	DisableAutoMerge                 string
+	DisablingAutoMerge               string
+	AutoMergeDisabled                string
+	EnableAutoMerge                  string
+	EnableAutoMergeTooltip           string
+	AutoMergeNotAllowed              string
+	AutoMergeNotNeeded               string
+	MergeTitle                       string
+	MergeKeepBranch                  string
+	MergeDeleteBranch                string
+	MergeDeleteBranches              string
+	MergeConfirmTitle                string
+	Merging                          string
+	Merged                           string
+	EnablingAutoMerge                string
+	AutoMergeEnabledToast            string
+	AlreadyMerged                    string
+	Close                            string
+	CloseConfirm                     string
+	Closing                          string
+	Closed                           string
+	MarkReady                        string
+	Updating                         string
+	MarkedReady                      string
+	ConvertToDraft                   string
+	ConvertedToDraft                 string
+	Reopen                           string
+	Reopening                        string
+	Reopened                         string
+	StateTitle                       string
+	UpdatingBranch                   string
+	BranchUpdated                    string
+	UpdateBranchTitle                string
+	UpdateBranchPrompt               string
+	UpdateWithMerge                  string
+	UpdateWithRebase                 string
+	CommentTitle                     string
+	TextContinued                    string
+	Commenting                       string
+	CommentAdded                     string
+	SubmittingReview                 string
+	ReviewSubmitted                  string
+	CannotReviewOwnPullRequest       string
+	Approve                          string
+	ApproveWithComment               string
+	RequestChanges                   string
+	ReviewComment                    string
+	SubmitPendingReview              string
+	DiscardPendingReview             string
+	DiscardPendingReviewTitle        string
+	DiscardPendingReviewPrompt       string
+	PendingReviewDiscarded           string
+	ReviewTitle                      string
+	SubmitPendingReviewTitle         string
+	MergeKeyDescription              string
+	MergeTooltip                     string
+	StateKeyDescription              string
+	StateTooltip                     string
+	UpdateBranch                     string
+	UpdateBranchTooltip              string
+	Comment                          string
+	CommentTooltip                   string
+	Review                           string
+	ReviewTooltip                    string
+	CannotCreateFromDefaultBranch    string
+	CreateBaseBranchPrompt           string
+	NoTemplate                       string
+	ChooseTemplate                   string
+	NoCommitsToCreatePullRequest     string
+	CreateTitle                      string
+	DescriptionTitle                 string
+	CreateWillPush                   string
+	CreatePullRequest                string
+	CreateDraftPullRequest           string
+	Creating                         string
+	Created                          string
+	New                              string
+	NewTooltip                       string
+	NotOnABranch                     string
+	CreateHere                       string
+	CreateHereTooltip                string
+	BaseChanged                      string
+	CannotEdit                       string
+	ChangeBase                       string
+	ChangeBasePrompt                 string
+	Edited                           string
+	EditTitle                        string
+	EditTitleAndDescription          string
+	NoLabels                         string
+	PressToRemove                    string
+	AssignMe                         string
+	AssignSomeone                    string
+	AssignSomeonePrompt              string
+	ReviewRequested                  string
+	RerequestReview                  string
+	RequestReviewFrom                string
+	RequestReviewFromPrompt          string
+	Edit                             string
+	EditTooltip                      string
+	NoChecksToShow                   string
+	RerunFailedChecks                string
+	RerunFailedChecksTooltip         string
+	RerunningChecks                  string
+	RerunRequested                   string
+	OpenChecksInBrowser              string
+	ChecksTitle                      string
+	ViewChecks                       string
+	ViewChecksTooltip                string
+	AddReviewComment                 string
+	AddReviewCommentTooltip          string
+	CommentNeedsWholePullRequest     string
+	CommentNeedsLatestCommit         string
+	CommentNeedsDiffLines            string
+	CommentNeedsOneFile              string
+	ReviewCommentTitle               string
+	AddingReviewComment              string
+	ReviewCommentAdded               string
+	NoReviewThreads                  string
+	ReviewThreadsTitle               string
+	Reply                            string
+	ReplyTitle                       string
+	ReplyAdded                       string
+	ReplyAddedToPendingReview        string
+	Resolve                          string
+	Unresolve                        string
+	ThreadResolved                   string
+	OpenThreadInBrowser              string
+	ReviewThreads                    string
+	ReviewThreadsTooltip             string
+	FilesChanged                     string
 }
 
 type GithubActions struct {
@@ -1227,9 +1479,11 @@ type GithubActions struct {
 	WorkflowDisabled                   string
 	RunWorkflow                        string
 	RunWorkflowTooltip                 string
+	CantRunDisabledWorkflow            string
 	RunWorkflowRefPrompt               string
 	LoadingWorkflow                    string
 	NotDispatchable                    string
+	WorkflowFileNotAtRef               string
 	WorkflowInputPrompt                string
 	WorkflowInputPromptWithDescription string
 	StartingWorkflow                   string
@@ -1395,6 +1649,10 @@ type Actions struct {
 	OpenMergeTool                    string
 	OpenCommitInBrowser              string
 	OpenPullRequest                  string
+	CheckOutPullRequest              string
+	MergePullRequest                 string
+	ReviewPullRequest                string
+	CreatePullRequest                string
 	StartBisect                      string
 	ResetBisect                      string
 	BisectSkip                       string
@@ -1463,6 +1721,8 @@ func EnglishTranslationSet() *TranslationSet {
 		HunksWithOnlyAddedLinesWarning:       "There are ranges of only added lines in the diff; be careful to check that these belong in the found base commit.\n\nProceed?",
 		StatusTitle:                          "Status",
 		Execute:                              "Execute",
+		BackToPreviousMenu:                   "Back to previous menu",
+		OpenSubmenu:                          "Open submenu",
 		Stage:                                "Stage",
 		StageTooltip:                         "Toggle staged for selected file.",
 		ToggleStagedAll:                      "Stage all",
@@ -2301,6 +2561,7 @@ func EnglishTranslationSet() *TranslationSet {
 		CopiedToClipboard:                        "copied to clipboard",
 		ErrCannotEditDirectory:                   "Cannot edit directories: you can only edit individual files",
 		ErrCannotCopyContentOfDirectory:          "Cannot copy content of directories: you can only copy content of individual files",
+		ErrCannotCopyContentOfSubmodule:          "Cannot copy content of a submodule",
 		ErrStageDirWithInlineMergeConflicts:      "Cannot stage/unstage directory containing files with inline merge conflicts. Please fix up the merge conflicts first",
 		ErrRepositoryMovedOrDeleted:              "Cannot find repo. It might have been moved or deleted ¯\\_(ツ)_/¯",
 		CommandLog:                               "Command log",
@@ -2320,8 +2581,9 @@ func EnglishTranslationSet() *TranslationSet {
 		ToggleContextInDiffView:                  "Toggle full file diff view",
 		ToggleContextInDiffViewTooltip:           "Toggle between showing only changed lines with context and showing the entire file.\n\nPress again to restore the previous context size.",
 		DiffContextSizeChanged:                   "Changed diff context size to %d",
-		RestoreDiffContextSize:                   "Restored context size to %d",
+		RestoreDiffContextSize:                   "Restored context size to {{.size}}",
 		FullFileDiffView:                         "Showing full file diff",
+		AlreadyShowingFullFileDiff:               "Already showing the full file diff",
 		IncreaseRenameSimilarityThresholdTooltip: "Increase the similarity threshold for a deletion and addition pair to be treated as a rename.\n\nThe default can be changed in the config file with the key 'git.renameSimilarityThreshold'.",
 		IncreaseRenameSimilarityThreshold:        "Increase rename similarity threshold",
 		DecreaseRenameSimilarityThresholdTooltip: "Decrease the similarity threshold for a deletion and addition pair to be treated as a rename.\n\nThe default can be changed in the config file with the key 'git.renameSimilarityThreshold'.",
@@ -2614,6 +2876,10 @@ func EnglishTranslationSet() *TranslationSet {
 			OpenMergeTool:                    "Open merge tool",
 			OpenCommitInBrowser:              "Open commit in browser",
 			OpenPullRequest:                  "Open pull request in browser",
+			CheckOutPullRequest:              "Check out pull request",
+			MergePullRequest:                 "Merge pull request",
+			ReviewPullRequest:                "Review pull request",
+			CreatePullRequest:                "Create pull request",
 			StartBisect:                      "Start bisect",
 			ResetBisect:                      "Reset bisect",
 			BisectSkip:                       "Bisect skip",
@@ -2645,11 +2911,257 @@ func EnglishTranslationSet() *TranslationSet {
 			CopyToClipboard:          "Copying '{{.str}}' to clipboard",
 			Remove:                   "Removing '{{.filename}}'",
 			CreateFileWithContent:    "Creating file '{{.path}}'",
+			CreateSymlink:            "Creating symlink '{{.path}}' pointing to '{{.target}}'",
 			AppendingLineToFile:      "Appending '{{.line}}' to file '{{.filename}}'",
 			EditRebaseFromBaseCommit: "Beginning interactive rebase from '{{.baseCommit}}' onto '{{.targetBranchName}}'",
 			DroppingStash:            "Dropping stash %s",
 			PoppingStash:             "Popping stash %s",
 			DeletingBranch:           "Deleting branch '{{.branchName}}' (was {{.hash}})",
+		},
+		PullRequests: PullRequests{
+			ChooseRepository:                 "There are several GitHub remotes. Press {{.key}} to choose the one whose pull requests to show.",
+			Title:                            "Pull requests",
+			MainTitle:                        "Pull request",
+			HeadIntoBase:                     "{{.author}} wants to merge {{.head}} into {{.base}}",
+			CreatedAndUpdated:                "opened {{.created}} ago, updated {{.updated}} ago",
+			CheckedOutAs:                     "Checked out as {{.branch}}",
+			Labels:                           "Labels",
+			DetailsError:                     "Couldn't load the pull request's details: {{.error}}",
+			LoadingDetails:                   "Loading…",
+			Milestone:                        "Milestone",
+			Assignees:                        "Assignees",
+			Reviewers:                        "Reviewers",
+			Checks:                           "Checks",
+			MergeStatus:                      "Merge",
+			PendingReviewNotice:              "You have a pending review with {{.count}} comment(s) that you haven't submitted yet.",
+			NoDescription:                    "No description provided.",
+			FailingChecks:                    "Failing checks",
+			Required:                         "(required)",
+			Conversation:                     "Conversation",
+			ReviewThreadsHeading:             "Review threads ({{.unresolved}} of {{.total}} unresolved)",
+			NoChecks:                         "none",
+			ChecksFailed:                     "{{.count}} failing",
+			ChecksPending:                    "{{.count}} pending",
+			ChecksPassed:                     "{{.count}} passing",
+			ChecksSkipped:                    "{{.count}} skipped",
+			MergedBy:                         "merged by {{.user}} {{.ago}} ago",
+			ClosedAgo:                        "closed {{.ago}} ago",
+			MergeConflicts:                   "has conflicts with the base branch",
+			MergeBehind:                      "the head branch is behind the base branch",
+			MergeBlocked:                     "blocked (required reviews or checks are missing)",
+			MergeUnstable:                    "can be merged, but some checks are failing",
+			MergeReady:                       "ready to merge",
+			MergeDraft:                       "a draft can't be merged",
+			MergeUnknown:                     "GitHub is still working out whether it can be merged",
+			AutoMergeEnabled:                 "auto-merge ({{.method}}) enabled by {{.user}}",
+			Commented:                        "commented",
+			Approved:                         "approved",
+			RequestedChanges:                 "requested changes",
+			ReviewDismissed:                  "had their review dismissed",
+			Reviewed:                         "reviewed",
+			Resolved:                         "resolved",
+			Outdated:                         "outdated",
+			Pending:                          "pending",
+			NoGithubRemote:                   "This repository has no GitHub remote, so there are no pull requests to show.",
+			NotLoggedIn:                      "Not logged in to GitHub. Press {{.key}} to log in and load the pull requests.",
+			NoPullRequests:                   "No pull requests match the filter.",
+			Loading:                          "Loading pull requests…",
+			LoadError:                        "Couldn't load the pull requests: {{.error}}",
+			Refresh:                          "Refresh pull requests",
+			RefreshTooltip:                   "Load the pull requests again; this logs you in to GitHub first if needed. They also reload by themselves every minute while the list is shown.",
+			OpenInBrowser:                    "Open in browser",
+			OpenInBrowserTooltip:             "Open the pull request on GitHub.",
+			CopyToClipboard:                  "Copy to clipboard",
+			CopyShort:                        "Copy",
+			CopyURL:                          "URL",
+			CopyNumber:                       "Number",
+			CopyTitle:                        "Title",
+			CopyHeadBranch:                   "Head branch",
+			CopyDescription:                  "Description",
+			CopiedToClipboard:                "Copied the pull request's {{.what}} to the clipboard",
+			Filter:                           "Filter pull requests",
+			FilterShort:                      "Filter",
+			FilterTooltip:                    "Choose which pull requests to load: open, closed, merged or all of them, and only those by an author, assigned to someone, awaiting someone's review, with a label, against a base branch, or matching a search.",
+			FilterOpen:                       "Open",
+			FilterClosed:                     "Closed",
+			FilterMerged:                     "Merged",
+			FilterAll:                        "All",
+			FilterState:                      "State",
+			FilterMine:                       "Created by me",
+			FilterReviewRequested:            "Awaiting my review",
+			FilterAssigned:                   "Assigned to me",
+			FilterAuthor:                     "By author…",
+			FilterAuthorPrompt:               "Author's login",
+			FilterLabel:                      "With label…",
+			FilterLabelPrompt:                "Label",
+			FilterBase:                       "Against base branch…",
+			FilterBasePrompt:                 "Base branch",
+			FilterSearch:                     "Search…",
+			FilterSearchPrompt:               `Search (GitHub search syntax, e.g. "fix in:title")`,
+			ClearFilter:                      "Show all open pull requests",
+			FilterDescriptionAuthor:          "by {{.value}}",
+			FilterDescriptionAssignee:        "assigned to {{.value}}",
+			FilterDescriptionReviewRequested: "awaiting review by {{.value}}",
+			FilterDescriptionLabel:           "labelled {{.value}}",
+			FilterDescriptionBase:            "into {{.value}}",
+			FilterDescriptionSearch:          `matching "{{.value}}"`,
+			NoFilter:                         "All open pull requests are shown already.",
+			CheckingOut:                      "Checking out pull request…",
+			CheckedOut:                       "Checked out #{{.number}} as {{.branch}}",
+			CheckedOutDetached:               "Checked out #{{.number}} at a detached HEAD",
+			WorktreeLocationPrompt:           "Where to check out #{{.number}}?",
+			CheckOut:                         "Check out",
+			CheckOutTooltip:                  "Check out the pull request the way `gh pr checkout` does: on a local branch named like its head branch (fast-forwarding it if it exists), set up to pull new commits of the pull request, and, where maintainers may push to it, to push to it. A pull request from a fork without a remote of its own is fetched from the base repository.",
+			CheckOutOptionsTooltip:           "Check the pull request out the way `gh pr checkout` does, or under another branch name, detached, in a new worktree, or resetting the local branch to it rather than only fast-forwarding it.",
+			CheckOutAsBranch:                 "Check out as a branch named…",
+			CheckOutAsBranchNamed:            "Check out as a branch named",
+			CheckOutAsBranchPrompt:           "Local branch name",
+			CheckOutDetached:                 "Check out detached",
+			CheckOutInWorktree:               "Check out in a new worktree",
+			CheckOutInWorktreeTitle:          "In a new worktree",
+			CheckOutForce:                    "Check out, resetting the local branch to the pull request",
+			CheckOutForceTooltip:             "Like checking it out, but if the local branch has diverged from the pull request, reset it to the pull request rather than failing. Commits only on the local branch are lost.",
+			CheckOutOptionsTitle:             "Check out #{{.number}}",
+			ViewCommits:                      "View commits",
+			ViewCommitsTooltip:               "Fetch the pull request from GitHub and show its commits, without checking it out. From there, view the files a commit changed, or select a range of commits to see their combined diff.",
+			FetchingPullRequest:              "Fetching pull request…",
+			NotOpen:                          "The pull request isn't open.",
+			DefaultMethod:                    "(your default)",
+			MergeMethodNotAllowed:            "The repository doesn't allow merging this way.",
+			DraftCannotBeMerged:              "A draft can't be merged; mark it as ready for review first.",
+			MergeCommit:                      "Create a merge commit",
+			SquashAndMerge:                   "Squash and merge",
+			RebaseAndMerge:                   "Rebase and merge",
+			DisableAutoMerge:                 "Disable auto-merge",
+			DisablingAutoMerge:               "Disabling auto-merge…",
+			AutoMergeDisabled:                "Disabled auto-merge for #{{.number}}",
+			EnableAutoMerge:                  "Enable auto-merge",
+			EnableAutoMergeTooltip:           "Have GitHub merge the pull request by itself once its required reviews and checks are in.",
+			AutoMergeNotAllowed:              "The repository doesn't allow auto-merge.",
+			AutoMergeNotNeeded:               "The pull request can be merged right away.",
+			MergeTitle:                       "Merge #{{.number}} into {{.base}}",
+			MergeKeepBranch:                  "Merge, keeping the branch",
+			MergeDeleteBranch:                "Merge, and delete the branch",
+			MergeDeleteBranches:              "Merge, and delete the branch along with the local branch {{.branch}}",
+			MergeConfirmTitle:                "Merge #{{.number}} {{.title}}",
+			Merging:                          "Merging…",
+			Merged:                           "Merged #{{.number}}",
+			EnablingAutoMerge:                "Enabling auto-merge…",
+			AutoMergeEnabledToast:            "#{{.number}} will be merged once it's ready",
+			AlreadyMerged:                    "The pull request has been merged.",
+			Close:                            "Close the pull request",
+			CloseConfirm:                     "Close #{{.number}} {{.title}} without merging it?",
+			Closing:                          "Closing…",
+			Closed:                           "Closed #{{.number}}",
+			MarkReady:                        "Mark as ready for review",
+			Updating:                         "Updating…",
+			MarkedReady:                      "Marked #{{.number}} as ready for review",
+			ConvertToDraft:                   "Convert to draft",
+			ConvertedToDraft:                 "Converted #{{.number}} to a draft",
+			Reopen:                           "Reopen the pull request",
+			Reopening:                        "Reopening…",
+			Reopened:                         "Reopened #{{.number}}",
+			StateTitle:                       "#{{.number}} {{.title}}",
+			UpdatingBranch:                   "Updating branch…",
+			BranchUpdated:                    "Brought {{.head}} up to date with {{.base}}",
+			UpdateBranchTitle:                "Update {{.head}} with {{.base}}",
+			UpdateBranchPrompt:               "Bring the pull request's branch up to date with the latest changes of {{.base}} on GitHub.",
+			UpdateWithMerge:                  "Merge {{.base}} into it",
+			UpdateWithRebase:                 "Rebase it onto {{.base}}",
+			CommentTitle:                     "Comment on #{{.number}}",
+			TextContinued:                    "More (optional)",
+			Commenting:                       "Commenting…",
+			CommentAdded:                     "Commented on #{{.number}}",
+			SubmittingReview:                 "Submitting review…",
+			ReviewSubmitted:                  "Reviewed #{{.number}}",
+			CannotReviewOwnPullRequest:       "You can't approve your own pull request or request changes to it.",
+			Approve:                          "Approve",
+			ApproveWithComment:               "Approve with a comment",
+			RequestChanges:                   "Request changes",
+			ReviewComment:                    "Comment without approving",
+			SubmitPendingReview:              "Submit the pending review without a comment",
+			DiscardPendingReview:             "Discard the pending review ({{.count}} comment(s))",
+			DiscardPendingReviewTitle:        "Discard pending review",
+			DiscardPendingReviewPrompt:       "Discard your pending review, along with the comments you collected in it?",
+			PendingReviewDiscarded:           "Discarded the pending review",
+			ReviewTitle:                      "Review #{{.number}}",
+			SubmitPendingReviewTitle:         "Submit your pending review of #{{.number}} ({{.count}} comment(s))",
+			MergeKeyDescription:              "Merge",
+			MergeTooltip:                     "Merge the pull request on GitHub with a merge commit, by squashing or by rebasing, optionally deleting its branch, locally too; or have GitHub merge it once it's ready.",
+			StateKeyDescription:              "Close, reopen, or change draft state",
+			StateTooltip:                     "Close or reopen the pull request, mark it as ready for review, or convert it to a draft.",
+			UpdateBranch:                     "Update branch",
+			UpdateBranchTooltip:              "Bring the pull request's branch up to date with its base branch on GitHub, by merging the base branch into it or by rebasing it, like `gh pr update-branch` does.",
+			Comment:                          "Comment",
+			CommentTooltip:                   "Add a comment to the pull request's conversation.",
+			Review:                           "Review",
+			ReviewTooltip:                    "Approve the pull request, request changes, or comment on it, submitting the line comments you collected in a pending review along with it.",
+			CannotCreateFromDefaultBranch:    "{{.branch}} is the repository's default branch; a pull request merges another branch into it.",
+			CreateBaseBranchPrompt:           "Merge {{.branch}} into",
+			NoTemplate:                       "No template",
+			ChooseTemplate:                   "Choose a pull request template",
+			NoCommitsToCreatePullRequest:     "{{.branch}} has no commits that {{.base}} doesn't have.",
+			CreateTitle:                      "Pull request: {{.branch}} into {{.base}}",
+			DescriptionTitle:                 "Description",
+			CreateWillPush:                   "{{.branch}} will be pushed to {{.remote}} first.",
+			CreatePullRequest:                "Create pull request",
+			CreateDraftPullRequest:           "Create draft pull request",
+			Creating:                         "Creating pull request…",
+			Created:                          "Created #{{.number}}",
+			New:                              "New pull request",
+			NewTooltip:                       "Open a pull request for the checked out branch, without leaving lazygit, the way `gh pr create` does: choose the base branch, write the title and description (starting from the branch's commits or the repository's pull request template), and it is pushed first if needed.",
+			NotOnABranch:                     "You're not on a branch.",
+			CreateHere:                       "Create pull request in lazygit",
+			CreateHereTooltip:                "Write and open the pull request without leaving lazygit, the way `gh pr create` does, rather than in the browser.",
+			BaseChanged:                      "#{{.number}} now merges into {{.base}}",
+			CannotEdit:                       "You don't have permission to edit this pull request.",
+			ChangeBase:                       "Change the base branch…",
+			ChangeBasePrompt:                 "Merge {{.head}} into",
+			Edited:                           "Updated #{{.number}}",
+			EditTitle:                        "Edit #{{.number}}",
+			EditTitleAndDescription:          "Edit the title and description",
+			NoLabels:                         "The repository has no labels.",
+			PressToRemove:                    "Press to remove",
+			AssignMe:                         "Assign to me",
+			AssignSomeone:                    "Assign someone…",
+			AssignSomeonePrompt:              "Assign to (a login)",
+			ReviewRequested:                  "Requested a review from {{.reviewer}}",
+			RerequestReview:                  "Request another review from {{.reviewer}}",
+			RequestReviewFrom:                "Request a review from…",
+			RequestReviewFromPrompt:          "Request a review from (a login, or org/team)",
+			Edit:                             "Edit",
+			EditTooltip:                      "Edit the pull request's title and description, change its base branch, and add or remove labels, assignees and requested reviewers, like `gh pr edit` does.",
+			NoChecksToShow:                   "The pull request has no checks.",
+			RerunFailedChecks:                "Re-run the failed GitHub Actions jobs",
+			RerunFailedChecksTooltip:         "Re-run the jobs that failed, and the jobs that depend on them, of every GitHub Actions run among the checks.",
+			RerunningChecks:                  "Re-running…",
+			RerunRequested:                   "Requested re-runs of {{.count}} workflow run(s)",
+			OpenChecksInBrowser:              "Open the checks in the browser",
+			ChecksTitle:                      "Checks of #{{.number}}",
+			ViewChecks:                       "View checks",
+			ViewChecksTooltip:                "List the pull request's checks, failing ones first, like `gh pr checks` does. A GitHub Actions job opens in the GitHub Actions view, at its log; any other check opens in the browser. Failed GitHub Actions jobs can be re-run from here.",
+			AddReviewComment:                 "Comment on the selected lines in the pull request",
+			AddReviewCommentTooltip:          "Write a comment on the selected lines of the diff, adding it to your pending review of the pull request, which is started if you haven't one. The comments are published when you submit the review (with the review key in the pull requests panel). This needs the diff of the whole pull request as GitHub has it: all of its commits, up to its latest.",
+			CommentNeedsWholePullRequest:     "Comments go on the diff of the whole pull request: select all of its commits, from its first.",
+			CommentNeedsLatestCommit:         "Comments go on the diff of the whole pull request as GitHub has it, up to its latest commit {{.head}}; fetch or push to bring the diff up to date.",
+			CommentNeedsDiffLines:            "Select lines of the diff, not a file's or hunk's header.",
+			CommentNeedsOneFile:              "Select lines of one file.",
+			ReviewCommentTitle:               "Comment on {{.path}}:{{.lines}}",
+			AddingReviewComment:              "Adding comment…",
+			ReviewCommentAdded:               "Added the comment to your pending review",
+			NoReviewThreads:                  "Nobody has commented on lines of this pull request.",
+			ReviewThreadsTitle:               "Review threads of #{{.number}}",
+			Reply:                            "Reply…",
+			ReplyTitle:                       "Reply on {{.location}}",
+			ReplyAdded:                       "Replied",
+			ReplyAddedToPendingReview:        "Added the reply to your pending review",
+			Resolve:                          "Resolve the conversation",
+			Unresolve:                        "Unresolve the conversation",
+			ThreadResolved:                   "Resolved the conversation on {{.location}}",
+			OpenThreadInBrowser:              "Open in the browser",
+			ReviewThreads:                    "Review threads",
+			ReviewThreadsTooltip:             "List the conversations about lines of the pull request, unresolved ones first, to reply to them or resolve them. To start one, select lines of the pull request's diff in the main view and press the key for commenting there.",
+			FilesChanged:                     "{{.count}} file(s) changed in {{.commits}} commit(s)",
 		},
 		GithubActions: GithubActions{
 			LoginTitle:                         "Log in to {{.host}}",
@@ -2676,7 +3188,7 @@ func EnglishTranslationSet() *TranslationSet {
 			RunsTitleForRepo:                   "Actions · {{.repo}}",
 			LoadingRuns:                        "Loading GitHub Actions runs",
 			NoGithubRemote:                     "This repository has no GitHub remote",
-			SelectRepository:                   "Select the repository whose Actions to show",
+			SelectRepository:                   "Which GitHub repository is this one's?",
 			RepoNotFound:                       "Repository {{.repo}} not found on GitHub, or your token has no access to it",
 			NoRuns:                             "No workflow runs",
 			OpenGithubActions:                  "View GitHub Actions",
@@ -2761,9 +3273,11 @@ func EnglishTranslationSet() *TranslationSet {
 			WorkflowDisabled:                   "disabled",
 			RunWorkflow:                        "Run workflow",
 			RunWorkflowTooltip:                 "Trigger the workflow on a branch or tag of your choice, asking for its inputs, like `gh workflow run` does. Only workflows with a workflow_dispatch trigger can be run this way.",
+			CantRunDisabledWorkflow:            "The workflow is disabled, so it can't be run until it is enabled again.",
 			RunWorkflowRefPrompt:               "Run {{.workflow}} on branch or tag",
 			LoadingWorkflow:                    "Loading workflow",
 			NotDispatchable:                    "{{.workflow}} can't be run manually: it has no workflow_dispatch trigger",
+			WorkflowFileNotAtRef:               "{{.path}} doesn't exist at {{.ref}}",
 			WorkflowInputPrompt:                "{{.name}}",
 			WorkflowInputPromptWithDescription: "{{.name}}: {{.description}}",
 			StartingWorkflow:                   "Starting workflow",

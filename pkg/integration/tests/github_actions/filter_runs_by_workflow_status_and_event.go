@@ -34,7 +34,7 @@ var FilterRunsByWorkflowStatusAndEvent = NewIntegrationTest(NewIntegrationTestAr
 			Confirm()
 
 		t.ExpectPopup().Menu().
-			Title(Equals("Runs of workflow")).
+			Title(Equals("Filter runs › Runs of workflow")).
 			Lines(
 				Contains("Any workflow").IsSelected(),
 				Contains("CI"),
@@ -60,7 +60,7 @@ var FilterRunsByWorkflowStatusAndEvent = NewIntegrationTest(NewIntegrationTestAr
 			Confirm()
 
 		t.ExpectPopup().Menu().
-			Title(Equals("Runs with status")).
+			Title(Equals("Filter runs › Runs with status")).
 			Lines(
 				Contains("Any status").IsSelected(),
 				Contains("Failed"),
@@ -91,7 +91,7 @@ var FilterRunsByWorkflowStatusAndEvent = NewIntegrationTest(NewIntegrationTestAr
 			Confirm()
 
 		t.ExpectPopup().Menu().
-			Title(Equals("Runs triggered by")).
+			Title(Equals("Filter runs › Runs triggered by")).
 			Select(Equals("( ) pull_request")).
 			Confirm()
 

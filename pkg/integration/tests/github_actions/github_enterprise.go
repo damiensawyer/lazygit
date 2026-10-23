@@ -40,7 +40,7 @@ var GithubEnterprise = NewIntegrationTest(NewIntegrationTestArgs{
 			Confirm()
 
 		t.ExpectPopup().Menu().
-			Title(Equals("CI")).
+			Title(Equals("Workflows › CI")).
 			Select(Contains("Open in browser")).
 			Confirm()
 

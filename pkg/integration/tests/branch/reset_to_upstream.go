@@ -65,7 +65,7 @@ var ResetToUpstream = NewIntegrationTest(NewIntegrationTestArgs{
 					Confirm()
 
 				t.ExpectPopup().Menu().
-					Title(Equals("Reset to origin/soft-branch")).
+					Title(Equals("Upstream options › Reset to origin/soft-branch")).
 					Select(Contains("Soft reset")).
 					Confirm()
 			})
@@ -96,7 +96,7 @@ var ResetToUpstream = NewIntegrationTest(NewIntegrationTestArgs{
 					Confirm()
 
 				t.ExpectPopup().Menu().
-					Title(Equals("Reset to origin/hard-branch")).
+					Title(Equals("Upstream options › Reset to origin/hard-branch")).
 					Select(Contains("Hard reset")).
 					Confirm()
 

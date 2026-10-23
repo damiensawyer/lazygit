@@ -100,6 +100,11 @@ type IGuiCommon interface {
 	SaveAppStateAndLogError()
 	SaveSidePanelWidth()
 	SaveHalfScreenModeSidePanelWidth()
+	// ResetSidePanelWidth and ResetHalfScreenModeSidePanelWidth remove the
+	// width saved to the per-repo config and reload the config, so that the
+	// configured width applies again
+	ResetSidePanelWidth() error
+	ResetHalfScreenModeSidePanelWidth() error
 
 	// Runs the given function on the UI thread (this is for things like showing a popup asking a user for input).
 	// Only necessary to call if you're not already on the UI thread i.e. you're inside a goroutine.
@@ -393,6 +398,9 @@ type Model struct {
 	PullRequestsMap       map[string]*models.GithubPullRequest
 
 	GithubRuns []*models.GithubRun
+
+	// the pull requests the pull requests panel lists
+	ListedPullRequests []*models.GithubPullRequest
 
 	// FilteredReflogCommits are the ones that appear in the reflog panel.
 	// When in filtering mode we only include the ones that match the given path

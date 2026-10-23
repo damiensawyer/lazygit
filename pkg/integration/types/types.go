@@ -76,6 +76,9 @@ type GuiDriver interface {
 	TopViewInWindow(windowName string) *gocui.View
 	SetCaption(caption string)
 	SetCaptionPrefix(prefix string)
+	// Show the keys that a demo pressed most recently, in a box in the corner
+	// of the screen. Only for demos; an empty string hides the box.
+	SetKeycast(keys string)
 	// Pop the next toast that was displayed; returns nil if there was none
 	NextToast() *string
 	CheckAllToastsAcknowledged()

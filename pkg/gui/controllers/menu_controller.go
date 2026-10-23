@@ -57,6 +57,21 @@ func (self *MenuController) GetKeybindings(opts types.KeybindingsOpts) []*types.
 			Description:     self.c.Tr.CloseCancel,
 			DisplayOnScreen: true,
 		},
+		// Only the primary keys, because the alternates (h and l) are what menu
+		// items like to use as their own keys.
+		{
+			Keys:              lo.Slice(opts.GetKeys(opts.Config.Universal.PrevBlock), 0, 1),
+			Handler:           self.goBack,
+			GetDisabledReason: self.canGoBack,
+			Description:       self.c.Tr.BackToPreviousMenu,
+			DisplayOnScreen:   true,
+		},
+		{
+			Keys:              lo.Slice(opts.GetKeys(opts.Config.Universal.NextBlock), 0, 1),
+			Handler:           self.withItem(self.press),
+			GetDisabledReason: self.canOpenSubmenu,
+			Description:       self.c.Tr.OpenSubmenu,
+		},
 	}
 
 	if self.context().FilterAsYouType() {
@@ -122,6 +137,31 @@ func (self *MenuController) GetOnFocus() func(types.OnFocusOpts) {
 
 func (self *MenuController) press(selectedItem *types.MenuItem) error {
 	return self.context().OnMenuPress(selectedItem)
+}
+
+func (self *MenuController) goBack() error {
+	self.context().GoBack()
+	self.c.ResetKeybindings()
+	self.c.PostRefreshUpdate(self.context())
+	self.GetOnFocus()(types.OnFocusOpts{})
+	return nil
+}
+
+// While the user is typing into the filter, the arrow keys move the cursor in
+// it instead.
+func (self *MenuController) canGoBack() *types.DisabledReason {
+	if !self.context().HasParent() || self.context().FilterStarted() {
+		return &types.DisabledReason{AllowFurtherDispatching: true}
+	}
+	return nil
+}
+
+func (self *MenuController) canOpenSubmenu() *types.DisabledReason {
+	selectedItem := self.context().GetSelected()
+	if selectedItem == nil || !selectedItem.OpensMenu || self.context().FilterStarted() {
+		return &types.DisabledReason{AllowFurtherDispatching: true}
+	}
+	return nil
 }
 
 func (self *MenuController) close() error {

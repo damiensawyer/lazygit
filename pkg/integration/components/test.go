@@ -207,7 +207,7 @@ func (self *IntegrationTest) Run(gui integrationTypes.GuiDriver) {
 	}
 
 	keys := gui.Keys()
-	testDriver := NewTestDriver(gui, shell, keys, InputDelay())
+	testDriver := NewTestDriver(gui, shell, keys, InputDelay(), self.isDemo)
 	testDriver.fakeGithub = self.fakeGithub
 
 	if InputDelay() > 0 {

@@ -27,7 +27,7 @@ var ShowWorkflowRuns = NewIntegrationTest(NewIntegrationTestArgs{
 			Confirm()
 
 		t.ExpectPopup().Menu().
-			Title(Equals("Release")).
+			Title(Equals("Workflows › Release")).
 			Select(Contains("Show only its runs")).
 			Confirm()
 

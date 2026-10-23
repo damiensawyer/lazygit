@@ -36,6 +36,7 @@ var DirectoryListing = NewIntegrationTest(NewIntegrationTestArgs{
 			)
 
 		t.Views().Main().
+			Title(Equals("/")).
 			Content(Equals("dir/\ntop.txt"))
 
 		// subdirectories get a trailing slash, and their contents aren't

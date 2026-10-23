@@ -227,6 +227,30 @@ func TestSplitJobLogEdgeCases(t *testing.T) {
 			expected: []StepLog{{StepNumber: 1, Lines: []string{"one", "", "three"}}},
 		},
 		{
+			name: "log ending in an earlier step",
+			log:  "2026-10-21T00:00:01.5Z one\n",
+			steps: []models.GithubStep{
+				step(1, "One", "00:00:01", "00:00:02"),
+				step(2, "Two", "00:00:05", "00:00:06"),
+			},
+			expected: []StepLog{
+				{StepNumber: 1, Lines: []string{"one"}},
+				{StepNumber: 2},
+			},
+		},
+		{
+			name: "log without timestamps",
+			log:  "one\ntwo\n",
+			steps: []models.GithubStep{
+				step(1, "One", "00:00:01", "00:00:02"),
+				step(2, "Two", "00:00:05", "00:00:06"),
+			},
+			expected: []StepLog{
+				{StepNumber: 1, Lines: []string{"one", "two"}},
+				{StepNumber: 2},
+			},
+		},
+		{
 			name: "timestamps without fractional seconds",
 			log: "2026-10-21T00:00:01Z one\n" +
 				"2026-10-21T00:00:03Z two\n",
@@ -318,4 +342,8 @@ func TestStripLogTimestamps(t *testing.T) {
 		"2026-10-21T00:05:22.6292870Z \n"
 
 	assert.Equal(t, []string{"first", "no timestamp", ""}, StripLogTimestamps(log))
+}
+
+func TestStripLogTimestampsOfEmptyLog(t *testing.T) {
+	assert.Nil(t, StripLogTimestamps(""))
 }

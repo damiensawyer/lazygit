@@ -998,6 +998,123 @@ func TestSaveRepoGuiValueErrors(t *testing.T) {
 	})
 }
 
+func TestRemoveRepoGuiValue(t *testing.T) {
+	tests := []struct {
+		name     string
+		existing string // empty means the file doesn't exist
+		key      string
+		expected string // empty means the file doesn't exist
+	}{
+		{
+			name:     "leaves a file that doesn't exist alone",
+			existing: "",
+			key:      "sidePanelWidth",
+			expected: "",
+		},
+		{
+			name:     "keeps the other keys in the gui section",
+			existing: "gui:\n  sidePanelWidth: 0.28\n  halfScreenModeSidePanelWidth: 0.45\n",
+			key:      "sidePanelWidth",
+			expected: "gui:\n  halfScreenModeSidePanelWidth: 0.45\n",
+		},
+		{
+			name:     "removes a gui section that is left empty",
+			existing: "git:\n  paging:\n    useConfig: true\ngui:\n  sidePanelWidth: 0.28\n",
+			key:      "sidePanelWidth",
+			expected: "git:\n  paging:\n    useConfig: true\n",
+		},
+		{
+			name:     "removes a file that is left empty",
+			existing: "gui:\n  halfScreenModeSidePanelWidth: 0.45\n",
+			key:      "halfScreenModeSidePanelWidth",
+			expected: "",
+		},
+		{
+			name:     "removes a file whose gui section is in flow style",
+			existing: "gui: {sidePanelWidth: 0.3}\n",
+			key:      "sidePanelWidth",
+			expected: "",
+		},
+		{
+			name:     "keeps the comments of other keys",
+			existing: "gui:\n  sidePanelWidth: 0.2\n  # nice\n  showIcons: true # yes\n",
+			key:      "sidePanelWidth",
+			expected: "gui:\n  # nice\n  showIcons: true # yes\n",
+		},
+		{
+			name:     "leaves the file untouched when the key isn't in it",
+			existing: "gui:\n    showIcons:   true\n",
+			key:      "sidePanelWidth",
+			expected: "gui:\n    showIcons:   true\n",
+		},
+		{
+			name:     "leaves the file untouched when it has no gui section",
+			existing: "git:\n    autoFetch:   false\n",
+			key:      "sidePanelWidth",
+			expected: "git:\n    autoFetch:   false\n",
+		},
+		{
+			name:     "leaves the file untouched when the gui section isn't a mapping",
+			existing: "gui: 3\n",
+			key:      "sidePanelWidth",
+			expected: "gui: 3\n",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), "lazygit.yml")
+			if test.existing != "" {
+				assert.NoError(t, os.WriteFile(path, []byte(test.existing), 0o644))
+			}
+
+			assert.NoError(t, removeRepoGuiValue(path, test.key))
+
+			actual, err := os.ReadFile(path)
+			if test.expected == "" {
+				assert.ErrorIs(t, err, os.ErrNotExist)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, string(actual))
+			}
+		})
+	}
+}
+
+func TestRemoveRepoGuiValueErrors(t *testing.T) {
+	tests := []struct {
+		name          string
+		existing      string
+		expectedError string
+	}{
+		{
+			name:          "top-level element is a sequence",
+			existing:      "- a\n",
+			expectedError: "top-level element of the config file is not a mapping",
+		},
+		{
+			name:          "file is not valid yaml",
+			existing:      "gui: [\n",
+			expectedError: "did not find expected node content",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), "lazygit.yml")
+			assert.NoError(t, os.WriteFile(path, []byte(test.existing), 0o644))
+
+			err := removeRepoGuiValue(path, "sidePanelWidth")
+			assert.ErrorContains(t, err, test.expectedError)
+
+			// The file is left untouched
+			actual, readErr := os.ReadFile(path)
+			assert.NoError(t, readErr)
+			assert.Equal(t, test.existing, string(actual))
+		})
+	}
+}
+
 func TestSaveSidePanelWidthsRoundTrip(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "lazygit.yml")
 	appConfig := &AppConfig{}

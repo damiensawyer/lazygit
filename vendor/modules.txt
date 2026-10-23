@@ -47,6 +47,9 @@ github.com/cloudfoundry/jibber_jabber
 # github.com/creack/pty v1.1.24
 ## explicit; go 1.18
 github.com/creack/pty
+# github.com/danieljoos/wincred v1.2.3
+## explicit; go 1.18
+github.com/danieljoos/wincred
 # github.com/dlclark/regexp2/v2 v2.2.1
 ## explicit; go 1.25
 github.com/dlclark/regexp2/v2
@@ -71,6 +74,9 @@ github.com/go-errors/errors
 # github.com/go-logfmt/logfmt v0.5.0
 ## explicit; go 1.13
 github.com/go-logfmt/logfmt
+# github.com/godbus/dbus/v5 v5.2.2
+## explicit; go 1.20
+github.com/godbus/dbus/v5
 # github.com/gookit/color v1.6.1
 ## explicit; go 1.18
 github.com/gookit/color
@@ -173,6 +179,11 @@ github.com/wk8/go-ordered-map/v2
 # github.com/xo/terminfo v1.2.0
 ## explicit; go 1.25
 github.com/xo/terminfo
+# github.com/zalando/go-keyring v0.2.8
+## explicit; go 1.18
+github.com/zalando/go-keyring
+github.com/zalando/go-keyring/internal/shellescape
+github.com/zalando/go-keyring/secret_service
 # go.yaml.in/yaml/v3 v3.0.5
 ## explicit; go 1.16
 go.yaml.in/yaml/v3

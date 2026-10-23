@@ -68,7 +68,7 @@ var RebaseToUpstream = NewIntegrationTest(NewIntegrationTestArgs{
 					Select(Contains("Rebase checked-out branch onto origin/master...")).
 					Confirm()
 				t.ExpectPopup().Menu().
-					Title(Equals("Rebase 'target'")).
+					Title(Equals("Upstream options › Rebase 'target'")).
 					Select(Contains("Simple rebase")).
 					Confirm()
 			})

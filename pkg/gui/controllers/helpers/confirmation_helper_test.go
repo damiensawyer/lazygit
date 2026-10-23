@@ -29,3 +29,23 @@ func TestMenuFilterPrompt(t *testing.T) {
 		})
 	}
 }
+
+func TestMenuTitle(t *testing.T) {
+	tests := []struct {
+		name        string
+		breadcrumbs []string
+		width       int
+		expected    string
+	}{
+		{name: "a menu that is not a submenu", breadcrumbs: []string{"Menu"}, width: 80, expected: "Menu"},
+		{name: "all titles fit", breadcrumbs: []string{"Menu", "Submenu", "Subsubmenu"}, width: 27, expected: "Menu › Submenu › Subsubmenu"},
+		{name: "leaves out the first title", breadcrumbs: []string{"Menu", "Submenu", "Subsubmenu"}, width: 26, expected: "… › Submenu › Subsubmenu"},
+		{name: "keeps the last title even if it doesn't fit", breadcrumbs: []string{"Menu", "Submenu", "Subsubmenu"}, width: 5, expected: "… › Subsubmenu"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.expected, menuTitle(test.breadcrumbs, test.width))
+		})
+	}
+}

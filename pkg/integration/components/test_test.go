@@ -23,6 +23,7 @@ type coordinate struct {
 
 type fakeGuiDriver struct {
 	failureMessage      string
+	captions            []string
 	pressedKeys         []string
 	clickedCoordinates  []coordinate
 	heldCoordinates     []coordinate
@@ -31,6 +32,7 @@ type fakeGuiDriver struct {
 	scrolledCoordinates []coordinate
 	onUIThread          bool
 	onUIThreadCallCount int
+	keycasts            []string
 }
 
 var _ integrationTypes.GuiDriver = &fakeGuiDriver{}
@@ -134,10 +136,15 @@ func (self *fakeGuiDriver) TopViewInWindow(windowName string) *gocui.View {
 	return nil
 }
 
-func (self *fakeGuiDriver) SetCaption(string) {
+func (self *fakeGuiDriver) SetCaption(caption string) {
+	self.captions = append(self.captions, caption)
 }
 
 func (self *fakeGuiDriver) SetCaptionPrefix(string) {
+}
+
+func (self *fakeGuiDriver) SetKeycast(keys string) {
+	self.keycasts = append(self.keycasts, utils.Decolorise(keys))
 }
 
 func (self *fakeGuiDriver) NextToast() *string {
@@ -186,9 +193,25 @@ func TestSuccess(t *testing.T) {
 	assert.Equal(t, "", driver.failureMessage)
 }
 
+func TestCaptionsNameThePressedKeys(t *testing.T) {
+	driver := &fakeGuiDriver{}
+	testDriver := NewTestDriver(driver, nil, config.KeybindingConfig{}, 0, false)
+	testDriver.press("a")
+	testDriver.pressRapidly([]string{"b", "c"})
+	assert.Equal(t, []string{"Pressing a", "Pressing b, c"}, driver.captions)
+}
+
+func TestDemoCaptionsLeaveThePressedKeysToTheKeycast(t *testing.T) {
+	driver := &fakeGuiDriver{}
+	testDriver := NewTestDriver(driver, nil, config.KeybindingConfig{}, 0, true)
+	testDriver.press("a")
+	testDriver.pressRapidly([]string{"b", "c"})
+	assert.Equal(t, []string{"", ""}, driver.captions)
+}
+
 func TestViewDriverPointerCoordinates(t *testing.T) {
 	guiDriver := &fakeGuiDriver{}
-	testDriver := NewTestDriver(guiDriver, nil, config.KeybindingConfig{}, 0)
+	testDriver := NewTestDriver(guiDriver, nil, config.KeybindingConfig{}, 0, false)
 	view := gocui.NewView("source", 10, 20, 30, 31, gocui.OutputNormal)
 	targetView := gocui.NewView("target", 40, 50, 60, 61, gocui.OutputNormal)
 	viewDriver := &ViewDriver{
@@ -313,4 +336,23 @@ func TestGitVersionRestriction(t *testing.T) {
 			assert.Equal(t, shouldRun, s.expectedShouldRun)
 		})
 	}
+}
+
+func TestDemosShowThePressedKeys(t *testing.T) {
+	driver := &fakeGuiDriver{}
+	testDriver := NewTestDriver(driver, nil, config.KeybindingConfig{}, 0, true)
+	testDriver.press("c")
+	testDriver.typeContent("hi")
+	testDriver.pressFast("<enter>")
+	testDriver.pressRapidly([]string{"j", "k"})
+	assert.Equal(t, []string{"c", "h", "i", "<enter>", "j", "k"}, driver.pressedKeys)
+	assert.Equal(t, " c   hi   ⏎   j   k ", driver.keycasts[len(driver.keycasts)-1])
+}
+
+func TestOnlyDemosShowThePressedKeys(t *testing.T) {
+	driver := &fakeGuiDriver{}
+	testDriver := NewTestDriver(driver, nil, config.KeybindingConfig{}, 0, false)
+	testDriver.press("c")
+	testDriver.typeContent("hi")
+	assert.Empty(t, driver.keycasts)
 }

@@ -10,6 +10,12 @@ func UnixToTimeAgo(timestamp int64) string {
 	return formatSecondsAgo(now - timestamp)
 }
 
+// TimeAgo is like UnixToTimeAgo, but measures to the given time rather than
+// to the current one.
+func TimeAgo(t time.Time, now time.Time) string {
+	return formatSecondsAgo(now.Unix() - t.Unix())
+}
+
 const (
 	SECONDS_IN_SECOND = 1
 	SECONDS_IN_MINUTE = 60

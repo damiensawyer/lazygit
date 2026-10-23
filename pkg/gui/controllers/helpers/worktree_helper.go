@@ -87,7 +87,7 @@ func (self *WorktreeHelper) newWorktreeForPickerValue(value string) error {
 
 		prompt := utils.ResolvePlaceholderString(self.c.Tr.WorktreeLocationPromptCheckout,
 			map[string]string{"branchName": branch.Name})
-		return self.promptForWorktreeLocation(branch.Name, prompt, func(path string) error {
+		return self.PromptForWorktreeLocation(branch.Name, prompt, func(path string) error {
 			return self.createWorktree(git_commands.NewWorktreeOpts{Path: path, Base: branch.RefName()}, context.WORKTREES_CONTEXT_KEY)
 		})
 	}
@@ -95,7 +95,7 @@ func (self *WorktreeHelper) newWorktreeForPickerValue(value string) error {
 	if _, branchName, ok := self.refsHelper.ParseRemoteBranchName(value); ok {
 		prompt := utils.ResolvePlaceholderString(self.c.Tr.WorktreeLocationPromptTrackingBranch,
 			map[string]string{"name": branchName, "ref": value})
-		return self.promptForWorktreeLocation(branchName, prompt, func(path string) error {
+		return self.PromptForWorktreeLocation(branchName, prompt, func(path string) error {
 			return self.createWorktree(git_commands.NewWorktreeOpts{Path: path, Base: value, Branch: branchName}, context.WORKTREES_CONTEXT_KEY)
 		})
 	}
@@ -104,7 +104,7 @@ func (self *WorktreeHelper) newWorktreeForPickerValue(value string) error {
 	base := self.refsHelper.GetCheckedOutRef().RefName()
 	prompt := utils.ResolvePlaceholderString(self.c.Tr.WorktreeLocationPromptNewBranch,
 		map[string]string{"name": name, "base": base})
-	return self.promptForWorktreeLocation(name, prompt, func(path string) error {
+	return self.PromptForWorktreeLocation(name, prompt, func(path string) error {
 		return self.createWorktree(git_commands.NewWorktreeOpts{Path: path, Base: base, Branch: name}, context.WORKTREES_CONTEXT_KEY)
 	})
 }
@@ -303,7 +303,7 @@ func (self *WorktreeHelper) newLocalBranchAndWorktreeItem(remoteBranch *models.R
 // locationPrompt builds the location-menu prompt once the name is known.
 func (self *WorktreeHelper) startNewBranchWorktree(nameInitialContent string, base string, locationPrompt func(name string) string) error {
 	return self.promptForName(self.c.Tr.NewBranchAndWorktreeName, nameInitialContent, func(name string) error {
-		return self.promptForWorktreeLocation(name, locationPrompt(name), func(path string) error {
+		return self.PromptForWorktreeLocation(name, locationPrompt(name), func(path string) error {
 			return self.createWorktree(git_commands.NewWorktreeOpts{Path: path, Base: base, Branch: name}, context.LOCAL_BRANCHES_CONTEXT_KEY)
 		})
 	})
@@ -318,7 +318,7 @@ func (self *WorktreeHelper) worktreeForBranchItem(branch *models.Branch) *types.
 		OnPress: func() error {
 			prompt := utils.ResolvePlaceholderString(self.c.Tr.WorktreeLocationPromptCheckout,
 				map[string]string{"branchName": branch.Name})
-			return self.promptForWorktreeLocation(branch.Name, prompt, func(path string) error {
+			return self.PromptForWorktreeLocation(branch.Name, prompt, func(path string) error {
 				return self.createWorktree(git_commands.NewWorktreeOpts{Path: path, Base: branch.RefName()}, context.LOCAL_BRANCHES_CONTEXT_KEY)
 			})
 		},
@@ -341,10 +341,10 @@ func (self *WorktreeHelper) detachedWorktreeItem(ref string, base string, defaul
 		Keys:  menuKey('d'),
 		OnPress: func() error {
 			if defaultDirName != "" {
-				return self.promptForWorktreeLocation(defaultDirName, prompt, create)
+				return self.PromptForWorktreeLocation(defaultDirName, prompt, create)
 			}
 			return self.promptForName(self.c.Tr.NewWorktreeName, "", func(name string) error {
-				return self.promptForWorktreeLocation(name, prompt, create)
+				return self.PromptForWorktreeLocation(name, prompt, create)
 			})
 		},
 	}
@@ -380,7 +380,10 @@ func (self *WorktreeHelper) promptForName(title string, initialContent string, o
 // directory (each labelled with the absolute path the worktree would end up at),
 // plus an "Other…" item that opens a free-form path prompt. The chosen absolute
 // path is passed to onConfirm.
-func (self *WorktreeHelper) promptForWorktreeLocation(dirName string, prompt string, onConfirm func(path string) error) error {
+// PromptForWorktreeLocation asks where to create a worktree named dirName,
+// offering the usual parent directories, and passes the chosen path to
+// onConfirm.
+func (self *WorktreeHelper) PromptForWorktreeLocation(dirName string, prompt string, onConfirm func(path string) error) error {
 	linkedWorktreePaths := []string{}
 	for _, worktree := range self.c.Model().Worktrees {
 		if !worktree.IsMain {
@@ -426,6 +429,15 @@ func (self *WorktreeHelper) promptForWorktreeLocation(dirName string, prompt str
 }
 
 func (self *WorktreeHelper) createWorktree(opts git_commands.NewWorktreeOpts, contextKey types.ContextKey) error {
+	return self.CreateWorktreeAndSwitch(opts.Path, contextKey, func(gocui.Task) error {
+		self.c.LogAction(self.c.Tr.Actions.AddWorktree)
+		return self.c.Git().Worktree.New(opts)
+	})
+}
+
+// CreateWorktreeAndSwitch creates a worktree at path by calling create on a
+// worker, and then switches to it.
+func (self *WorktreeHelper) CreateWorktreeAndSwitch(path string, contextKey types.ContextKey, create func(gocui.Task) error) error {
 	// Check now, before we create the worktree, rather than when we come to
 	// switch to it afterwards: by then this operation's own waiting-status
 	// spinner would make Busy() true and refuse our own switch.
@@ -433,9 +445,8 @@ func (self *WorktreeHelper) createWorktree(opts git_commands.NewWorktreeOpts, co
 		return nil
 	}
 
-	return self.c.WithWaitingStatus(self.c.Tr.AddingWorktree, func(gocui.Task) error {
-		self.c.LogAction(self.c.Tr.Actions.AddWorktree)
-		if err := self.c.Git().Worktree.New(opts); err != nil {
+	return self.c.WithWaitingStatus(self.c.Tr.AddingWorktree, func(task gocui.Task) error {
+		if err := create(task); err != nil {
 			return err
 		}
 
@@ -445,7 +456,7 @@ func (self *WorktreeHelper) createWorktree(opts git_commands.NewWorktreeOpts, co
 		// because we checked above and creating the worktree is now
 		// complete, so switching to it is safe.
 		self.c.OnUIThread(func() error {
-			return self.reposHelper.switchTo(opts.Path, self.c.Tr.ErrWorktreeMovedOrRemoved, contextKey)
+			return self.reposHelper.switchTo(path, self.c.Tr.ErrWorktreeMovedOrRemoved, contextKey)
 		})
 		return nil
 	})

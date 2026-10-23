@@ -170,6 +170,13 @@ func (self *MainViewController) GetKeybindings(opts types.KeybindingsOpts) []*ty
 			DisplayOnScreen:   true,
 		},
 		{
+			Keys:              opts.GetKeys(opts.Config.Main.AddReviewComment),
+			Handler:           self.addReviewComment,
+			Description:       self.c.Tr.PullRequests.AddReviewComment,
+			Tooltip:           self.c.Tr.PullRequests.AddReviewCommentTooltip,
+			GetDisabledReason: self.reviewCommentDisabledReason,
+		},
+		{
 			Keys:              opts.GetKeys(opts.Config.Commits.OpenPullRequestInBrowser),
 			Handler:           self.openPullRequestAtSelectedLine,
 			Description:       self.c.Tr.OpenPullRequestAtSelectedLine,
@@ -589,6 +596,11 @@ func (self *MainViewController) openPullRequestDisabledReason() *types.DisabledR
 		return &types.DisabledReason{Text: self.c.Tr.NotAvailableForCustomPatch}
 	}
 	diff := self.pullRequestDiff()
+	if diff.PullRequestNumber != 0 {
+		// entered from the pull requests panel, so its commits are the pull
+		// request's own
+		return nil
+	}
 	if diff.SpansBranches {
 		return &types.DisabledReason{Text: self.c.Tr.CommitsInSeveralPullRequests}
 	}
@@ -1097,7 +1109,7 @@ func (self *MainViewController) editDiffLine(viewLine int, beforeEdit func()) er
 // can be commented on there.
 func (self *MainViewController) openPullRequestAtSelectedLine() error {
 	diff := self.pullRequestDiff()
-	pr, ok := self.c.Helpers().Host.PullRequestForBranch(diff.Branch)
+	prURL, ok := self.pullRequestURLOfDiff(diff)
 	if !ok {
 		// Guarded against by the disabled reason, but a refresh in the background may
 		// have taken the pull request away since it was asked.
@@ -1119,8 +1131,27 @@ func (self *MainViewController) openPullRequestAtSelectedLine() error {
 	}
 
 	self.c.LogAction(self.c.Tr.Actions.OpenPullRequest)
-	url := githubPullRequestLineURL(pr.Url, githubCommitRange(diff.Commits, diff.BaseHash), relativePath, info)
+	url := githubPullRequestLineURL(prURL, githubCommitRange(diff.Commits, diff.BaseHash), relativePath, info)
 	return self.c.OS().OpenLink(url)
+}
+
+// pullRequestURLOfDiff returns the URL of the pull request a diff is of: the one
+// entered from the pull requests panel, or the one of the branch the commits are on.
+func (self *MainViewController) pullRequestURLOfDiff(diff types.PullRequestDiff) (string, bool) {
+	if diff.PullRequestNumber != 0 {
+		pr, found := lo.Find(self.c.Model().ListedPullRequests, func(pr *models.GithubPullRequest) bool {
+			return pr.Number == diff.PullRequestNumber
+		})
+		if !found {
+			return "", false
+		}
+		return pr.Url, true
+	}
+	pr, ok := self.c.Helpers().Host.PullRequestForBranch(diff.Branch)
+	if !ok {
+		return "", false
+	}
+	return pr.Url, true
 }
 
 // pullRequestDiff returns the commits whose diff this pane is showing, and the branch

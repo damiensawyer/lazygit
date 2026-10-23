@@ -17,8 +17,8 @@ import (
 	"github.com/samber/lo"
 )
 
-// FakeGithub stands in for the GitHub REST API in tests of the GitHub Actions
-// view. While a test that has one runs, it is served over HTTP, and lazygit
+// FakeGithub stands in for the GitHub API in tests of the GitHub Actions view
+// and of the pull requests panel. While a test that has one runs, it is served over HTTP, and lazygit
 // talks to it instead of to GitHub, without needing a token.
 //
 // It serves the canned data below for any repository, and records the
@@ -43,6 +43,14 @@ type FakeGithub struct {
 	// the content of each artifact's archive: keyed by artifact ID, and then
 	// by the path of a file in the archive
 	ArtifactFiles map[int64]map[string]string
+	// the repository's pull requests, as the GraphQL API lists them
+	PullRequests []*models.GithubPullRequest
+	// keyed by pull request number
+	PullRequestDetails map[int]*models.GithubPullRequestDetails
+	// the repository's labels
+	Labels []models.GithubLabel
+	// the logins of the users that pull requests can be assigned to
+	AssignableUsers []string
 	// responses to give instead of the canned data, keyed by method and path,
 	// e.g. "GET /repos/owner/repo/actions/runs"
 	Errors map[string]FakeGithubError
@@ -100,7 +108,9 @@ func (self *FakeGithub) record(r *http.Request, body []byte) {
 	if len(r.URL.Query()) > 0 {
 		description += "?" + r.URL.Query().Encode()
 	}
-	if len(body) > 0 {
+	if r.URL.Path == "/graphql" {
+		description = describeGraphQLRequest(body)
+	} else if len(body) > 0 {
 		description += " " + string(body)
 	}
 
@@ -182,6 +192,26 @@ func (self *FakeGithub) handler() http.Handler {
 	mux.HandleFunc("POST "+repo+"actions/workflows/{id}/dispatches", accept(http.StatusNoContent))
 	mux.HandleFunc("PUT "+repo+"actions/workflows/{id}/enable", accept(http.StatusNoContent))
 	mux.HandleFunc("PUT "+repo+"actions/workflows/{id}/disable", accept(http.StatusNoContent))
+	mux.HandleFunc("DELETE "+repo+"git/refs/heads/{branch...}", accept(http.StatusNoContent))
+	mux.HandleFunc("GET /repos/{owner}/{repo}", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, map[string]any{"default_branch": "master"})
+	})
+	mux.HandleFunc("POST "+repo+"pulls", self.createPullRequest)
+	mux.HandleFunc("PATCH "+repo+"pulls/{number}", accept(http.StatusOK))
+	mux.HandleFunc("GET "+repo+"labels", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, lo.CoalesceSliceOrEmpty(self.Labels))
+	})
+	mux.HandleFunc("POST "+repo+"issues/{number}/labels", accept(http.StatusOK))
+	mux.HandleFunc("DELETE "+repo+"issues/{number}/labels/{label}", accept(http.StatusOK))
+	mux.HandleFunc("GET "+repo+"assignees", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, lo.Map(self.AssignableUsers, func(login string, _ int) models.GithubUser {
+			return models.GithubUser{Login: login}
+		}))
+	})
+	mux.HandleFunc("POST "+repo+"issues/{number}/assignees", accept(http.StatusCreated))
+	mux.HandleFunc("DELETE "+repo+"issues/{number}/assignees", accept(http.StatusOK))
+	mux.HandleFunc("POST "+repo+"pulls/{number}/requested_reviewers", accept(http.StatusCreated))
+	mux.HandleFunc("DELETE "+repo+"pulls/{number}/requested_reviewers", accept(http.StatusOK))
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, err := io.ReadAll(r.Body)
@@ -190,11 +220,17 @@ func (self *FakeGithub) handler() http.Handler {
 			return
 		}
 		self.record(r, body)
+		// for the handlers that read it too
+		r.Body = io.NopCloser(bytes.NewReader(body))
 
 		self.dataMutex.Lock()
 		defer self.dataMutex.Unlock()
 		if response, found := self.Errors[r.Method+" "+r.URL.Path]; found {
 			writeError(w, response.StatusCode, response.Message)
+			return
+		}
+		if r.Method == http.MethodPost && r.URL.Path == "/graphql" {
+			self.serveGraphQL(w, body)
 			return
 		}
 		mux.ServeHTTP(w, r)

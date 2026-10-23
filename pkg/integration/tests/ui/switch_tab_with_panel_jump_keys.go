@@ -21,6 +21,9 @@ var SwitchTabWithPanelJumpKeys = NewIntegrationTest(NewIntegrationTestArgs{
 		t.Views().Branches().IsFocused().
 			Press(keys.Universal.JumpToBlock[2])
 
+		t.Views().PullRequests().IsFocused().
+			Press(keys.Universal.JumpToBlock[2])
+
 		t.Views().Remotes().IsFocused().
 			Press(keys.Universal.JumpToBlock[2])
 

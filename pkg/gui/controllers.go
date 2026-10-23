@@ -88,6 +88,7 @@ func (gui *Gui) resetHelpersAndControllers() {
 	)
 
 	githubLoginHelper := helpers.NewGithubLoginHelper(helperCommon)
+	githubClientHelper := helpers.NewGithubClientHelper(helperCommon, githubLoginHelper, gui.githubTokens)
 
 	gui.helpers = &helpers.Helpers{
 		Refs:            refsHelper,
@@ -132,12 +133,13 @@ func (gui *Gui) resetHelpersAndControllers() {
 		SubCommits:   helpers.NewSubCommitsHelper(helperCommon, refreshHelper),
 		FinalVersion: helpers.NewFinalVersionHelper(helperCommon),
 		GithubLogin:  githubLoginHelper,
+		GithubClient: githubClientHelper,
 		GithubActions: helpers.NewGithubActionsHelper(
 			helperCommon,
 			windowHelper,
-			githubLoginHelper,
-			gui.githubTokens,
+			githubClientHelper,
 		),
+		GithubPullRequests: helpers.NewGithubPullRequestsHelper(helperCommon, windowHelper, githubClientHelper, commitsHelper, filesHelper, suggestionsHelper),
 	}
 
 	gui.CustomCommandsClient = custom_commands.NewClient(
@@ -197,6 +199,7 @@ func (gui *Gui) resetHelpersAndControllers() {
 	reflogCommitsController := controllers.NewReflogCommitsController(common)
 	subCommitsController := controllers.NewSubCommitsController(common)
 	githubRunsController := controllers.NewGithubRunsController(common)
+	pullRequestsController := controllers.NewPullRequestsController(common)
 	githubJobsController := controllers.NewGithubJobsController(common)
 	githubStepsController := controllers.NewGithubStepsController(common)
 	statusController := controllers.NewStatusController(common)
@@ -222,6 +225,7 @@ func (gui *Gui) resetHelpersAndControllers() {
 	for _, context := range []types.Context{
 		gui.State.Contexts.Status,
 		gui.State.Contexts.Remotes,
+		gui.State.Contexts.PullRequests,
 		gui.State.Contexts.Worktrees,
 		gui.State.Contexts.Tags,
 		gui.State.Contexts.Branches,
@@ -357,6 +361,10 @@ func (gui *Gui) resetHelpersAndControllers() {
 
 	controllers.AttachControllers(gui.State.Contexts.Remotes,
 		remotesController,
+	)
+
+	controllers.AttachControllers(gui.State.Contexts.PullRequests,
+		pullRequestsController,
 	)
 
 	controllers.AttachControllers(gui.State.Contexts.Worktrees,

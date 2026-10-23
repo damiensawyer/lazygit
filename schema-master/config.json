@@ -605,16 +605,16 @@
         },
         "sidePanelWidth": {
           "type": "number",
-          "maximum": 1,
-          "minimum": 0,
-          "description": "Fraction of the total screen width to use for the left side section. You may want to pick a small number (e.g. 0.2) if you're using a narrow screen, so that you can see more of the main section.\nNumber from 0 to 1.0.",
+          "exclusiveMaximum": 1,
+          "exclusiveMinimum": 0,
+          "description": "Fraction of the total screen width to use for the left side section. You may want to pick a small number (e.g. 0.2) if you're using a narrow screen, so that you can see more of the main section.\nNumber between 0 and 1.0, exclusive.",
           "default": 0.3333
         },
         "halfScreenModeSidePanelWidth": {
           "type": "number",
-          "maximum": 1,
-          "minimum": 0,
-          "description": "Fraction of the total screen width to use for the left side section when in half screen mode.\nThis overrides `sidePanelWidth` when the screen is split half and half (after pressing '+' once).\nNumber from 0 to 1.0. Defaults to 0.5 (equal split).",
+          "exclusiveMaximum": 1,
+          "exclusiveMinimum": 0,
+          "description": "Fraction of the total screen width to use for the left side section when in half screen mode.\nThis overrides `sidePanelWidth` when the screen is split half and half (after pressing '+' once).\nNumber between 0 and 1.0, exclusive. Defaults to 0.5 (equal split).",
           "default": 0.5
         },
         "expandFocusedSidePanel": {
@@ -637,7 +637,7 @@
             "$ref": "#/$defs/SidePanel"
           },
           "type": "array",
-          "description": "The side panels, in the order they appear from top to bottom.\nEach entry is a list of one or more names that share a single panel as tabs (cycle through them with the next-tab/previous-tab keys).\nOmit a name to hide it; give a name its own one-element list to promote a tab to a top-level panel.\nValid names are: 'status', 'files', 'worktrees', 'submodules', 'branches', 'remotes', 'tags', 'commits', 'reflog', 'stash'. 'files', 'branches', and 'commits' must always be included; they can't be hidden.",
+          "description": "The side panels, in the order they appear from top to bottom.\nEach entry is a list of one or more names that share a single panel as tabs (cycle through them with the next-tab/previous-tab keys).\nOmit a name to hide it; give a name its own one-element list to promote a tab to a top-level panel.\nValid names are: 'status', 'files', 'worktrees', 'submodules', 'branches', 'pullRequests', 'remotes', 'tags', 'commits', 'reflog', 'stash'. 'files', 'branches', and 'commits' must always be included; they can't be hidden.",
           "default": [
             [
               "status"
@@ -649,6 +649,7 @@
             ],
             [
               "branches",
+              "pullRequests",
               "remotes",
               "tags"
             ],
@@ -2188,6 +2189,9 @@
         },
         "githubActions": {
           "$ref": "#/$defs/KeybindingGithubActionsConfig"
+        },
+        "pullRequests": {
+          "$ref": "#/$defs/KeybindingPullRequestsConfig"
         }
       },
       "additionalProperties": false,
@@ -2572,6 +2576,20 @@
     },
     "KeybindingMainConfig": {
       "properties": {
+        "addReviewComment": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "r"
+        },
         "prevHunk": {
           "oneOf": [
             {
@@ -2675,6 +2693,180 @@
             }
           ],
           "default": "E"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "KeybindingPullRequestsConfig": {
+      "properties": {
+        "checkOut": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "c"
+        },
+        "merge": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "M"
+        },
+        "changeState": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "d"
+        },
+        "updateBranch": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "u"
+        },
+        "comment": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "C"
+        },
+        "review": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "r"
+        },
+        "edit": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "e"
+        },
+        "viewChecks": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "t"
+        },
+        "reviewThreads": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "T"
+        },
+        "openInBrowser": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "o"
+        },
+        "copyToClipboard": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "y"
+        },
+        "filter": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "default": "f"
         }
       },
       "additionalProperties": false,
@@ -4364,6 +4556,7 @@
           "worktrees",
           "submodules",
           "branches",
+          "pullRequests",
           "remotes",
           "tags",
           "commits",

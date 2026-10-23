@@ -180,6 +180,7 @@ func Start(buildInfo *BuildInfo, integrationTest integrationTypes.IntegrationTes
 
 func parseCliArgsAndEnvVars() *cliArgs {
 	flaggy.DefaultParser.ShowVersionWithVersionFlag = false
+	flaggy.SetDescription("crazy bot edition")
 
 	repoPath := ""
 	flaggy.String(&repoPath, "p", "path", "Path of git repo. (equivalent to --work-tree=<path> --git-dir=<path>/.git/)")

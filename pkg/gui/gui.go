@@ -167,6 +167,9 @@ type Gui struct {
 
 	integrationTest integrationTypes.IntegrationTest
 
+	// The keys that a demo pressed most recently; see layoutKeycast
+	keycast string
+
 	afterLayoutFuncs chan func() error
 }
 
@@ -399,6 +402,9 @@ func (gui *Gui) onNewRepo(startArgs appTypes.StartArgs, contextKey types.Context
 	if err != nil {
 		return err
 	}
+	if startArgs.IntegrationTest != nil || gui.integrationTest != nil {
+		git.GitHub.DisableAuthTokens()
+	}
 	gui.git = git
 
 	err = gui.Config.ReloadUserConfigForRepo(gui.getPerRepoConfigFiles())
@@ -416,6 +422,10 @@ func (gui *Gui) onNewRepo(startArgs appTypes.StartArgs, contextKey types.Context
 	gui.resetHelpersAndControllers()
 	gui.resetKeybindings()
 
+	// onUserConfigLoaded configured the views while the previous repo's state
+	// was still current, so their titles show that repo's modes.
+	gui.helpers.Mode.UpdateCommitsViewTitle()
+
 	gui.g.SetFocusHandler(func(Focused bool) error {
 		if Focused {
 			gui.git.Config.DropConfigCache()
@@ -424,13 +434,7 @@ func (gui *Gui) onNewRepo(startArgs appTypes.StartArgs, contextKey types.Context
 			reloadErr, didChange := gui.Config.ReloadChangedUserConfigFiles()
 			if didChange && reloadErr == nil {
 				gui.c.Log.Info("User config changed - reloading")
-				reloadErr = gui.onUserConfigLoaded()
-				gui.reloadSidePanels()
-				gui.resetKeybindings()
-
-				if err := gui.checkForChangedConfigsThatDontAutoReload(oldConfig, gui.Config.GetUserConfig()); err != nil {
-					return err
-				}
+				reloadErr = gui.onUserConfigReloaded(oldConfig)
 			}
 
 			gui.c.Log.Info("Receiving focus - refreshing")
@@ -514,12 +518,18 @@ func (gui *Gui) onNewRepo(startArgs appTypes.StartArgs, contextKey types.Context
 	return nil
 }
 
+// repoConfigFilePath is the path of the per-repo config file in the git dir,
+// which is also where lazygit saves settings that are adjusted per repo.
+func (gui *Gui) repoConfigFilePath() string {
+	return filepath.Join(gui.git.RepoPaths.RepoGitDirPath(), "lazygit.yml")
+}
+
 func (gui *Gui) getPerRepoConfigFiles() []*config.ConfigFile {
 	repoConfigFiles := []*config.ConfigFile{
 		// TODO: add filepath.Join(gui.git.RepoPaths.RepoPath(), ".lazygit.yml"),
 		// with trust prompt
 		{
-			Path:   filepath.Join(gui.git.RepoPaths.RepoGitDirPath(), "lazygit.yml"),
+			Path:   gui.repoConfigFilePath(),
 			Policy: config.ConfigFilePolicySkipIfMissing,
 		},
 	}
@@ -535,6 +545,22 @@ func (gui *Gui) getPerRepoConfigFiles() []*config.ConfigFile {
 		dir = filepath.Dir(dir)
 	}
 	return repoConfigFiles
+}
+
+// onUserConfigReloaded applies a config that was reloaded while lazygit is
+// running, so that the changes take effect without a restart; oldConfig is
+// the config from before the reload.
+func (gui *Gui) onUserConfigReloaded(oldConfig *config.UserConfig) error {
+	loadErr := gui.onUserConfigLoaded()
+	gui.applySidePanelWidthConfig()
+	gui.reloadSidePanels()
+	gui.resetKeybindings()
+
+	if err := gui.checkForChangedConfigsThatDontAutoReload(oldConfig, gui.Config.GetUserConfig()); err != nil {
+		return err
+	}
+
+	return loadErr
 }
 
 func (gui *Gui) onUserConfigLoaded() error {
@@ -654,8 +680,7 @@ func (gui *Gui) resetState(startArgs appTypes.StartArgs) types.Context {
 
 		// The repo we're switching to may have a per-repo config with different
 		// side panel widths, so update them.
-		gui.State.SidePanelWidth = gui.UserConfig().Gui.SidePanelWidth
-		gui.State.HalfScreenModeSidePanelWidth = gui.UserConfig().Gui.HalfScreenModeSidePanelWidth
+		gui.applySidePanelWidthConfig()
 
 		// The repo we're switching to may have a per-repo config with a different
 		// side panel layout, so re-apply it to this repo's contexts.
@@ -694,9 +719,7 @@ func (gui *Gui) resetState(startArgs appTypes.StartArgs) types.Context {
 			Diffing:          diffing.New(),
 			MarkedBaseCommit: marked_base_commit.New(),
 		},
-		ScreenMode:                   initialScreenMode,
-		SidePanelWidth:               gui.UserConfig().Gui.SidePanelWidth,
-		HalfScreenModeSidePanelWidth: gui.UserConfig().Gui.HalfScreenModeSidePanelWidth,
+		ScreenMode: initialScreenMode,
 		// TODO: only use contexts from context manager
 		ContextMgr:  NewContextMgr(gui, contextTree),
 		Contexts:    contextTree,
@@ -705,9 +728,33 @@ func (gui *Gui) resetState(startArgs appTypes.StartArgs) types.Context {
 
 	gui.RepoStateMap[Repo(worktreePath)] = gui.State
 
+	gui.applySidePanelWidthConfig()
 	gui.applySidePanelConfig()
 
 	return initialContext(contextTree, startArgs)
+}
+
+// applySidePanelWidthConfig sets the current repo's side panel widths to the
+// ones from the config.
+func (gui *Gui) applySidePanelWidthConfig() {
+	gui.State.SidePanelWidth = gui.UserConfig().Gui.SidePanelWidth
+	gui.State.HalfScreenModeSidePanelWidth = gui.UserConfig().Gui.HalfScreenModeSidePanelWidth
+}
+
+// resetSavedSidePanelWidth removes a side panel width that was saved to the
+// per-repo config, using remove, and reloads the config so that the width
+// from the other config files, or the default, applies again.
+func (gui *Gui) resetSavedSidePanelWidth(remove func(path string) error) error {
+	oldConfig := gui.Config.GetUserConfig()
+	if err := remove(gui.repoConfigFilePath()); err != nil {
+		return err
+	}
+
+	if err := gui.Config.ReloadUserConfigForRepo(gui.getPerRepoConfigFiles()); err != nil {
+		return err
+	}
+
+	return gui.onUserConfigReloaded(oldConfig)
 }
 
 func (gui *Gui) loadCachedPullRequests() []*models.GithubPullRequest {

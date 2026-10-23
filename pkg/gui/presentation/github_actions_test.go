@@ -2,6 +2,7 @@ package presentation
 
 import (
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -24,7 +25,7 @@ func TestFormatGithubRunSummary(t *testing.T) {
 	oldColorLevel := color.ForceSetColorLevel(terminfo.ColorLevelNone)
 	defer color.ForceSetColorLevel(oldColorLevel)
 
-	start := time.Now().Add(-10 * time.Minute)
+	start := time.Date(2026, 1, 1, 12, 0, 0, 0, time.UTC)
 	run := &models.GithubRun{
 		Name:         "CI",
 		DisplayTitle: "Fix the flaky test",
@@ -68,7 +69,7 @@ func TestFormatGithubRunSummary(t *testing.T) {
 
 	assert.Equal(t, `X Fix the flaky test
 CI #12 · main 01234567 · .github/workflows/ci.yml
-Triggered via push by octocat 10m ago · 3m5s · attempt 2
+Triggered via push by octocat 1h ago · 3m5s · attempt 2
 https://github.com/owner/repo/actions/runs/1
 
 Jobs
@@ -252,6 +253,20 @@ func TestGetGithubRunListDisplayStringsDoesNotTruncateShortNames(t *testing.T) {
 		{"*", "30m", "Exactly twenty chars", "One"},
 		{"•", "2d", "CI", "Two"},
 	}, GetGithubRunListDisplayStrings(runs, false, now))
+}
+
+func TestGetGithubRunListDisplayStringsMeasuresAgeToNow(t *testing.T) {
+	withoutColors(t)
+
+	created := time.Date(2026, 1, 1, 12, 0, 0, 0, time.UTC)
+	run := &models.GithubRun{
+		Name: "CI", DisplayTitle: "One", HeadBranch: "main", Event: "push", Status: "in_progress",
+		CreatedAt: created, RunStartedAt: created,
+	}
+
+	assert.Equal(t, [][]string{
+		{"*", "5m", "CI", "main", "push", "5m0s", "One"},
+	}, GetGithubRunListDisplayStrings([]*models.GithubRun{run}, true, created.Add(5*time.Minute)))
 }
 
 func TestGetGithubRunListDisplayStringsIsEmptyForNoRuns(t *testing.T) {
@@ -650,4 +665,18 @@ func TestFormatGithubStepLog(t *testing.T) {
 
 	skipped := &models.GithubStep{Number: 4, Name: "Skipped", Status: "completed", Conclusion: "skipped"}
 	assert.Contains(t, FormatGithubStepLog(tr, job, skipped, log, start), "\nbuild\n\nThis step logged nothing\n")
+}
+
+func TestFormatGithubJobDetailsAndStepLogHeadersWithoutDuration(t *testing.T) {
+	withoutColors(t)
+
+	tr := i18n.EnglishTranslationSet()
+	job := &models.GithubJob{Name: "build", Status: "queued"}
+	step := &models.GithubStep{Number: 1, Name: "Skipped", Status: "completed", Conclusion: "skipped"}
+
+	details := FormatGithubJobDetails(tr, GithubJobDetailsOpts{Job: job, Now: time.Now()})
+	stepLog := FormatGithubStepLog(tr, job, step, &github_commands.JobLog{}, time.Now())
+
+	assert.True(t, strings.HasPrefix(details, "• build\n"))
+	assert.True(t, strings.HasPrefix(stepLog, "- Skipped\n"))
 }

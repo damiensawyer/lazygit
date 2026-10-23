@@ -427,13 +427,13 @@ func (self *GithubRunsController) context() *context.GithubRunsContext {
 
 func (self *GithubRunsController) downloadArtifacts(run *models.GithubRun) error {
 	tr := self.c.Tr.GithubActions
-	client := self.c.Helpers().GithubActions.Client()
+	client := self.c.Helpers().GithubClient.Client()
 
 	return self.c.WithWaitingStatus(tr.LoadingArtifacts, func(gocui.Task) error {
 		artifacts, err := client.ListArtifacts(goContext.Background(), run.RunId)
 		self.c.OnUIThread(func() error {
 			if err != nil {
-				return err
+				return self.c.Helpers().GithubActions.HandleError(err)
 			}
 			if len(artifacts) == 0 {
 				return errors.New(tr.NoArtifacts)
@@ -483,7 +483,7 @@ func (self *GithubRunsController) promptForArtifactsDir(initialDir string, artif
 		FindSuggestionsFunc: self.c.Helpers().Suggestions.GetFilePathSuggestionsFunc(),
 		HandleConfirm: func(dir string) error {
 			dir = filepath.Join(self.c.Git().RepoPaths.WorktreePath(), dir)
-			client := self.c.Helpers().GithubActions.Client()
+			client := self.c.Helpers().GithubClient.Client()
 			return self.c.WithWaitingStatus(tr.DownloadingArtifacts, func(gocui.Task) error {
 				for _, artifact := range artifacts {
 					artifactDir := dir
@@ -492,7 +492,8 @@ func (self *GithubRunsController) promptForArtifactsDir(initialDir string, artif
 					}
 					archive, err := client.DownloadArtifact(goContext.Background(), artifact.ArtifactId)
 					if err != nil {
-						return err
+						self.c.OnUIThread(func() error { return self.c.Helpers().GithubActions.HandleError(err) })
+						return nil
 					}
 					if err := github_commands.ExtractArtifact(archive, artifactDir); err != nil {
 						return err

@@ -66,5 +66,16 @@ var SymlinksAndSubmodules = NewIntegrationTest(NewIntegrationTestArgs{
 			Press(keys.RepoFiles.SaveFile)
 
 		t.ExpectToast(Equals("Disabled: Cannot save a submodule"))
+
+		t.Views().RepoFiles().
+			Press(keys.Files.CopyFileInfoToClipboard)
+
+		t.ExpectPopup().Menu().
+			Title(Equals("Copy to clipboard")).
+			Select(Contains("Content of selected file")).
+			Tooltip(Contains("Disabled: Cannot copy content of a submodule")).
+			Select(Contains("Blob hash")).
+			Tooltip(Contains("Disabled: Cannot copy content of a submodule")).
+			Cancel()
 	},
 })

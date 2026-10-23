@@ -80,5 +80,16 @@ var CopyJobAndStepToClipboard = NewIntegrationTest(NewIntegrationTestArgs{
 			"##[group]Run make test\n"+
 				"frobnicator_test.go:12: expected 1, got 2\n"+
 				"##[error]Process completed with exit code 1.\n"))
+
+		t.Views().GithubSteps().
+			NavigateToLine(Contains("Upload coverage")).
+			Press(keys.GithubActions.CopyToClipboard)
+
+		t.ExpectToast(Equals(
+			"Nothing to copy"))
+		t.FileSystem().FileContent("clipboard", Equals(
+			"##[group]Run make test\n"+
+				"frobnicator_test.go:12: expected 1, got 2\n"+
+				"##[error]Process completed with exit code 1.\n"))
 	},
 })

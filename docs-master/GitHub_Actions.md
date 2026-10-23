@@ -17,10 +17,14 @@ requests: the one set with `gh repo set-default` if there is one, otherwise
 the only GitHub remote, otherwise a remote named `upstream`; if that still
 leaves a choice, you are asked.
 
-The token is the one the GitHub CLI uses, if you are logged in with `gh`. If
-not, lazygit offers to log you in, either in your browser (the same device
-login `gh auth login --web` uses) or by pasting a personal access token. The
-token is stored in the GitHub CLI's `hosts.yml`, so `gh` will use it too.
+The token is the one the GitHub CLI uses, if you are logged in with `gh`;
+lazygit finds it the way `gh auth token` does (in the `GH_TOKEN` and
+`GITHUB_TOKEN` environment variables, gh's `hosts.yml`, or the system
+keyring), so `gh` doesn't need to be installed. If there is none, lazygit
+offers to log you in, either in your browser (the same device login
+`gh auth login --web` uses) or by pasting a personal access token. Like
+`gh auth login`, it stores the token in the system keyring, or in gh's
+`hosts.yml` where there is no keyring, so `gh` will use it too.
 
 ## Runs
 

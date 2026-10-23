@@ -1,0 +1,115 @@
+# Pull Requests
+
+Lazygit can show the pull requests of the repository you have open on
+GitHub, and do most of what `gh pr` does from inside it, without needing
+`gh` installed.
+
+The pull requests are a tab of the branches panel, between local branches
+and remotes (move it elsewhere with `gui.sidePanels`; it is called
+`pullRequests` there). They load the first time the tab is shown, and while
+it is shown they reload by themselves every minute, or every 20 seconds
+while some of them have checks running.
+
+## Which repository, and logging in
+
+The repository is picked from your GitHub remotes the same way as for the
+GitHub Actions view: the one set with `gh repo set-default` if there is one,
+otherwise the only GitHub remote, otherwise a remote named `upstream`; if
+that still leaves a choice, you are asked when you press `R`.
+
+The token is found the way `gh auth token` finds it, so if you are logged in
+with `gh` there is nothing to do. Otherwise the tab says so, and pressing `R`
+offers to log you in, in your browser or with a personal access token; see
+[GitHub Actions](./GitHub_Actions.md#which-repository-and-logging-in).
+
+## The list
+
+Each pull request shows its state (open, draft, merged or closed), its
+number, a `*` if it is checked out (or `•` if you have a local branch for it
+that isn't), the state of its checks, its review decision (approved, changes
+requested, or review required), its author and its title. Press `+` to
+enlarge the panel and also see when it was last updated, its head and base
+branches, its size, how many comments it has, and its labels.
+
+The main view shows the selected pull request in roughly the way
+`gh pr view` does: who wants to merge what into what, its labels,
+milestone, assignees and reviewers, how its checks are doing, whether it can
+be merged, its description, its failing checks, its conversation, and its
+review threads.
+
+| Key | Action |
+|-----|--------|
+| `enter` | Show its commits, without checking it out: its head is fetched into `refs/pull/<number>/head`, the way GitHub names it. From there, `enter` on a commit shows the files it changes, and a range of commits shows their combined diff |
+| `c` | Check the pull request out: `c` again to check it out (see below), or `b` under another branch name, `d` detached, or `f` resetting the local branch to it. `w` asks for the same choices for checking it out in a new worktree, and switches to that |
+| `T` | List its review threads (conversations about lines of it), unresolved ones first, to reply to one (into your pending review if you have one) or resolve it, or to open it in the browser |
+| `t` | List its checks, failing ones first, like `gh pr checks`. A check that is a GitHub Actions job opens in the [GitHub Actions view](./GitHub_Actions.md) at that job, where its log can be read; any other opens in the browser. The failed GitHub Actions jobs can be re-run from there too |
+| `n` | Create a pull request for the checked out branch (see below) |
+| `M` | Merge it: with a merge commit, by squashing, or by rebasing, as the repository allows; optionally deleting its branch, on GitHub and locally (checking out its base branch first if it's checked out). Or have GitHub merge it once its requirements are met (auto-merge), or stop it from doing that |
+| `r` | Review it: approve it, request changes, or comment, submitting your pending review along with it if you have one; or discard the pending review |
+| `C` | Comment on it |
+| `e` | Edit it: its title and description, its base branch, its labels, its assignees, and whose review it requests (including asking someone who has reviewed it to review it again) |
+| `d` | Close or reopen it, mark a draft as ready for review, or convert it to a draft |
+| `u` | Bring its branch up to date with the base branch on GitHub, by merging the base branch into it or by rebasing it |
+| `o` | Open the pull request in the browser |
+| `y` | Copy its URL, number, title, head branch or description |
+| `f` | Choose which pull requests to load: open, closed, merged or all of them; yours, the ones awaiting your review, or the ones assigned to you; or those by an author, with a label, against a base branch, or matching a search in GitHub's search syntax |
+| `R` | Reload the pull requests, logging in first if needed |
+| `/` | Filter the loaded pull requests by text |
+
+## Checking out
+
+Checking out a pull request does what `gh pr checkout` does:
+
+- A pull request from a branch of the repository, or from a fork that you
+  have a remote for, is fetched from that remote, and checked out on a local
+  branch of the same name that tracks it. If you have that branch already,
+  it is fast-forwarded to the pull request (or, with the option to reset it,
+  reset to it).
+- A pull request from a fork that you have no remote for is fetched from the
+  base repository's `refs/pull/<number>/head`, onto a local branch named
+  like its head branch (prefixed with the fork's owner if that would clash
+  with the default branch). The branch is set up so that pulling it brings
+  in new commits of the pull request; and if the fork's owner allows
+  maintainers to push to it, so that pushing it pushes to the fork.
+
+A local branch that already tracks the pull request's head branch is the
+one that is checked out and brought up to date, whatever it is called. The
+pull requests list marks the pull request that is checked out with `*`.
+
+## Creating a pull request
+
+`n` in the pull requests panel creates a pull request for the checked out
+branch the way `gh pr create` does, without going to the browser; so does
+the last entry of the menu that `O` opens in the local branches panel, for
+the selected branch. It asks which branch to merge it into (the default
+branch to begin with), and then for its title and description. These start
+out as the message of the branch's commit if it has just one, and otherwise
+as the branch's name and a list of its commits' subjects; or, if the
+repository has a pull request template, the description starts out as that,
+choosing between them if it has several. Finally it asks whether to create
+it as a draft. If the branch hasn't been pushed, or has commits that
+haven't, it is pushed first: to the remote it tracks, or if it doesn't track
+one, to `origin`, setting it up to track the branch there.
+
+## Commenting on lines
+
+In the focused main view, select lines of the diff of a pull request (with
+`v`, or by dragging) and press `r` to comment on them. The comment goes into
+your pending review of the pull request, which is started if you haven't
+one, the way GitHub's "Start a review" does; nobody sees it until you submit
+the review, with `r` in the pull requests panel, approving, requesting
+changes, or just commenting. The main view of the pull request says when you
+have a pending review, and how many comments are in it.
+
+GitHub places a comment on a line of the pull request's diff as a whole, so
+this works on the diff of all of a pull request's commits up to its latest
+one: entered from the pull requests panel, the diff of its single commit or
+of the range of all of them; or the same from the commits panel when its
+branch is checked out and pushed.
+
+## Writing comments
+
+Comments, and the bodies of reviews, are written in the commit message
+panel: the first line in its upper part and the rest in the lower part, or,
+from the panel's menu (`<ctrl+o>`), in your editor. Unlike a commit message, the text isn't
+wrapped, since GitHub would show the line breaks.

@@ -1,8 +1,6 @@
 package gui
 
 import (
-	"path/filepath"
-
 	"github.com/jesseduffield/lazygit/pkg/commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/oscommands"
 	"github.com/jesseduffield/lazygit/pkg/config"
@@ -102,7 +100,7 @@ func (self *guiCommon) SaveAppStateAndLogError() {
 }
 
 func (self *guiCommon) SaveSidePanelWidth() {
-	repoPath := filepath.Join(self.gui.git.RepoPaths.RepoGitDirPath(), "lazygit.yml")
+	repoPath := self.gui.repoConfigFilePath()
 	value := self.gui.State.SidePanelWidth
 	if err := self.gui.Config.SaveSidePanelWidth(repoPath, value); err != nil {
 		self.gui.Log.Errorf("error when saving side panel width: %v", err)
@@ -110,11 +108,19 @@ func (self *guiCommon) SaveSidePanelWidth() {
 }
 
 func (self *guiCommon) SaveHalfScreenModeSidePanelWidth() {
-	repoPath := filepath.Join(self.gui.git.RepoPaths.RepoGitDirPath(), "lazygit.yml")
+	repoPath := self.gui.repoConfigFilePath()
 	value := self.gui.State.HalfScreenModeSidePanelWidth
 	if err := self.gui.Config.SaveHalfScreenModeSidePanelWidth(repoPath, value); err != nil {
 		self.gui.Log.Errorf("error when saving half screen mode side panel width: %v", err)
 	}
+}
+
+func (self *guiCommon) ResetSidePanelWidth() error {
+	return self.gui.resetSavedSidePanelWidth(self.gui.Config.RemoveSidePanelWidth)
+}
+
+func (self *guiCommon) ResetHalfScreenModeSidePanelWidth() error {
+	return self.gui.resetSavedSidePanelWidth(self.gui.Config.RemoveHalfScreenModeSidePanelWidth)
 }
 
 func (self *guiCommon) GetConfig() config.AppConfigurer {

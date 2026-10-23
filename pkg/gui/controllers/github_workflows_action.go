@@ -72,7 +72,7 @@ func (self *GithubWorkflowsAction) workflowMenu(workflow *models.GithubWorkflow)
 		OnPress: func() error { return self.promptForRef(workflow) },
 	}
 	if !workflow.IsActive() {
-		runItem.DisabledReason = &types.DisabledReason{Text: tr.WorkflowDisabled}
+		runItem.DisabledReason = &types.DisabledReason{Text: tr.CantRunDisabledWorkflow}
 	}
 
 	editItem := &types.MenuItem{
@@ -104,7 +104,7 @@ func (self *GithubWorkflowsAction) workflowMenu(workflow *models.GithubWorkflow)
 			{
 				Label: tr.OpenWorkflowInBrowser,
 				OnPress: func() error {
-					repo := helper.Client().Repo()
+					repo := self.c.Helpers().GithubClient.Client().Repo()
 					return self.c.OS().OpenLink(fmt.Sprintf("https://%s/%s/actions/workflows/%s",
 						repo.Host, repo.FullName(), path.Base(workflow.Path)))
 				},
@@ -140,7 +140,7 @@ func (self *GithubWorkflowsAction) promptForRef(workflow *models.GithubWorkflow)
 // its definition there.
 func (self *GithubWorkflowsAction) loadInputs(workflow *models.GithubWorkflow, ref string) error {
 	tr := self.c.Tr.GithubActions
-	client := self.c.Helpers().GithubActions.Client()
+	client := self.c.Helpers().GithubClient.Client()
 
 	return self.c.WithWaitingStatus(tr.LoadingWorkflow, func(gocui.Task) error {
 		content, err := client.GetFileContent(goContext.Background(), workflow.Path, ref)
@@ -155,8 +155,14 @@ func (self *GithubWorkflowsAction) loadInputs(workflow *models.GithubWorkflow, r
 					"workflow": workflow.Name,
 				}))
 			}
+			if github_commands.IsNotFound(err) {
+				return errors.New(utils.ResolvePlaceholderString(tr.WorkflowFileNotAtRef, map[string]string{
+					"path": workflow.Path,
+					"ref":  ref,
+				}))
+			}
 			if err != nil {
-				return err
+				return self.c.Helpers().GithubActions.HandleError(err)
 			}
 			return self.askForInputs(workflow, ref, inputs, map[string]string{})
 		})

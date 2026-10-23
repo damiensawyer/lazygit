@@ -98,12 +98,12 @@ type GuiConfig struct {
 	// If true, switch to a different worktree without confirmation when checking out a branch that is checked out in that worktree
 	SkipSwitchWorktreeOnCheckoutWarning bool `yaml:"skipSwitchWorktreeOnCheckoutWarning"`
 	// Fraction of the total screen width to use for the left side section. You may want to pick a small number (e.g. 0.2) if you're using a narrow screen, so that you can see more of the main section.
-	// Number from 0 to 1.0.
-	SidePanelWidth float64 `yaml:"sidePanelWidth" jsonschema:"maximum=1,minimum=0"`
+	// Number between 0 and 1.0, exclusive.
+	SidePanelWidth float64 `yaml:"sidePanelWidth" jsonschema:"exclusiveMaximum=1,exclusiveMinimum=0"`
 	// Fraction of the total screen width to use for the left side section when in half screen mode.
 	// This overrides `sidePanelWidth` when the screen is split half and half (after pressing '+' once).
-	// Number from 0 to 1.0. Defaults to 0.5 (equal split).
-	HalfScreenModeSidePanelWidth float64 `yaml:"halfScreenModeSidePanelWidth" jsonschema:"maximum=1,minimum=0"`
+	// Number between 0 and 1.0, exclusive. Defaults to 0.5 (equal split).
+	HalfScreenModeSidePanelWidth float64 `yaml:"halfScreenModeSidePanelWidth" jsonschema:"exclusiveMaximum=1,exclusiveMinimum=0"`
 	// If true, increase the height of the focused side window; creating an accordion effect.
 	ExpandFocusedSidePanel bool `yaml:"expandFocusedSidePanel"`
 	// The weight of the expanded side panel, relative to the other panels. 2 means twice as tall as the other panels. Only relevant if `expandFocusedSidePanel` is true.
@@ -113,7 +113,7 @@ type GuiConfig struct {
 	// The side panels, in the order they appear from top to bottom.
 	// Each entry is a list of one or more names that share a single panel as tabs (cycle through them with the next-tab/previous-tab keys).
 	// Omit a name to hide it; give a name its own one-element list to promote a tab to a top-level panel.
-	// Valid names are: 'status', 'files', 'worktrees', 'submodules', 'branches', 'remotes', 'tags', 'commits', 'reflog', 'stash'. 'files', 'branches', and 'commits' must always be included; they can't be hidden.
+	// Valid names are: 'status', 'files', 'worktrees', 'submodules', 'branches', 'pullRequests', 'remotes', 'tags', 'commits', 'reflog', 'stash'. 'files', 'branches', and 'commits' must always be included; they can't be hidden.
 	SidePanels []SidePanel `yaml:"sidePanels"`
 	// Sometimes the main window is split in two (e.g. when the selected file has both staged and unstaged changes). This setting controls how the two sections are split.
 	// Options are:
@@ -358,7 +358,7 @@ type GitConfig struct {
 	// The number of lines of context to show around each diff hunk. Can be changed from within Lazygit with the `{` and `}` keys.
 	DiffContextSize uint64 `yaml:"diffContextSize"`
 	// Saved context size for toggling with `<alt+}>`. Used internally when toggling full-file diff view.
-	DiffContextSizeSaved uint64 `yaml:"-"`
+	DiffContextSizeSaved *uint64 `yaml:"-"`
 	// The threshold for considering a file to be renamed, in percent. Can be changed from within Lazygit with the `(` and `)` keys.
 	RenameSimilarityThreshold int `yaml:"renameSimilarityThreshold" jsonschema:"minimum=0,maximum=100"`
 	// If true, do not spawn a separate process when using GPG
@@ -487,6 +487,7 @@ type KeybindingConfig struct {
 	Submodules     KeybindingSubmodulesConfig     `yaml:"submodules"`
 	CommitMessage  KeybindingCommitMessageConfig  `yaml:"commitMessage"`
 	GithubActions  KeybindingGithubActionsConfig  `yaml:"githubActions"`
+	PullRequests   KeybindingPullRequestsConfig   `yaml:"pullRequests"`
 }
 
 // damn looks like we have some inconsistencies here with -alt and -alt1
@@ -702,6 +703,21 @@ type KeybindingGithubActionsConfig struct {
 	CopyToClipboard   Keybinding `yaml:"copyToClipboard"`
 }
 
+type KeybindingPullRequestsConfig struct {
+	CheckOut        Keybinding `yaml:"checkOut"`
+	Merge           Keybinding `yaml:"merge"`
+	ChangeState     Keybinding `yaml:"changeState"`
+	UpdateBranch    Keybinding `yaml:"updateBranch"`
+	Comment         Keybinding `yaml:"comment"`
+	Review          Keybinding `yaml:"review"`
+	Edit            Keybinding `yaml:"edit"`
+	ViewChecks      Keybinding `yaml:"viewChecks"`
+	ReviewThreads   Keybinding `yaml:"reviewThreads"`
+	OpenInBrowser   Keybinding `yaml:"openInBrowser"`
+	CopyToClipboard Keybinding `yaml:"copyToClipboard"`
+	Filter          Keybinding `yaml:"filter"`
+}
+
 type KeybindingCommitFilesConfig struct {
 	CheckoutCommitFile Keybinding `yaml:"checkoutCommitFile"`
 }
@@ -712,6 +728,7 @@ type KeybindingRepoFilesConfig struct {
 }
 
 type KeybindingMainConfig struct {
+	AddReviewComment Keybinding `yaml:"addReviewComment"`
 	PrevHunk         Keybinding `yaml:"prevHunk"`
 	NextHunk         Keybinding `yaml:"nextHunk"`
 	PrevFile         Keybinding `yaml:"prevFile"`
@@ -927,7 +944,7 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 			SidePanels: []SidePanel{
 				{"status"},
 				{"files", "worktrees", "submodules"},
-				{"branches", "remotes", "tags"},
+				{"branches", "pullRequests", "remotes", "tags"},
 				{"commits", "reflog"},
 				{"stash"},
 			},
@@ -1243,11 +1260,26 @@ func GetDefaultConfigForPlatform(platform string) *UserConfig {
 				DownloadArtifacts: Keybinding{"a"},
 				CopyToClipboard:   Keybinding{"y"},
 			},
+			PullRequests: KeybindingPullRequestsConfig{
+				CheckOut:        Keybinding{"c"},
+				Merge:           Keybinding{"M"},
+				ChangeState:     Keybinding{"d"},
+				UpdateBranch:    Keybinding{"u"},
+				Comment:         Keybinding{"C"},
+				Review:          Keybinding{"r"},
+				Edit:            Keybinding{"e"},
+				ViewChecks:      Keybinding{"t"},
+				ReviewThreads:   Keybinding{"T"},
+				OpenInBrowser:   Keybinding{"o"},
+				CopyToClipboard: Keybinding{"y"},
+				Filter:          Keybinding{"f"},
+			},
 			RepoFiles: KeybindingRepoFilesConfig{
 				Restore:  Keybinding{"c"},
 				SaveFile: Keybinding{"S"},
 			},
 			Main: KeybindingMainConfig{
+				AddReviewComment: Keybinding{"r"},
 				PrevHunk:         Keybinding{"<left>", "h"},
 				NextHunk:         Keybinding{"<right>", "l"},
 				PrevFile:         Keybinding{"N"},

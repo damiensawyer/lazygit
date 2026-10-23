@@ -38,8 +38,7 @@ func SplitJobLog(log string, steps []models.GithubStep) []StepLog {
 	}
 
 	current := 0
-	for line := range strings.SplitSeq(strings.TrimPrefix(log, byteOrderMark), "\n") {
-		line = strings.TrimSuffix(line, "\r")
+	for _, line := range logLines(log) {
 		timestamp, text := splitLogTimestamp(line)
 		if !timestamp.IsZero() {
 			second := timestamp.Truncate(time.Second)
@@ -58,12 +57,6 @@ func SplitJobLog(log string, steps []models.GithubStep) []StepLog {
 			}
 		}
 		result[current].Lines = append(result[current].Lines, text)
-	}
-
-	// The log ends with a newline, which leaves an empty last line.
-	last := &result[len(result)-1]
-	if n := len(last.Lines); n > 0 && last.Lines[n-1] == "" {
-		last.Lines = last.Lines[:n-1]
 	}
 
 	return result
@@ -106,9 +99,22 @@ func splitLogTimestamp(line string) (time.Time, string) {
 // StripLogTimestamps removes the timestamp from the start of every line of a
 // job log.
 func StripLogTimestamps(log string) []string {
-	lines := strings.Split(strings.TrimSuffix(strings.TrimPrefix(log, byteOrderMark), "\n"), "\n")
+	lines := logLines(log)
 	for i, line := range lines {
-		_, lines[i] = splitLogTimestamp(strings.TrimSuffix(line, "\r"))
+		_, lines[i] = splitLogTimestamp(line)
+	}
+	return lines
+}
+
+// logLines splits a job log into its lines, without the line endings.
+func logLines(log string) []string {
+	log = strings.TrimPrefix(log, byteOrderMark)
+	if log == "" {
+		return nil
+	}
+	lines := strings.Split(strings.TrimSuffix(log, "\n"), "\n")
+	for i, line := range lines {
+		lines[i] = strings.TrimSuffix(line, "\r")
 	}
 	return lines
 }

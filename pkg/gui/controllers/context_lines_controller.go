@@ -3,8 +3,10 @@ package controllers
 import (
 	"fmt"
 	"math"
+	"strconv"
 
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
+	"github.com/jesseduffield/lazygit/pkg/utils"
 )
 
 // This controller lets you change the context size for diffs. The 'context' in 'context size' refers to the conventional meaning of the word 'context' in a diff, as opposed to lazygit's own idea of a 'context'.
@@ -55,13 +57,24 @@ func (self *ContextLinesController) Context() types.Context {
 }
 
 func (self *ContextLinesController) Increase() error {
-	if self.c.UserConfig().Git.DiffContextSize < math.MaxUint64 {
-		self.c.UserConfig().Git.DiffContextSize++
+	// The full-file diff already shows as much context as there is
+	if self.c.UserConfig().Git.DiffContextSize == math.MaxUint64 {
+		self.c.Toast(self.c.Tr.AlreadyShowingFullFileDiff)
+		return nil
 	}
+
+	self.c.UserConfig().Git.DiffContextSize++
 	return self.applyChange()
 }
 
 func (self *ContextLinesController) Decrease() error {
+	// Less than the full file is what the full-file diff was toggled on from
+	if self.c.UserConfig().Git.DiffContextSize == math.MaxUint64 {
+		self.restoreSavedSize()
+		self.rerender()
+		return nil
+	}
+
 	if self.c.UserConfig().Git.DiffContextSize > 0 {
 		self.c.UserConfig().Git.DiffContextSize--
 	}
@@ -71,21 +84,30 @@ func (self *ContextLinesController) Decrease() error {
 func (self *ContextLinesController) Toggle() error {
 	currentSize := self.c.UserConfig().Git.DiffContextSize
 	if currentSize == math.MaxUint64 {
-		// Currently showing the full file: restore previous context size.
-		saved := self.c.UserConfig().Git.DiffContextSizeSaved
-		if saved == 0 {
-			// No saved value (unusual), just decrease to a reasonable default.
-			saved = 3
-		}
-		self.c.UserConfig().Git.DiffContextSize = saved
-		self.c.Toast(fmt.Sprintf(self.c.Tr.RestoreDiffContextSize, saved))
+		self.restoreSavedSize()
 	} else {
-		self.c.UserConfig().Git.DiffContextSizeSaved = currentSize
+		self.c.UserConfig().Git.DiffContextSizeSaved = &currentSize
 		self.c.UserConfig().Git.DiffContextSize = math.MaxUint64
 		self.c.Toast(self.c.Tr.FullFileDiffView)
 	}
 	self.rerender()
 	return nil
+}
+
+// restoreSavedSize leaves the full-file diff for the context size that was in
+// use before it.
+func (self *ContextLinesController) restoreSavedSize() {
+	// With no saved value (the config started out showing the full file),
+	// fall back to a reasonable default.
+	saved := uint64(3)
+	if self.c.UserConfig().Git.DiffContextSizeSaved != nil {
+		saved = *self.c.UserConfig().Git.DiffContextSizeSaved
+	}
+	self.c.UserConfig().Git.DiffContextSize = saved
+	self.c.Toast(utils.ResolvePlaceholderString(
+		self.c.Tr.RestoreDiffContextSize,
+		map[string]string{"size": strconv.FormatUint(saved, 10)},
+	))
 }
 
 func (self *ContextLinesController) applyChange() error {
