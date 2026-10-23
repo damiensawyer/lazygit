@@ -870,25 +870,9 @@ func (c *AppConfig) SaveHalfScreenModeSidePanelWidth(path string, value float64)
 // config file at path to the given value, preserving the file's other
 // content. The file is created if it doesn't exist yet.
 func saveRepoGuiValue(path string, key string, value float64) error {
-	rootNode := &yaml.Node{Kind: yaml.DocumentNode}
-	existing, err := os.ReadFile(path)
-	if err == nil && len(existing) > 0 {
-		if err := yaml.Unmarshal(existing, rootNode); err != nil {
-			return err
-		}
-	} else if err != nil && !errors.Is(err, os.ErrNotExist) {
+	rootNode, body, err := loadRepoConfig(path)
+	if err != nil {
 		return err
-	}
-
-	var body *yaml.Node
-	if rootNode.Kind == yaml.DocumentNode && len(rootNode.Content) > 0 {
-		body = rootNode.Content[0]
-		if body.Kind != yaml.MappingNode {
-			return errors.New("top-level element of the config file is not a mapping")
-		}
-	} else {
-		body = &yaml.Node{Kind: yaml.MappingNode}
-		rootNode.Content = []*yaml.Node{body}
 	}
 
 	// Get the gui section, creating it if necessary
@@ -914,6 +898,38 @@ func saveRepoGuiValue(path string, key string, value float64) error {
 		valueNode.Tag = "!!float"
 	}
 
+	return writeRepoConfig(path, rootNode)
+}
+
+// loadRepoConfig reads the per-repo config file at path, returning its
+// document node and the top-level mapping in it. A file that doesn't exist
+// or is empty gives an empty mapping.
+func loadRepoConfig(path string) (*yaml.Node, *yaml.Node, error) {
+	rootNode := &yaml.Node{Kind: yaml.DocumentNode}
+	existing, err := os.ReadFile(path)
+	if err == nil && len(existing) > 0 {
+		if err := yaml.Unmarshal(existing, rootNode); err != nil {
+			return nil, nil, err
+		}
+	} else if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return nil, nil, err
+	}
+
+	var body *yaml.Node
+	if rootNode.Kind == yaml.DocumentNode && len(rootNode.Content) > 0 {
+		body = rootNode.Content[0]
+		if body.Kind != yaml.MappingNode {
+			return nil, nil, errors.New("top-level element of the config file is not a mapping")
+		}
+	} else {
+		body = &yaml.Node{Kind: yaml.MappingNode}
+		rootNode.Content = []*yaml.Node{body}
+	}
+
+	return rootNode, body, nil
+}
+
+func writeRepoConfig(path string, rootNode *yaml.Node) error {
 	marshalled, err := yaml_utils.YamlMarshal(rootNode)
 	if err != nil {
 		return err
