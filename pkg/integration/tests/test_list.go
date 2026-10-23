@@ -193,6 +193,8 @@ var tests = []*components.IntegrationTest{
 	config.SidePanelWidthFullScreenMode,
 	config.SidePanelWidthInPopup,
 	config.SidePanelWidthPersistence,
+	config.SidePanelWidthResetAfterReload,
+	config.SidePanelWidthResetHalfScreenMode,
 	config.SidePanelWidthRounding,
 	config.SidePanelWidthSwitchingRepos,
 	config.SidePanelsInPerRepoConfig,
