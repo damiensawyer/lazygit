@@ -200,3 +200,12 @@ func (self *GitHubCommands) FetchPullRequestHead(task gocui.Task, remote string,
 	cmdArgs := NewGitCmd("fetch").Arg(remote, "+"+ref+":"+ref, "--no-tags").ToArgv()
 	return self.cmd.New(cmdArgs).PromptOnCredentialRequest(task).Run()
 }
+
+// FetchPullRequestHeadAndBase fetches the head of a pull request the way
+// FetchPullRequestHead does, together with the branch it is to be merged into,
+// so that the commit it branched off is there to diff it against.
+func (self *GitHubCommands) FetchPullRequestHeadAndBase(task gocui.Task, remote string, number int, baseBranch string) error {
+	ref := fmt.Sprintf("refs/pull/%d/head", number)
+	cmdArgs := NewGitCmd("fetch").Arg(remote, "+"+ref+":"+ref, "refs/heads/"+baseBranch, "--no-tags").ToArgv()
+	return self.cmd.New(cmdArgs).PromptOnCredentialRequest(task).Run()
+}

@@ -354,6 +354,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | Key | Action | Info |
 |-----|--------|-------------|
 | `` <enter> `` | View commits | Fetch the pull request from GitHub and show its commits, without checking it out. From there, view the files a commit changed, or select a range of commits to see their combined diff. |
+| `` F `` | View changed files | Fetch the pull request from GitHub and show the files it changes, without checking it out, as GitHub's "Files changed" tab does: diffed against where it branched off its base branch, so that what the base branch got since then doesn't show. |
 | `` c `` | Check out | Check the pull request out the way `gh pr checkout` does, or under another branch name, detached, in a new worktree, or resetting the local branch to it rather than only fast-forwarding it. |
 | `` M `` | Merge | Merge the pull request on GitHub with a merge commit, by squashing or by rebasing, optionally deleting its branch, locally too; or have GitHub merge it once it's ready. |
 | `` r `` | Review | Approve the pull request, request changes, or comment on it, submitting the line comments you collected in a pending review along with it. |

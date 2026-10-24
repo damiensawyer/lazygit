@@ -131,6 +131,7 @@ func (gui *Gui) resetHelpersAndControllers() {
 		Search:       searchHelper,
 		Worktree:     worktreeHelper,
 		SubCommits:   helpers.NewSubCommitsHelper(helperCommon, refreshHelper),
+		CommitFiles:  helpers.NewCommitFilesHelper(helperCommon),
 		FinalVersion: helpers.NewFinalVersionHelper(helperCommon),
 		GithubLogin:  githubLoginHelper,
 		GithubClient: githubClientHelper,

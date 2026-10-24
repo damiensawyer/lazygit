@@ -642,6 +642,8 @@ var tests = []*components.IntegrationTest{
 	pull_requests.ReplyToAndResolveReviewThread,
 	pull_requests.ReviewPullRequest,
 	pull_requests.ViewChecks,
+	pull_requests.ViewMergedPullRequestChangedFiles,
+	pull_requests.ViewPullRequestChangedFiles,
 	pull_requests.ViewPullRequestCommits,
 	reflog.Checkout,
 	reflog.CherryPick,

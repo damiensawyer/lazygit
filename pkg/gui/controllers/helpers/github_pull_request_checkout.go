@@ -198,3 +198,33 @@ func (self *GithubPullRequestsHelper) ViewCommits(pr *models.GithubPullRequest, 
 		})
 	})
 }
+
+// ViewChangedFiles shows the files a pull request changes without checking it
+// out, as GitHub's "Files changed" tab does: diffed against the merge base of
+// its head and the base commit GitHub reports. For a merged pull request, that
+// base commit is where its base branch was when it was merged, so that merging
+// it doesn't make its changes disappear.
+func (self *GithubPullRequestsHelper) ViewChangedFiles(pr *models.GithubPullRequest, commitFilesHelper *CommitFilesHelper) error {
+	return self.WithDetails(pr, func(details *GithubPullRequestDetails) error {
+		remote, _ := self.baseRemote()
+		ref := models.GithubPullRequestRef{Number: details.PullRequest.Number, Title: details.PullRequest.Title}
+		return self.c.WithWaitingStatus(self.c.Tr.PullRequests.FetchingPullRequest, func(task gocui.Task) error {
+			if err := self.c.Git().GitHub.FetchPullRequestHeadAndBase(
+				task, remote, ref.Number, details.PullRequest.BaseRefName,
+			); err != nil {
+				return err
+			}
+			mergeBase, err := self.c.Git().Branch.MergeBase(details.Details.BaseRefOid, ref.FullRefName())
+			if err != nil {
+				return err
+			}
+			self.c.OnUIThread(func() error {
+				return commitFilesHelper.ViewCommitFiles(ViewCommitFilesOpts{
+					Ref:     models.GithubPullRequestChangesRef{GithubPullRequestRef: ref, MergeBase: mergeBase},
+					Context: self.c.Contexts().PullRequests,
+				})
+			})
+			return nil
+		})
+	})
+}

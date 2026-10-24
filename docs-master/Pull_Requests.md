@@ -40,6 +40,7 @@ review threads.
 | Key | Action |
 |-----|--------|
 | `enter` | Show its commits, without checking it out: its head is fetched into `refs/pull/<number>/head`, the way GitHub names it. From there, `enter` on a commit shows the files it changes, and a range of commits shows their combined diff |
+| `F` | Show the files it changes, without checking it out, as GitHub's "Files changed" tab does: its head is diffed against where it branched off its base branch, so what the base branch got since doesn't show. For a merged pull request, that's where the base branch was when it was merged |
 | `c` | Check the pull request out: `c` again to check it out (see below), or `b` under another branch name, `d` detached, or `f` resetting the local branch to it. `w` asks for the same choices for checking it out in a new worktree, and switches to that |
 | `T` | List its review threads (conversations about lines of it), unresolved ones first, to reply to one (into your pending review if you have one) or resolve it, or to open it in the browser |
 | `t` | List its checks, failing ones first, like `gh pr checks`. A check that is a GitHub Actions job opens in the [GitHub Actions view](./GitHub_Actions.md) at that job, where its log can be read; any other opens in the browser. The failed GitHub Actions jobs can be re-run from there too |

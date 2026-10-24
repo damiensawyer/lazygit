@@ -1229,6 +1229,8 @@ type PullRequests struct {
 	CheckOutOptionsTitle             string
 	ViewCommits                      string
 	ViewCommitsTooltip               string
+	ViewChangedFiles                 string
+	ViewChangedFilesTooltip          string
 	FetchingPullRequest              string
 	NotOpen                          string
 	DefaultMethod                    string
@@ -3024,6 +3026,8 @@ func EnglishTranslationSet() *TranslationSet {
 			CheckOutOptionsTitle:             "Check out #{{.number}}",
 			ViewCommits:                      "View commits",
 			ViewCommitsTooltip:               "Fetch the pull request from GitHub and show its commits, without checking it out. From there, view the files a commit changed, or select a range of commits to see their combined diff.",
+			ViewChangedFiles:                 "View changed files",
+			ViewChangedFilesTooltip:          "Fetch the pull request from GitHub and show the files it changes, without checking it out, as GitHub's \"Files changed\" tab does: diffed against where it branched off its base branch, so that what the base branch got since then doesn't show.",
 			FetchingPullRequest:              "Fetching pull request…",
 			NotOpen:                          "The pull request isn't open.",
 			DefaultMethod:                    "(your default)",
