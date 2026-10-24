@@ -243,3 +243,17 @@ func (self GithubPullRequestRef) ParentRefName() string {
 func (self GithubPullRequestRef) Description() string {
 	return fmt.Sprintf("#%d %s", self.Number, self.Title)
 }
+
+// GithubPullRequestChangesRef is a pull request's head as the changes the pull
+// request makes: diffed against MergeBase, the commit where it branched off its
+// base branch, as GitHub's "Files changed" tab does.
+type GithubPullRequestChangesRef struct {
+	GithubPullRequestRef
+	MergeBase string
+}
+
+var _ Ref = GithubPullRequestChangesRef{}
+
+func (self GithubPullRequestChangesRef) ParentRefName() string {
+	return self.MergeBase
+}

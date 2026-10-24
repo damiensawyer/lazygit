@@ -57,6 +57,14 @@ func (self *PullRequestsController) GetKeybindings(opts types.KeybindingsOpts) [
 			DisplayOnScreen:   true,
 		},
 		{
+			Keys:              opts.GetKeys(opts.Config.PullRequests.ViewChangedFiles),
+			Handler:           self.withItem(self.viewChangedFiles),
+			GetDisabledReason: self.require(self.singleItemSelected()),
+			Description:       tr.ViewChangedFiles,
+			Tooltip:           tr.ViewChangedFilesTooltip,
+			DisplayOnScreen:   true,
+		},
+		{
 			Keys:              opts.GetKeys(opts.Config.PullRequests.CheckOut),
 			Handler:           self.withItem(self.checkOut),
 			GetDisabledReason: self.require(self.singleItemSelected()),
@@ -221,6 +229,10 @@ func (self *PullRequestsController) createPullRequest() error {
 
 func (self *PullRequestsController) viewCommits(pr *models.GithubPullRequest) error {
 	return self.c.Helpers().GithubPullRequests.ViewCommits(pr, self.c.Helpers().SubCommits)
+}
+
+func (self *PullRequestsController) viewChangedFiles(pr *models.GithubPullRequest) error {
+	return self.c.Helpers().GithubPullRequests.ViewChangedFiles(pr, self.c.Helpers().CommitFiles)
 }
 
 func (self *PullRequestsController) checkOut(pr *models.GithubPullRequest) error {

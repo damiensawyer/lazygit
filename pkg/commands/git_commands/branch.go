@@ -310,6 +310,15 @@ func (self *BranchCommands) IsAncestor(ancestorRefName string, refName string) b
 	return err == nil
 }
 
+// MergeBase returns the hash of the best common ancestor of two refs.
+func (self *BranchCommands) MergeBase(refName string, otherRefName string) (string, error) {
+	cmdArgs := NewGitCmd("merge-base").
+		Arg(refName, otherRefName).
+		ToArgv()
+	output, err := self.cmd.New(cmdArgs).DontLog().RunWithOutput()
+	return strings.TrimSpace(output), err
+}
+
 // Only choose between non-empty, non-identical commands
 func (self *BranchCommands) allBranchesLogCandidates() []string {
 	return lo.Uniq(lo.WithoutEmpty(self.UserConfig().Git.AllBranchesLogCmds))

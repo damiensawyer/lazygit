@@ -906,6 +906,7 @@ keybinding:
     downloadArtifacts: a
     copyToClipboard: "y"
   pullRequests:
+    viewChangedFiles: F
     checkOut: c
     merge: M
     changeState: d

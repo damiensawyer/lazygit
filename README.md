@@ -30,6 +30,7 @@ The pull requests are a tab of the branches panel (`3`, then `]`), between local
 | Key | Action |
 |-----|--------|
 | `<enter>` | Show its commits without checking it out (then its files, and the diff of any range of them) |
+| `F` | Show the files it changes, like GitHub's "Files changed" tab, without checking it out |
 | `<space>` | Check it out, exactly the way `gh pr checkout` does, forks included |
 | `c` / `w` | Check it out under another name, detached, reset, or in a new worktree |
 | `M` | Merge, squash or rebase it (deleting its branch, locally too, if you like), or enable auto-merge |
