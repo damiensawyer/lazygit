@@ -53,6 +53,7 @@ type Helpers struct {
 	Search             *SearchHelper
 	Worktree           *WorktreeHelper
 	SubCommits         *SubCommitsHelper
+	CommitFiles        *CommitFilesHelper
 	FinalVersion       *FinalVersionHelper
 	GithubLogin        *GithubLoginHelper
 	GithubClient       *GithubClientHelper
@@ -95,6 +96,7 @@ func NewStubHelpers() *Helpers {
 		Search:             &SearchHelper{},
 		Worktree:           &WorktreeHelper{},
 		SubCommits:         &SubCommitsHelper{},
+		CommitFiles:        &CommitFilesHelper{},
 		FinalVersion:       &FinalVersionHelper{},
 		GithubLogin:        &GithubLoginHelper{},
 		GithubClient:       &GithubClientHelper{},
