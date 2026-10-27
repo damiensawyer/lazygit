@@ -170,24 +170,33 @@ func isDirectoryAGitRepository(dir string) (bool, error) {
 func openRecentRepo(app *App) bool {
 	for _, repoDir := range app.Config.GetAppState().RecentRepos {
 		if isRepo, _ := isDirectoryAGitRepository(repoDir); isRepo {
-			if err := os.Chdir(repoDir); err == nil {
-				// We're still in setup, before the gui exists, so we can't show the approval popup
-				// that DispatchSwitchTo offers for blocked .envrc files; just log and move on.
-				// Also, the logs only go to the debug log, not the Command Log, because that's not
-				// available yet, either.
-				result := direnv.Load(app.OSCommand.Cmd)
-				if result.Message != "" {
-					app.Log.WithField("message", result.Message).Info("direnv")
-				}
-				if result.Err != nil {
-					app.Log.WithError(result.Err).Warn("direnv load failed")
-				}
+			if err := app.enterRepo(repoDir); err == nil {
 				return true
 			}
 		}
 	}
 
 	return false
+}
+
+// enterRepo makes repoDir the repo that the gui opens.
+func (app *App) enterRepo(repoDir string) error {
+	if err := os.Chdir(repoDir); err != nil {
+		return err
+	}
+
+	// We're still in setup, before the gui exists, so we can't show the approval popup
+	// that DispatchSwitchTo offers for blocked .envrc files; just log and move on.
+	// Also, the logs only go to the debug log, not the Command Log, because that's not
+	// available yet, either.
+	result := direnv.Load(app.OSCommand.Cmd)
+	if result.Message != "" {
+		app.Log.WithField("message", result.Message).Info("direnv")
+	}
+	if result.Err != nil {
+		app.Log.WithError(result.Err).Warn("direnv load failed")
+	}
+	return nil
 }
 
 func (app *App) setupRepo(
