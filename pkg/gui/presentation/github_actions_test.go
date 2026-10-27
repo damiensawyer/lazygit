@@ -231,13 +231,15 @@ func TestGetGithubRunListDisplayStrings(t *testing.T) {
 	}
 	run.HeadCommit.Message = "Fix the thing\n\nbody"
 
-	assert.Equal(t, [][]string{
-		{"✓", "3h", "A workflow with a v…", "Fix the thing"},
-	}, GetGithubRunListDisplayStrings([]*models.GithubRun{run}, false, now))
+	tr := i18n.EnglishTranslationSet()
 
 	assert.Equal(t, [][]string{
-		{"✓", "3h", "A workflow with a very long name", "main", "pull_request", "4m12s", "Fix the thing"},
-	}, GetGithubRunListDisplayStrings([]*models.GithubRun{run}, true, now))
+		{"✓", "Succeeded", "3h", "A workflow with a v…", "Fix the thing"},
+	}, GetGithubRunListDisplayStrings(tr, []*models.GithubRun{run}, false, now))
+
+	assert.Equal(t, [][]string{
+		{"✓", "Succeeded", "3h", "A workflow with a very long name", "main", "pull_request", "4m12s", "Fix the thing"},
+	}, GetGithubRunListDisplayStrings(tr, []*models.GithubRun{run}, true, now))
 }
 
 func TestGetGithubRunListDisplayStringsDoesNotTruncateShortNames(t *testing.T) {
@@ -250,9 +252,9 @@ func TestGetGithubRunListDisplayStringsDoesNotTruncateShortNames(t *testing.T) {
 	}
 
 	assert.Equal(t, [][]string{
-		{"*", "30m", "Exactly twenty chars", "One"},
-		{"•", "2d", "CI", "Two"},
-	}, GetGithubRunListDisplayStrings(runs, false, now))
+		{"*", "In progress", "30m", "Exactly twenty chars", "One"},
+		{"•", "Queued", "2d", "CI", "Two"},
+	}, GetGithubRunListDisplayStrings(i18n.EnglishTranslationSet(), runs, false, now))
 }
 
 func TestGetGithubRunListDisplayStringsMeasuresAgeToNow(t *testing.T) {
@@ -265,12 +267,12 @@ func TestGetGithubRunListDisplayStringsMeasuresAgeToNow(t *testing.T) {
 	}
 
 	assert.Equal(t, [][]string{
-		{"*", "5m", "CI", "main", "push", "5m0s", "One"},
-	}, GetGithubRunListDisplayStrings([]*models.GithubRun{run}, true, created.Add(5*time.Minute)))
+		{"*", "In progress", "5m", "CI", "main", "push", "5m0s", "One"},
+	}, GetGithubRunListDisplayStrings(i18n.EnglishTranslationSet(), []*models.GithubRun{run}, true, created.Add(5*time.Minute)))
 }
 
 func TestGetGithubRunListDisplayStringsIsEmptyForNoRuns(t *testing.T) {
-	assert.Empty(t, GetGithubRunListDisplayStrings(nil, false, time.Now()))
+	assert.Empty(t, GetGithubRunListDisplayStrings(i18n.EnglishTranslationSet(), nil, false, time.Now()))
 }
 
 func TestGetGithubRunListDisplayStringsColors(t *testing.T) {
@@ -285,13 +287,14 @@ func TestGetGithubRunListDisplayStringsColors(t *testing.T) {
 
 	assert.Equal(t, [][]string{{
 		"\x1b[31mX\x1b[0m",
+		"\x1b[31mFailed\x1b[0m",
 		"\x1b[34m1m\x1b[0m",
 		"\x1b[36mCI\x1b[0m",
 		"\x1b[35mmain\x1b[0m",
 		"\x1b[90mpush\x1b[0m",
 		"1m0s",
 		"Title",
-	}}, GetGithubRunListDisplayStrings([]*models.GithubRun{run}, true, now))
+	}}, GetGithubRunListDisplayStrings(i18n.EnglishTranslationSet(), []*models.GithubRun{run}, true, now))
 }
 
 func TestGetGithubJobAndStepListDisplayStrings(t *testing.T) {
@@ -307,13 +310,15 @@ func TestGetGithubJobAndStepListDisplayStrings(t *testing.T) {
 		{Name: "docs", Status: "completed", Conclusion: "skipped"},
 		{Name: "lint", Status: "completed", Conclusion: "cancelled", StartedAt: start, CompletedAt: start.Add(time.Second)},
 	}
+	tr := i18n.EnglishTranslationSet()
+
 	assert.Equal(t, [][]string{
-		{"✓", "build", "1m15s"},
-		{"*", "test", "9m0s"},
-		{"•", "deploy", ""},
-		{"-", "docs", ""},
-		{"X", "lint", "1s"},
-	}, GetGithubJobListDisplayStrings(jobs, now))
+		{"✓", "Succeeded", "build", "1m15s"},
+		{"*", "In progress", "test", "9m0s"},
+		{"•", "Queued", "deploy", ""},
+		{"-", "Skipped", "docs", ""},
+		{"X", "Cancelled", "lint", "1s"},
+	}, GetGithubJobListDisplayStrings(tr, jobs, now))
 
 	steps := []*models.GithubStep{
 		{Name: "Set up job", Status: "completed", Conclusion: "success", StartedAt: start, CompletedAt: start.Add(2 * time.Second)},
@@ -323,12 +328,12 @@ func TestGetGithubJobAndStepListDisplayStrings(t *testing.T) {
 		{Name: "Neutral", Status: "completed", Conclusion: "neutral", StartedAt: start, CompletedAt: start},
 	}
 	assert.Equal(t, [][]string{
-		{"✓", "Set up job", "2s"},
-		{"*", "Run tests", "9m58s"},
-		{"•", "Upload", ""},
-		{"-", "Notify", ""},
-		{"-", "Neutral", "0s"},
-	}, GetGithubStepListDisplayStrings(steps, now))
+		{"✓", "Succeeded", "Set up job", "2s"},
+		{"*", "In progress", "Run tests", "9m58s"},
+		{"•", "Queued", "Upload", ""},
+		{"-", "Skipped", "Notify", ""},
+		{"-", "Neutral", "Neutral", "0s"},
+	}, GetGithubStepListDisplayStrings(tr, steps, now))
 }
 
 func TestFormatGithubRunSummaryOfRunInProgress(t *testing.T) {

@@ -37,6 +37,28 @@ func GithubActionsStateIcon(state models.GithubActionsState) string {
 	return "?"
 }
 
+// GithubActionsStatusLabel spells out a run, job, or step's state, in the
+// colour of its icon.
+func GithubActionsStatusLabel(tr *i18n.TranslationSet, state models.GithubActionsState) string {
+	switch state {
+	case models.GithubActionsStateSuccess:
+		return style.FgGreen.Sprint(tr.GithubActions.StatusSuccess)
+	case models.GithubActionsStateFailure:
+		return style.FgRed.Sprint(tr.GithubActions.StatusFailure)
+	case models.GithubActionsStateCancelled:
+		return style.FgYellow.Sprint(tr.GithubActions.StatusCancelled)
+	case models.GithubActionsStateSkipped:
+		return githubDim.Sprint(tr.GithubActions.StatusSkipped)
+	case models.GithubActionsStateNeutral:
+		return githubDim.Sprint(tr.GithubActions.StatusNeutral)
+	case models.GithubActionsStateQueued:
+		return style.FgYellow.Sprint(tr.GithubActions.StatusQueued)
+	case models.GithubActionsStateInProgress:
+		return style.FgYellow.Sprint(tr.GithubActions.StatusInProgress)
+	}
+	return "?"
+}
+
 // FormatGithubDuration formats a duration the way gh does, e.g. "4m12s".
 func FormatGithubDuration(d time.Duration) string {
 	d = d.Truncate(time.Second)
@@ -50,13 +72,15 @@ func FormatGithubDuration(d time.Duration) string {
 	}
 }
 
-func GetGithubRunListDisplayStrings(runs []*models.GithubRun, fullDescription bool, now time.Time) [][]string {
+func GetGithubRunListDisplayStrings(tr *i18n.TranslationSet, runs []*models.GithubRun, fullDescription bool, now time.Time) [][]string {
 	return lo.Map(runs, func(run *models.GithubRun, _ int) []string {
 		age := style.FgBlue.Sprint(utils.TimeAgo(run.CreatedAt, now))
+		state := run.State()
 		// The title comes last because it's the one column that can be long.
 		if !fullDescription {
 			return []string{
-				GithubActionsStateIcon(run.State()),
+				GithubActionsStateIcon(state),
+				GithubActionsStatusLabel(tr, state),
 				age,
 				style.FgCyan.Sprint(utils.TruncateWithEllipsis(run.Name, 20)),
 				run.Title(),
@@ -64,7 +88,8 @@ func GetGithubRunListDisplayStrings(runs []*models.GithubRun, fullDescription bo
 		}
 
 		return []string{
-			GithubActionsStateIcon(run.State()),
+			GithubActionsStateIcon(state),
+			GithubActionsStatusLabel(tr, state),
 			age,
 			style.FgCyan.Sprint(run.Name),
 			style.FgMagenta.Sprint(run.HeadBranch),
@@ -75,22 +100,26 @@ func GetGithubRunListDisplayStrings(runs []*models.GithubRun, fullDescription bo
 	})
 }
 
-func GetGithubJobListDisplayStrings(jobs []*models.GithubJob, now time.Time) [][]string {
+func GetGithubJobListDisplayStrings(tr *i18n.TranslationSet, jobs []*models.GithubJob, now time.Time) [][]string {
 	return lo.Map(jobs, func(job *models.GithubJob, _ int) []string {
+		state := job.State()
 		return []string{
-			GithubActionsStateIcon(job.State()),
+			GithubActionsStateIcon(state),
+			GithubActionsStatusLabel(tr, state),
 			job.Name,
-			githubDurationColumn(job.State(), job.Duration(now)),
+			githubDurationColumn(state, job.Duration(now)),
 		}
 	})
 }
 
-func GetGithubStepListDisplayStrings(steps []*models.GithubStep, now time.Time) [][]string {
+func GetGithubStepListDisplayStrings(tr *i18n.TranslationSet, steps []*models.GithubStep, now time.Time) [][]string {
 	return lo.Map(steps, func(step *models.GithubStep, _ int) []string {
+		state := step.State()
 		return []string{
-			GithubActionsStateIcon(step.State()),
+			GithubActionsStateIcon(state),
+			GithubActionsStatusLabel(tr, state),
 			step.Name,
-			githubDurationColumn(step.State(), step.Duration(now)),
+			githubDurationColumn(state, step.Duration(now)),
 		}
 	})
 }

@@ -1474,6 +1474,8 @@ type GithubActions struct {
 	StatusQueued                       string
 	StatusCancelled                    string
 	StatusActionRequired               string
+	StatusSkipped                      string
+	StatusNeutral                      string
 	NotOnABranch                       string
 	NoRunsFilter                       string
 	Workflows                          string
@@ -3270,6 +3272,8 @@ func EnglishTranslationSet() *TranslationSet {
 			StatusQueued:                       "Queued",
 			StatusCancelled:                    "Cancelled",
 			StatusActionRequired:               "Waiting for approval",
+			StatusSkipped:                      "Skipped",
+			StatusNeutral:                      "Neutral",
 			NotOnABranch:                       "HEAD is detached, so there is no current branch",
 			NoRunsFilter:                       "The runs aren't filtered",
 			Workflows:                          "Workflows",

@@ -29,7 +29,7 @@ func NewGithubJobsContext(c *ContextCommon) *GithubJobsContext {
 	)
 
 	getDisplayStrings := func(_ int, _ int) [][]string {
-		return presentation.GetGithubJobListDisplayStrings(viewModel.GetItems(), time.Now())
+		return presentation.GetGithubJobListDisplayStrings(self.c.Tr, viewModel.GetItems(), time.Now())
 	}
 
 	self.FilteredListViewModel = viewModel

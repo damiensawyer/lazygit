@@ -30,7 +30,7 @@ func NewGithubStepsContext(c *ContextCommon) *GithubStepsContext {
 	)
 
 	getDisplayStrings := func(_ int, _ int) [][]string {
-		return presentation.GetGithubStepListDisplayStrings(viewModel.GetItems(), time.Now())
+		return presentation.GetGithubStepListDisplayStrings(self.c.Tr, viewModel.GetItems(), time.Now())
 	}
 
 	self.FilteredListViewModel = viewModel

@@ -44,6 +44,7 @@ func NewGithubRunsContext(c *ContextCommon) *GithubRunsContext {
 
 	getDisplayStrings := func(_ int, _ int) [][]string {
 		return presentation.GetGithubRunListDisplayStrings(
+			c.Tr,
 			viewModel.GetItems(),
 			c.State().GetRepoState().GetScreenMode() != types.SCREEN_NORMAL,
 			time.Now(),
