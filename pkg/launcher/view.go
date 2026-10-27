@@ -152,8 +152,6 @@ func (self *launcher) closePopup() error {
 }
 
 func (self *launcher) layout(g *gocui.Gui) error {
-	g.SelFrameColor = theme.ActiveBorderColor
-	g.FrameColor = theme.InactiveBorderColor
 	width, height := g.Size()
 
 	header, err := self.setView(headerView, -1, -1, width, 1, false)
@@ -185,6 +183,9 @@ func (self *launcher) layout(g *gocui.Gui) error {
 		return err
 	}
 	self.renderList(list)
+	// What the user types filters the list, so it's drawn as having focus
+	// too, its selected tab highlighted like that of a focused panel.
+	search.ParentView = list
 
 	if listWidth < width {
 		detail, err := self.setView(detailView, listWidth, 4, width-1, height-2, true)
@@ -239,9 +240,12 @@ func (self *launcher) setView(name string, x0, y0, x1, y1 int, frame bool) (*goc
 	}
 	if errors.Is(err, gocui.ErrUnknownView) {
 		v.Frame = frame
-		v.SelBgColor = theme.GocuiSelectedLineBgColor
-		v.InactiveViewSelBgColor = theme.GocuiSelectedLineBgColor
 	}
+	// The theme can change while we're running, when the terminal's
+	// background does.
+	v.SelFgColor = theme.ActiveBorderColor
+	v.SelBgColor = theme.GocuiSelectedLineBgColor
+	v.InactiveViewSelBgColor = theme.GocuiInactiveViewSelectedLineBgColor
 	return v, nil
 }
 
@@ -391,7 +395,12 @@ func (self *launcher) renderList(v *gocui.View) {
 	}
 
 	v.Highlight = true
+	// The list isn't the current view, the search field in it is, but it's
+	// drawn as having focus unless a popup has it.
 	v.HighlightInactive = true
+	if self.popup == popupNone {
+		v.InactiveViewSelBgColor = theme.GocuiSelectedLineBgColor
+	}
 	width := v.InnerWidth()
 	lines := lo.Map(entries, func(e entry, _ int) string {
 		if e.repo == nil {

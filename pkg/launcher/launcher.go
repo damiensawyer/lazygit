@@ -90,12 +90,16 @@ func Run(deps Deps) (Choice, error) {
 	}
 	homeDir, _ := os.UserHomeDir()
 
-	theme.UpdateTheme(deps.UserConfig.Gui.Theme)
-
 	g, err := gocui.NewGui(gocui.NewGuiOpts{OutputMode: gocui.OutputTrue})
 	if err != nil {
 		return Choice{}, err
 	}
+	g.Highlight = true
+	applyTheme(g, deps.UserConfig)
+	g.SetColorSchemeChangeHandler(func(gocui.DetectedColorScheme) error {
+		applyTheme(g, deps.UserConfig)
+		return nil
+	})
 
 	self := newLauncher(deps, g, newModel(deps.Tr, deps.Host, cwd, homeDir, deps.RecentRepos))
 	defer self.stop()
@@ -110,6 +114,16 @@ func Run(deps Deps) (Choice, error) {
 		return Choice{}, err
 	}
 	return self.choice, nil
+}
+
+// applyTheme sets the colors from the theme in the user config, the same way
+// the gui does.
+func applyTheme(g *gocui.Gui, userConfig *config.UserConfig) {
+	theme.UpdateTheme(theme.ConfigForTerminal(&userConfig.Gui, g.DetectedColorScheme()))
+	g.FgColor = theme.InactiveBorderColor
+	g.SelFgColor = theme.ActiveBorderColor
+	g.FrameColor = theme.InactiveBorderColor
+	g.SelFrameColor = theme.ActiveBorderColor
 }
 
 type popupKind int
