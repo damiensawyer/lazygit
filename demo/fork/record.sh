@@ -18,7 +18,7 @@
 
 set -e
 
-DEMOS="browse_files final_version full_file_diff github_actions keybindings_search overview_mode side_panel_width"
+DEMOS="browse_files final_version full_file_diff github_actions keybindings_search overview_mode repo_picker side_panel_width"
 
 # The non-Mono Nerd Font variant; the Mono variant renders the icons too small
 FONT=${DEMO_FONT:-CaskaydiaMono Nerd Font}
@@ -99,9 +99,81 @@ Hide
 EOF
 }
 
+# repo_picker_steps prints the steps of a tape that records the repository
+# picker, which lazygit shows outside of a repo. It runs before the gui, so no
+# integration test can drive it, and it shows what's on GitHub, so this records
+# the real thing, logged in as whoever gh is logged in as. Recording starts on
+# the GitHub tab, so that the user's private repositories aren't in the GIF.
+#
+# HOME is a scratch directory, so the picker shows ~/code/scratch as where it
+# was started, and finds a clone of jesseduffield/lazygit among the recent
+# repos; gh's config, and so its login, is still the user's.
+repo_picker_steps() {
+    GH_DIR=${GH_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/gh}
+    DEMO_HOME=$SCRATCH/home
+    mkdir -p "$DEMO_HOME/code/scratch" "$DEMO_HOME/config"
+    git init -q "$DEMO_HOME/code/lazygit"
+    git -C "$DEMO_HOME/code/lazygit" remote add origin https://github.com/jesseduffield/lazygit.git
+    cp "$DIR/config.yml" "$DEMO_HOME/config/config.yml"
+    printf 'recentrepos:\n  - %s\n' "$DEMO_HOME/code/lazygit" > "$DEMO_HOME/config/state.yml"
+    go build -o "$SCRATCH/lazygit" .
+
+    cat <<EOF
+Hide
+Type "clear; cd $DEMO_HOME/code/scratch && HOME=$DEMO_HOME GH_CONFIG_DIR=$GH_DIR CONFIG_DIR=$DEMO_HOME/config $SCRATCH/lazygit; echo VHS''DONE"
+Enter
+Wait+Screen@60s /Search/
+Type "]]"
+Wait+Screen@30s /Type to search all of GitHub/
+Sleep 3s
+Show
+Sleep 2s
+Type@200ms "jes laz"
+Wait+Screen@30s /jesseduffield\/lazydocker/
+Sleep 3s
+Down
+Sleep 800ms
+Down
+Sleep 800ms
+Up
+Sleep 1.5s
+Tab
+Sleep 1.5s
+Type "j"
+Sleep 800ms
+Type "k"
+Sleep 1.5s
+Type "["
+Sleep 2.5s
+Type "]"
+Sleep 1.5s
+Enter
+Sleep 3s
+Down
+Sleep 1s
+Down
+Sleep 1.5s
+Escape
+Sleep 1s
+Tab
+Sleep 1s
+Escape
+Sleep 1.5s
+Type@60ms "https://github.com/jesseduffield/horcrux"
+Wait+Screen@30s /Split your file/
+Sleep 3s
+Hide
+Ctrl+C
+Wait+Screen@30s /VHSDONE/
+EOF
+}
+
 for NAME in "$@"
 do
-    STEPS=$(integration_test_steps "$NAME")
+    case $NAME in
+        repo_picker) STEPS=$(repo_picker_steps) ;;
+        *) STEPS=$(integration_test_steps "$NAME") ;;
+    esac
 
     echo "Recording $NAME"
 

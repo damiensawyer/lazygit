@@ -93,23 +93,7 @@ Full reference: [docs-master/GitHub_Actions.md](docs-master/GitHub_Actions.md)
 
 Start lazygit in a directory that isn't a git repo and, instead of upstream's "Create a new git repository? (y/N)", you get a repository picker: `gh repo list`, `gh search repos` and `gh repo clone`/`gh repo fork --clone` rolled into one fuzzy finder.
 
-```
- ~/code is not a git repository. Pick a repository to clone or open, or press ctrl+n…     you on github.com
-┌─Search──────────────────────────────────────────────────────────────────────────────────────────────────┐
-│jes laz                                                                                                  │
-└─────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-┌─Yours (0) - Starred (0) - GitHub (14) - Recent (1)─────────┐┌──────────────────────────────────────────┐
-│ ★   83k  jesseduffield/lazygit ⑂ ✓  Go  simple terminal…   ││jesseduffield/lazygit                     │
-│ ★   53k  jesseduffield/lazydocker ⑂  Go  The lazier way…   ││simple terminal UI for git commands       │
-│ ★   863  jesseduffield/lazynpm  Go  terminal UI for npm    ││                                          │
-│ ★   435  jesseduffield/lazycli  Rust  Turn static CLI…     ││★ 83k stars · 3.1k forks · Go             │
-│                                                            ││pushed 6d ago                             │
-│                                                            ││                                          │
-│                                                            ││⑂ You have a fork: you/lazygit            │
-│                                                            ││✓ Cloned at ~/code/lazygit/main           │
-└────────────────────────────────────────────────────────────┘└──────────────────────────────────────────┘
- enter: choose  tab: go to list  [/]: switch list  ctrl+n: new repo here  ctrl+o: open in browser  esc: quit
-```
+![Repository picker](demo/fork/gifs/repo_picker.gif)
 
 - **Four lists, one search box.** *Yours* (your repos, then your organizations'), *Starred*, *GitHub* (all of it) and *Recent* (your recent local repos). Type to filter, and move through the matches with the arrow keys as you go, or press `<tab>` to jump into the list (`j`/`k`, `<enter>`, `<tab>` back), like lazygit's other searches. `[`/`]` switch lists, like the tabs of lazygit's panels, keeping what you typed.
 - **Fuzzy matching, even against GitHub.** GitHub's own search only matches whole words, so `jes laz` finds nothing there. The picker sends GitHub just the longest word, and filters the results (up to 300, fetched a page at a time as you scroll) by fuzzy-matching every word against `owner/name`. So `jes laz` finds `jesseduffield/lazygit` and `jesseduffield/lazydocker`. A word that's a login it knows about (yours, your orgs', owners of repos you starred) is searched as `user:<login>`. Qualifiers like `language:go` go to GitHub as they are.
@@ -232,3 +216,5 @@ The demos above are recorded with [vhs](https://github.com/charmbracelet/vhs) fr
 demo/fork/record.sh               # all of them
 demo/fork/record.sh overview_mode # or just some
 ```
+
+The repository picker's demo (`repo_picker`) can't be an integration test, since the picker runs before lazygit's gui; it records the real thing instead, so it needs `gh` to be logged in, and searches GitHub as you. It starts on the *GitHub* tab, so your private repositories stay out of the GIF.
