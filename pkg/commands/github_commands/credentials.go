@@ -75,9 +75,10 @@ func tokenFromEnv(host string) string {
 }
 
 type hostsConfigEntry struct {
-	OauthToken string `yaml:"oauth_token"`
-	User       string `yaml:"user"`
-	Users      map[string]struct {
+	OauthToken  string `yaml:"oauth_token"`
+	User        string `yaml:"user"`
+	GitProtocol string `yaml:"git_protocol"`
+	Users       map[string]struct {
 		OauthToken string `yaml:"oauth_token"`
 	} `yaml:"users"`
 }
@@ -98,6 +99,25 @@ func readHostsConfig() map[string]hostsConfigEntry {
 		return nil
 	}
 	return hosts
+}
+
+// GitProtocolForHost returns the protocol, "ssh" or "https", that gh clones
+// repositories of a host with: the one configured for the host in hosts.yml,
+// else the one configured for all hosts in config.yml, else https.
+func GitProtocolForHost(host string) string {
+	if protocol := readHostsConfig()[auth.NormalizeHostname(host)].GitProtocol; protocol != "" {
+		return protocol
+	}
+
+	var config struct {
+		GitProtocol string `yaml:"git_protocol"`
+	}
+	content, err := os.ReadFile(filepath.Join(ghconfig.ConfigDir(), "config.yml"))
+	if err == nil && yaml.Unmarshal(content, &config) == nil && config.GitProtocol != "" {
+		return config.GitProtocol
+	}
+
+	return "https"
 }
 
 // keyringSet stores a secret in the system keyring, giving up after a while

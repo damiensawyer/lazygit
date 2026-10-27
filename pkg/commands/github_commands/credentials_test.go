@@ -119,3 +119,17 @@ func TestTokenForHostSeesChangesToTheConfig(t *testing.T) {
 	assert.NoError(t, os.WriteFile(hostsConfigPath(), []byte("github.com:\n    oauth_token: second\n"), 0o600))
 	assert.Equal(t, "second", TokenForHost("github.com"))
 }
+
+func TestGitProtocolForHost(t *testing.T) {
+	setUpCredentials(t, "")
+	assert.Equal(t, "https", GitProtocolForHost("github.com"))
+
+	configDir := os.Getenv("GH_CONFIG_DIR")
+	assert.NoError(t, os.WriteFile(filepath.Join(configDir, "config.yml"), []byte("git_protocol: ssh\n"), 0o600))
+	assert.Equal(t, "ssh", GitProtocolForHost("github.com"))
+
+	assert.NoError(t, os.WriteFile(filepath.Join(configDir, "hosts.yml"),
+		[]byte("github.com:\n    git_protocol: https\n"), 0o600))
+	assert.Equal(t, "https", GitProtocolForHost("GitHub.com"))
+	assert.Equal(t, "ssh", GitProtocolForHost("git.acme.com"))
+}
