@@ -72,15 +72,36 @@ export TMPDIR="$SCRATCH/tmp"
 
 mkdir -p "$OUT"
 
-for NAME in "$@"
-do
-    TEST=pkg/integration/tests/demo/$NAME.go
+# integration_test_steps prints the steps of a tape that records the demo
+# integration test $1.
+#
+# Recording starts once lazygit has drawn the top left corner of a view frame,
+# and stops once the end marker shows that lazygit has exited. The two quotes in
+# the marker keep it out of the command line, so that waiting for it cannot
+# match the command that prints it.
+integration_test_steps() {
+    TEST=pkg/integration/tests/demo/$1.go
 
     if [ ! -f "$TEST" ]
     then
-        echo "There is no demo called $NAME ($TEST)" >&2
+        echo "There is no demo called $1 ($TEST)" >&2
         exit 1
     fi
+
+    cat <<EOF
+Hide
+Type "clear; go run cmd/integration_test/main.go cli --slow $TEST; echo VHS''DONE"
+Enter
+Wait+Screen@180s /╭/
+Show
+Wait+Screen@600s /VHSDONE/
+Hide
+EOF
+}
+
+for NAME in "$@"
+do
+    STEPS=$(integration_test_steps "$NAME")
 
     echo "Recording $NAME"
 
@@ -91,11 +112,6 @@ do
     # sizes produce at this font size and padding. If you change any of them,
     # record a tape that runs `stty size` and adjust them until the grid is
     # 120x35 again.
-    #
-    # Recording starts once lazygit has drawn the top left corner of a view
-    # frame, and stops once the end marker shows that lazygit has exited. The
-    # two quotes in the marker keep it out of the command line, so that waiting
-    # for it cannot match the command that prints it.
     cat > "$TAPE" <<EOF
 Output "$RECORDING"
 
@@ -109,13 +125,7 @@ Set Height 704
 Set TypingSpeed 0ms
 Set Theme "Catppuccin Mocha"
 
-Hide
-Type "clear; go run cmd/integration_test/main.go cli --slow $TEST; echo VHS''DONE"
-Enter
-Wait+Screen@180s /╭/
-Show
-Wait+Screen@600s /VHSDONE/
-Hide
+$STEPS
 EOF
 
     vhs "$TAPE" > /dev/null
