@@ -10,6 +10,7 @@ import (
 	"github.com/jesseduffield/lazygit/pkg/gui/presentation"
 	"github.com/jesseduffield/lazygit/pkg/gui/style"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
+	"github.com/jesseduffield/lazygit/pkg/utils"
 	"github.com/samber/lo"
 )
 
@@ -32,11 +33,8 @@ func NewGithubStepsController(c *ControllerCommon) *GithubStepsController {
 			c.Contexts().GithubSteps.GetSelected,
 			c.Contexts().GithubSteps.GetSelectedItems,
 		),
-		c: c,
-		mainView: &githubMainViewRenderer{
-			c:     c,
-			title: func() string { return c.Tr.GithubActions.StepMainTitle },
-		},
+		c:        c,
+		mainView: &githubMainViewRenderer{c: c},
 	}
 }
 
@@ -75,29 +73,32 @@ func (self *GithubStepsController) GetKeybindings(opts types.KeybindingsOpts) []
 
 func (self *GithubStepsController) GetOnRenderToMain() func() {
 	return func() {
+		tr := self.c.Tr.GithubActions
 		job := self.context().GetJob()
 		step := self.context().GetSelected()
 		if job == nil || step == nil {
-			self.mainView.render("", self.c.Tr.GithubActions.NoSteps)
+			self.mainView.render("", tr.NoSteps, tr.StepMainTitle)
 			return
 		}
 
-		tr := self.c.Tr.GithubActions
+		title := utils.ResolvePlaceholderString(tr.StepMainTitleWithStatus, map[string]string{
+			"status": utils.Decolorise(presentation.GithubActionsStatusLabel(self.c.Tr, step.State())),
+		})
 		stepId := fmt.Sprintf("%d/%d", job.JobId, step.Number)
 		if job.State().IsActive() {
 			self.mainView.render(stepId, fmt.Sprintf("%s %s\n\n%s\n",
-				presentation.GithubActionsStateIcon(step.State()), style.AttrBold.Sprint(step.Name), tr.LogNotAvailableYet))
+				presentation.GithubActionsStateIcon(step.State()), style.AttrBold.Sprint(step.Name), tr.LogNotAvailableYet), title)
 			return
 		}
 
 		jobLog := self.c.Helpers().GithubActions.GetJobLog(job)
 		switch {
 		case jobLog == nil:
-			self.mainView.render(stepId, tr.LoadingLog)
+			self.mainView.render(stepId, tr.LoadingLog, title)
 		case jobLog.Err != nil:
-			self.mainView.render(stepId, style.FgRed.Sprint(jobLog.Err.Error()))
+			self.mainView.render(stepId, style.FgRed.Sprint(jobLog.Err.Error()), title)
 		default:
-			self.mainView.render(stepId, presentation.FormatGithubStepLog(self.c.Tr, job, step, jobLog.Log, time.Now()))
+			self.mainView.render(stepId, presentation.FormatGithubStepLog(self.c.Tr, job, step, jobLog.Log, time.Now()), title)
 		}
 	}
 }

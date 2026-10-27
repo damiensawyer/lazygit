@@ -36,11 +36,8 @@ func NewPullRequestsController(c *ControllerCommon) *PullRequestsController {
 			c.Contexts().PullRequests.GetSelected,
 			c.Contexts().PullRequests.GetSelectedItems,
 		),
-		c: c,
-		mainView: &githubMainViewRenderer{
-			c:     c,
-			title: func() string { return c.Tr.PullRequests.MainTitle },
-		},
+		c:        c,
+		mainView: &githubMainViewRenderer{c: c},
 	}
 }
 
@@ -191,8 +188,9 @@ func (self *PullRequestsController) GetOnRenderToMain() func() {
 	return func() {
 		helper := self.c.Helpers().GithubPullRequests
 		pr := self.context().GetSelected()
+		title := self.c.Tr.PullRequests.MainTitle
 		if pr == nil {
-			self.mainView.render("", helper.MainViewMessage())
+			self.mainView.render("", helper.MainViewMessage(), title)
 			return
 		}
 
@@ -208,7 +206,7 @@ func (self *PullRequestsController) GetOnRenderToMain() func() {
 				opts.Details = details.Details
 			}
 		}
-		self.mainView.render(pr.ID(), presentation.FormatPullRequestDetails(self.c.Tr, opts))
+		self.mainView.render(pr.ID(), presentation.FormatPullRequestDetails(self.c.Tr, opts), title)
 	}
 }
 

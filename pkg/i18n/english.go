@@ -1403,8 +1403,10 @@ type GithubActions struct {
 	OpenGithubActionsTooltip           string
 	OpenRunInBrowser                   string
 	RunMainTitle                       string
+	RunMainTitleWithStatus             string
 	JobsTitle                          string
 	JobMainTitle                       string
+	JobMainTitleWithStatus             string
 	StepsSectionTitle                  string
 	LogSectionTitle                    string
 	FailedStepsLogSectionTitle         string
@@ -1416,6 +1418,7 @@ type GithubActions struct {
 	JobsTitleForRun                    string
 	StepsTitleForJob                   string
 	StepMainTitle                      string
+	StepMainTitleWithStatus            string
 	ViewSteps                          string
 	NoSteps                            string
 	NoLogForStep                       string
@@ -3201,8 +3204,10 @@ func EnglishTranslationSet() *TranslationSet {
 			OpenGithubActionsTooltip:           "Show the workflow runs of this repository on GitHub, like `gh run list` does. The list refreshes itself while it is shown.",
 			OpenRunInBrowser:                   "Open in browser",
 			RunMainTitle:                       "Run",
+			RunMainTitleWithStatus:             "Run · {{.status}}",
 			JobsTitle:                          "Jobs",
 			JobMainTitle:                       "Job",
+			JobMainTitleWithStatus:             "Job · {{.status}}",
 			StepsSectionTitle:                  "Steps",
 			LogSectionTitle:                    "Log",
 			FailedStepsLogSectionTitle:         "Log of failed steps",
@@ -3214,6 +3219,7 @@ func EnglishTranslationSet() *TranslationSet {
 			JobsTitleForRun:                    "Jobs · {{.run}}",
 			StepsTitleForJob:                   "Steps · {{.job}}",
 			StepMainTitle:                      "Step",
+			StepMainTitleWithStatus:            "Step · {{.status}}",
 			ViewSteps:                          "View steps",
 			NoSteps:                            "This job has no steps",
 			NoLogForStep:                       "This step logged nothing",

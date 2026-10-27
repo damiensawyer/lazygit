@@ -38,11 +38,8 @@ func NewGithubRunsController(c *ControllerCommon) *GithubRunsController {
 			c.Contexts().GithubRuns.GetSelected,
 			c.Contexts().GithubRuns.GetSelectedItems,
 		),
-		c: c,
-		mainView: &githubMainViewRenderer{
-			c:     c,
-			title: func() string { return c.Tr.GithubActions.RunMainTitle },
-		},
+		c:        c,
+		mainView: &githubMainViewRenderer{c: c},
 	}
 }
 
@@ -400,9 +397,10 @@ func (self *GithubRunsController) delete(run *models.GithubRun) error {
 
 func (self *GithubRunsController) GetOnRenderToMain() func() {
 	return func() {
+		tr := self.c.Tr.GithubActions
 		run := self.context().GetSelected()
 		if run == nil {
-			self.mainView.render("", self.c.Tr.GithubActions.NoRuns)
+			self.mainView.render("", tr.NoRuns, tr.RunMainTitle)
 			return
 		}
 
@@ -413,7 +411,10 @@ func (self *GithubRunsController) GetOnRenderToMain() func() {
 			opts.JobsError = details.Err
 			opts.Annotations = details.Annotations
 		}
-		self.mainView.render(run.ID(), presentation.FormatGithubRunSummary(self.c.Tr, opts))
+		title := utils.ResolvePlaceholderString(tr.RunMainTitleWithStatus, map[string]string{
+			"status": utils.Decolorise(presentation.GithubActionsStatusLabel(self.c.Tr, run.State())),
+		})
+		self.mainView.render(run.ID(), presentation.FormatGithubRunSummary(self.c.Tr, opts), title)
 	}
 }
 

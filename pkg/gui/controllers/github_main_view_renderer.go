@@ -7,13 +7,12 @@ import "github.com/jesseduffield/lazygit/pkg/gui/types"
 // that is rendered again keeps its scroll position, so that a refresh doesn't
 // yank the log being read back to the top.
 type githubMainViewRenderer struct {
-	c     *ControllerCommon
-	title func() string
+	c *ControllerCommon
 
 	renderedItemId string
 }
 
-func (self *githubMainViewRenderer) render(itemId string, content string) {
+func (self *githubMainViewRenderer) render(itemId string, content string, title string) {
 	var task types.UpdateTask = types.NewRenderStringTask(content)
 	if itemId != "" && itemId == self.renderedItemId {
 		task = types.NewRenderStringWithoutScrollTask(content)
@@ -23,7 +22,7 @@ func (self *githubMainViewRenderer) render(itemId string, content string) {
 	self.c.RenderToMainViews(types.RefreshMainOpts{
 		Pair: self.c.MainViewPairs().Normal,
 		Main: &types.ViewUpdateOpts{
-			Title: self.title(),
+			Title: title,
 			Task:  task,
 		},
 	})

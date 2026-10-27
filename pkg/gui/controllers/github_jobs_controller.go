@@ -31,11 +31,8 @@ func NewGithubJobsController(c *ControllerCommon) *GithubJobsController {
 			c.Contexts().GithubJobs.GetSelected,
 			c.Contexts().GithubJobs.GetSelectedItems,
 		),
-		c: c,
-		mainView: &githubMainViewRenderer{
-			c:     c,
-			title: func() string { return c.Tr.GithubActions.JobMainTitle },
-		},
+		c:        c,
+		mainView: &githubMainViewRenderer{c: c},
 	}
 }
 
@@ -93,9 +90,10 @@ func (self *GithubJobsController) GetKeybindings(opts types.KeybindingsOpts) []*
 
 func (self *GithubJobsController) GetOnRenderToMain() func() {
 	return func() {
+		tr := self.c.Tr.GithubActions
 		job := self.context().GetSelected()
 		if job == nil {
-			self.mainView.render("", self.c.Tr.GithubActions.NoJobs)
+			self.mainView.render("", tr.NoJobs, tr.JobMainTitle)
 			return
 		}
 
@@ -108,7 +106,10 @@ func (self *GithubJobsController) GetOnRenderToMain() func() {
 				opts.Annotations = jobLog.Annotations
 			}
 		}
-		self.mainView.render(job.ID(), presentation.FormatGithubJobDetails(self.c.Tr, opts))
+		title := utils.ResolvePlaceholderString(tr.JobMainTitleWithStatus, map[string]string{
+			"status": utils.Decolorise(presentation.GithubActionsStatusLabel(self.c.Tr, job.State())),
+		})
+		self.mainView.render(job.ID(), presentation.FormatGithubJobDetails(self.c.Tr, opts), title)
 	}
 }
 
