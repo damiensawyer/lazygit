@@ -99,6 +99,9 @@ func (self *Client) Repo() Repo {
 type APIError struct {
 	StatusCode int
 	Message    string
+	// When the request was refused for exceeding a rate limit, the time at
+	// which the limit resets; zero otherwise.
+	RateLimitReset time.Time
 }
 
 func (self *APIError) Error() string {
@@ -113,6 +116,16 @@ func (self *APIError) Error() string {
 func IsNotFound(err error) bool {
 	var apiErr *APIError
 	return errors.As(err, &apiErr) && apiErr.StatusCode == http.StatusNotFound
+}
+
+// RateLimitReset reports whether err is a request refused for exceeding a rate
+// limit, and if so, when it is worth trying again.
+func RateLimitReset(err error) (time.Time, bool) {
+	var apiErr *APIError
+	if errors.As(err, &apiErr) && !apiErr.RateLimitReset.IsZero() {
+		return apiErr.RateLimitReset, true
+	}
+	return time.Time{}, false
 }
 
 // IsUnprocessable reports whether err is a 422 from the API, which it answers
@@ -180,7 +193,7 @@ func (self *Client) send(ctx context.Context, method string, u string, body any,
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		apiErr := &APIError{StatusCode: resp.StatusCode}
+		apiErr := &APIError{StatusCode: resp.StatusCode, RateLimitReset: rateLimitReset(resp, time.Now())}
 		var parsed struct {
 			Message string `json:"message"`
 		}
@@ -191,6 +204,25 @@ func (self *Client) send(ctx context.Context, method string, u string, body any,
 	}
 
 	return respBody, nil
+}
+
+// rateLimitReset returns when a refused request may be retried, if it was
+// refused for exceeding a rate limit. GitHub answers 403 or 429 for both its
+// primary limits, saying in X-RateLimit-Reset when they reset, and its
+// secondary ones, saying in Retry-After how long to wait.
+func rateLimitReset(resp *http.Response, now time.Time) time.Time {
+	if resp.StatusCode != http.StatusForbidden && resp.StatusCode != http.StatusTooManyRequests {
+		return time.Time{}
+	}
+	if seconds, err := strconv.Atoi(resp.Header.Get("Retry-After")); err == nil {
+		return now.Add(time.Duration(seconds) * time.Second)
+	}
+	if resp.Header.Get("X-RateLimit-Remaining") == "0" {
+		if epoch, err := strconv.ParseInt(resp.Header.Get("X-RateLimit-Reset"), 10, 64); err == nil {
+			return time.Unix(epoch, 0)
+		}
+	}
+	return time.Time{}
 }
 
 func (self *Client) getJSON(ctx context.Context, path string, query url.Values, result any) error {

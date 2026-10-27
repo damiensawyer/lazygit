@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -152,6 +154,69 @@ func TestAPIError(t *testing.T) {
 
 	assert.EqualError(t, err, "GitHub API request failed: HTTP 404: Not Found")
 	assert.True(t, IsNotFound(err))
+}
+
+func TestRateLimitReset(t *testing.T) {
+	now := time.Unix(1_000_000, 0)
+	scenarios := []struct {
+		name     string
+		status   int
+		headers  map[string]string
+		expected time.Time
+	}{
+		{
+			name:     "primary limit exhausted",
+			status:   http.StatusForbidden,
+			headers:  map[string]string{"X-RateLimit-Remaining": "0", "X-RateLimit-Reset": "1000060"},
+			expected: time.Unix(1_000_060, 0),
+		},
+		{
+			name:     "secondary limit",
+			status:   http.StatusTooManyRequests,
+			headers:  map[string]string{"Retry-After": "30", "X-RateLimit-Remaining": "12"},
+			expected: now.Add(30 * time.Second),
+		},
+		{
+			name:    "forbidden for another reason",
+			status:  http.StatusForbidden,
+			headers: map[string]string{"X-RateLimit-Remaining": "12", "X-RateLimit-Reset": "1000060"},
+		},
+		{
+			name:    "not a refusal",
+			status:  http.StatusNotFound,
+			headers: map[string]string{"Retry-After": "30"},
+		},
+	}
+
+	for _, s := range scenarios {
+		t.Run(s.name, func(t *testing.T) {
+			header := http.Header{}
+			for key, value := range s.headers {
+				header.Set(key, value)
+			}
+			assert.Equal(t, s.expected, rateLimitReset(&http.Response{StatusCode: s.status, Header: header}, now))
+		})
+	}
+}
+
+func TestRateLimitResetFromAPIError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("X-RateLimit-Remaining", "0")
+		w.Header().Set("X-RateLimit-Reset", "2000000000")
+		w.WriteHeader(http.StatusForbidden)
+		_, _ = w.Write([]byte(`{"message": "API rate limit exceeded"}`))
+	}))
+	t.Cleanup(server.Close)
+
+	client := NewClientWithBaseURL(Repo{Owner: "owner", Name: "repo"}, server.URL)
+	_, err := client.GetRun(context.Background(), 1)
+
+	reset, limited := RateLimitReset(err)
+	assert.True(t, limited)
+	assert.Equal(t, time.Unix(2_000_000_000, 0), reset)
+
+	_, limited = RateLimitReset(errors.New("something else"))
+	assert.False(t, limited)
 }
 
 func TestLogRedirectDropsAuthorization(t *testing.T) {
