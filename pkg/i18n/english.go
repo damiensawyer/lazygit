@@ -541,6 +541,55 @@ type TranslationSet struct {
 	InitialBranch                         string
 	NoRecentRepositories                  string
 	IncorrectNotARepository               string
+	LauncherNotARepository                string
+	LauncherHint                          string
+	LauncherLoggedInAs                    string
+	LauncherNotLoggedInShort              string
+	LauncherSearchTitle                   string
+	LauncherYoursTab                      string
+	LauncherStarredTab                    string
+	LauncherGithubTab                     string
+	LauncherRecentTab                     string
+	LauncherLoading                       string
+	LauncherSearching                     string
+	LauncherPartialResults                string
+	LauncherRateLimited                   string
+	LauncherNotLoggedIn                   string
+	LauncherLoadFailed                    string
+	LauncherNoRecentRepos                 string
+	LauncherTypeToSearch                  string
+	LauncherKeepTyping                    string
+	LauncherNoMatches                     string
+	LauncherStars                         string
+	LauncherForks                         string
+	LauncherPushedAgo                     string
+	LauncherPrivate                       string
+	LauncherArchived                      string
+	LauncherForkBadge                     string
+	LauncherForkOf                        string
+	LauncherYourFork                      string
+	LauncherClonedAt                      string
+	LauncherOpenClone                     string
+	LauncherCloneYourFork                 string
+	LauncherClone                         string
+	LauncherCloneFork                     string
+	LauncherForkAndClone                  string
+	LauncherOpenInBrowser                 string
+	LauncherCloneInto                     string
+	LauncherDestinationNotEmpty           string
+	LauncherInitialBranch                 string
+	LauncherKeyChoose                     string
+	LauncherKeySwitchList                 string
+	LauncherKeyNewRepo                    string
+	LauncherKeyOpenInBrowser              string
+	LauncherKeyQuit                       string
+	LauncherKeyConfirm                    string
+	LauncherKeyCancel                     string
+	LauncherForking                       string
+	LauncherCloning                       string
+	LauncherRetryingClone                 string
+	LauncherAddingUpstream                string
+	LauncherPressEnterToReturn            string
 	AutoStashTitle                        string
 	AutoStashPrompt                       string
 	AutoStashForUndo                      string
@@ -2227,6 +2276,55 @@ func EnglishTranslationSet() *TranslationSet {
 		InitialBranch:                        "Branch name? (leave empty for git's default): ",
 		NoRecentRepositories:                 "Must open lazygit in a git repository. No valid recent repositories. Exiting.",
 		IncorrectNotARepository:              "The value of 'notARepository' is incorrect. It should be one of 'prompt', 'create', 'skip', or 'quit'.",
+		LauncherNotARepository:               "{{.dir}} is not a git repository.",
+		LauncherHint:                         "Pick a repository to clone or open, or press {{.key}} to create a new one here.",
+		LauncherLoggedInAs:                   "{{.user}} on {{.host}}",
+		LauncherNotLoggedInShort:             "not logged in to {{.host}}",
+		LauncherSearchTitle:                  "Search",
+		LauncherYoursTab:                     "Yours",
+		LauncherStarredTab:                   "Starred",
+		LauncherGithubTab:                    "GitHub",
+		LauncherRecentTab:                    "Recent",
+		LauncherLoading:                      "loading…",
+		LauncherSearching:                    "searching…",
+		LauncherPartialResults:               "partial results",
+		LauncherRateLimited:                  "rate limited, retrying at {{.time}}",
+		LauncherNotLoggedIn:                  "Not logged in to {{.host}}. Run 'gh auth login' to see your repositories here.",
+		LauncherLoadFailed:                   "Couldn't load them: {{.error}}",
+		LauncherNoRecentRepos:                "No recent repositories.",
+		LauncherTypeToSearch:                 "Type to search all of GitHub, or paste the URL or owner/name of a repository.",
+		LauncherKeepTyping:                   "Keep typing to search GitHub.",
+		LauncherNoMatches:                    "No matches.",
+		LauncherStars:                        "{{.count}} stars",
+		LauncherForks:                        "{{.count}} forks",
+		LauncherPushedAgo:                    "pushed {{.ago}} ago",
+		LauncherPrivate:                      "private",
+		LauncherArchived:                     "archived",
+		LauncherForkBadge:                    "fork",
+		LauncherForkOf:                       "Fork of {{.parent}}",
+		LauncherYourFork:                     "You have a fork: {{.fork}}",
+		LauncherClonedAt:                     "Cloned at {{.path}}",
+		LauncherOpenClone:                    "Open {{.path}}",
+		LauncherCloneYourFork:                "Clone your fork {{.fork}}",
+		LauncherClone:                        "Clone {{.repo}}",
+		LauncherCloneFork:                    "Clone {{.repo}} (upstream: {{.parent}})",
+		LauncherForkAndClone:                 "Fork to {{.user}} and clone",
+		LauncherOpenInBrowser:                "Open in browser",
+		LauncherCloneInto:                    "Clone into (relative to {{.dir}})",
+		LauncherDestinationNotEmpty:          "{{.path}} already exists and isn't empty",
+		LauncherInitialBranch:                "Create a repository here; initial branch (blank for git's default)",
+		LauncherKeyChoose:                    "choose",
+		LauncherKeySwitchList:                "switch list",
+		LauncherKeyNewRepo:                   "new repo here",
+		LauncherKeyOpenInBrowser:             "open in browser",
+		LauncherKeyQuit:                      "quit",
+		LauncherKeyConfirm:                   "confirm",
+		LauncherKeyCancel:                    "cancel",
+		LauncherForking:                      "Forking {{.repo}}…",
+		LauncherCloning:                      "Cloning {{.repo}} into {{.path}}…",
+		LauncherRetryingClone:                "The fork isn't ready yet; retrying in {{.seconds}} seconds…",
+		LauncherAddingUpstream:               "Adding {{.repo}} as remote 'upstream'…",
+		LauncherPressEnterToReturn:           "Press enter to return to the repository picker.",
 		AutoStashTitle:                       "Autostash?",
 		AutoStashPrompt:                      "You must stash and pop your changes to bring them across. Do this automatically? (enter/esc)",
 		AutoStashForUndo:                     "Auto-stashing changes for undoing to %s",
