@@ -580,6 +580,8 @@ type TranslationSet struct {
 	LauncherInitialBranch                 string
 	LauncherKeyChoose                     string
 	LauncherKeySwitchList                 string
+	LauncherKeyGoToList                   string
+	LauncherKeyGoToSearch                 string
 	LauncherKeyNewRepo                    string
 	LauncherKeyOpenInBrowser              string
 	LauncherKeyQuit                       string
@@ -2315,6 +2317,8 @@ func EnglishTranslationSet() *TranslationSet {
 		LauncherInitialBranch:                "Create a repository here; initial branch (blank for git's default)",
 		LauncherKeyChoose:                    "choose",
 		LauncherKeySwitchList:                "switch list",
+		LauncherKeyGoToList:                  "go to list",
+		LauncherKeyGoToSearch:                "back to search",
 		LauncherKeyNewRepo:                   "new repo here",
 		LauncherKeyOpenInBrowser:             "open in browser",
 		LauncherKeyQuit:                      "quit",

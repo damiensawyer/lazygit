@@ -152,6 +152,9 @@ type launcher struct {
 	debounceTimer *time.Timer
 	retryTimer    *time.Timer
 
+	// Whether the list has the keyboard focus, rather than the search field.
+	listFocused bool
+
 	popup          popupKind
 	actions        []action
 	selectedAction int

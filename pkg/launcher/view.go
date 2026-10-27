@@ -47,20 +47,39 @@ func (self *launcher) setKeybindings() {
 	bindings := []binding{
 		{"", gocui.NewKeyStrMod("c", gocui.ModCtrl), self.quit},
 
-		{searchView, gocui.NewKeyName(gocui.KeyArrowUp), func() error { return self.moveSelection(-1) }},
-		{searchView, gocui.NewKeyName(gocui.KeyArrowDown), func() error { return self.moveSelection(1) }},
-		{searchView, gocui.NewKeyName(gocui.KeyPgup), func() error { return self.moveSelection(-self.listPageSize()) }},
-		{searchView, gocui.NewKeyName(gocui.KeyPgdn), func() error { return self.moveSelection(self.listPageSize()) }},
-		{searchView, gocui.NewKeyName(gocui.KeyTab), func() error { return self.selectTab(self.model.tab + 1) }},
-		{searchView, gocui.NewKeyName(gocui.KeyBacktab), func() error { return self.selectTab(self.model.tab - 1) }},
-		{searchView, gocui.NewKeyName(gocui.KeyEnter), self.chooseEntry},
+		{searchView, gocui.NewKeyName(gocui.KeyTab), self.focusList},
+		{searchView, gocui.NewKeyName(gocui.KeyBacktab), self.focusList},
 		{searchView, gocui.NewKeyName(gocui.KeyEsc), self.clearQueryOrQuit},
-		{searchView, gocui.NewKeyStrMod("n", gocui.ModCtrl), func() error {
-			self.openPrompt(popupInitialBranch, "")
-			return nil
-		}},
-		{searchView, gocui.NewKeyStrMod("o", gocui.ModCtrl), self.openSelectedInBrowser},
 
+		{listView, gocui.NewKeyRune('k'), func() error { return self.moveSelection(-1) }},
+		{listView, gocui.NewKeyRune('j'), func() error { return self.moveSelection(1) }},
+		{listView, gocui.NewKeyName(gocui.KeyHome), func() error { return self.moveSelection(-len(self.model.entries[self.model.tab])) }},
+		{listView, gocui.NewKeyName(gocui.KeyEnd), func() error { return self.moveSelection(len(self.model.entries[self.model.tab])) }},
+		{listView, gocui.NewKeyRune('['), func() error { return self.selectTab(self.model.tab - 1) }},
+		{listView, gocui.NewKeyRune(']'), func() error { return self.selectTab(self.model.tab + 1) }},
+		{listView, gocui.NewKeyRune('o'), self.openSelectedInBrowser},
+		{listView, gocui.NewKeyRune('q'), self.quit},
+		{listView, gocui.NewKeyName(gocui.KeyTab), self.focusSearch},
+		{listView, gocui.NewKeyName(gocui.KeyBacktab), self.focusSearch},
+		{listView, gocui.NewKeyName(gocui.KeyEsc), self.focusSearch},
+		{listView, gocui.NewKeyRune('/'), self.focusSearch},
+	}
+	// The list can be navigated while typing in the search field too.
+	for _, view := range []string{searchView, listView} {
+		bindings = append(bindings,
+			binding{view, gocui.NewKeyName(gocui.KeyArrowUp), func() error { return self.moveSelection(-1) }},
+			binding{view, gocui.NewKeyName(gocui.KeyArrowDown), func() error { return self.moveSelection(1) }},
+			binding{view, gocui.NewKeyName(gocui.KeyPgup), func() error { return self.moveSelection(-self.listPageSize()) }},
+			binding{view, gocui.NewKeyName(gocui.KeyPgdn), func() error { return self.moveSelection(self.listPageSize()) }},
+			binding{view, gocui.NewKeyName(gocui.KeyEnter), self.chooseEntry},
+			binding{view, gocui.NewKeyStrMod("n", gocui.ModCtrl), func() error {
+				self.openPrompt(popupInitialBranch, "")
+				return nil
+			}},
+			binding{view, gocui.NewKeyStrMod("o", gocui.ModCtrl), self.openSelectedInBrowser},
+		)
+	}
+	bindings = append(bindings, []binding{
 		{menuView, gocui.NewKeyName(gocui.KeyArrowUp), func() error { return self.moveActionSelection(-1) }},
 		{menuView, gocui.NewKeyRune('k'), func() error { return self.moveActionSelection(-1) }},
 		{menuView, gocui.NewKeyName(gocui.KeyArrowDown), func() error { return self.moveActionSelection(1) }},
@@ -76,7 +95,7 @@ func (self *launcher) setKeybindings() {
 			return self.confirmPrompt(v.TextArea.GetContent())
 		}},
 		{promptView, gocui.NewKeyName(gocui.KeyEsc), self.closePopup},
-	}
+	}...)
 	for _, b := range bindings {
 		self.g.SetKeybinding(b.view, b.key, func(*gocui.Gui, *gocui.View) error { return b.handler() })
 	}
@@ -91,6 +110,16 @@ func (self *launcher) moveSelection(delta int) error {
 func (self *launcher) selectTab(t tab) error {
 	self.model.selectTab(t)
 	self.fetchSearchResults()
+	return nil
+}
+
+func (self *launcher) focusList() error {
+	self.listFocused = true
+	return nil
+}
+
+func (self *launcher) focusSearch() error {
+	self.listFocused = false
 	return nil
 }
 
@@ -168,9 +197,9 @@ func (self *launcher) layout(g *gocui.Gui) error {
 		search.Title = self.deps.Tr.LauncherSearchTitle
 		search.Editable = true
 		search.Editor = gocui.EditorFunc(func(v *gocui.View, key gocui.Key) bool {
-			// Switch lists with [ and ], like the tabs of lazygit's panels.
-			// Neither can be part of a repository's name, nor of a search,
-			// so they're free to take from the search field.
+			// Switch lists with [ and ] here too, as in the list. Neither can
+			// be part of a repository's name, nor of a search, so they're
+			// free to take from the search field.
 			if !g.IsPasting {
 				switch {
 				case key.Equals(gocui.NewKeyRune('[')):
@@ -196,9 +225,6 @@ func (self *launcher) layout(g *gocui.Gui) error {
 		return err
 	}
 	self.renderList(list)
-	// What the user types filters the list, so it's drawn as having focus
-	// too, its selected tab highlighted like that of a focused panel.
-	search.ParentView = list
 
 	if listWidth < width {
 		detail, err := self.setView(detailView, listWidth, 4, width-1, height-2, true)
@@ -218,6 +244,9 @@ func (self *launcher) layout(g *gocui.Gui) error {
 	footer.SetContent(self.renderFooter())
 
 	currentView := searchView
+	if self.listFocused {
+		currentView = listView
+	}
 	switch self.popup {
 	case popupActions:
 		currentView = menuView
@@ -241,7 +270,7 @@ func (self *launcher) layout(g *gocui.Gui) error {
 	if _, err := g.SetViewOnTop(currentView); err != nil {
 		return err
 	}
-	g.Cursor = currentView != menuView
+	g.Cursor = currentView == searchView || currentView == promptView
 	return nil
 }
 
@@ -283,10 +312,21 @@ func (self *launcher) renderFooter() string {
 	tr := self.deps.Tr
 	keys := [][2]string{
 		{"enter", tr.LauncherKeyChoose},
+		{"tab", tr.LauncherKeyGoToList},
 		{"[/]", tr.LauncherKeySwitchList},
 		{"ctrl+n", tr.LauncherKeyNewRepo},
 		{"ctrl+o", tr.LauncherKeyOpenInBrowser},
 		{"esc", tr.LauncherKeyQuit},
+	}
+	if self.listFocused {
+		keys = [][2]string{
+			{"enter", tr.LauncherKeyChoose},
+			{"tab", tr.LauncherKeyGoToSearch},
+			{"[/]", tr.LauncherKeySwitchList},
+			{"ctrl+n", tr.LauncherKeyNewRepo},
+			{"o", tr.LauncherKeyOpenInBrowser},
+			{"q", tr.LauncherKeyQuit},
+		}
 	}
 	if self.popup != popupNone {
 		keys = [][2]string{{"enter", tr.LauncherKeyConfirm}, {"esc", tr.LauncherKeyCancel}}
@@ -408,8 +448,8 @@ func (self *launcher) renderList(v *gocui.View) {
 	}
 
 	v.Highlight = true
-	// The list isn't the current view, the search field in it is, but it's
-	// drawn as having focus unless a popup has it.
+	// The arrow keys move the selection while typing in the search field
+	// too, so it's highlighted as active then; only a popup takes that away.
 	v.HighlightInactive = true
 	if self.popup == popupNone {
 		v.InactiveViewSelBgColor = theme.GocuiSelectedLineBgColor
