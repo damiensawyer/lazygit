@@ -13,6 +13,7 @@ This page covers only what this fork adds.
 
 - [Pull requests](#pull-requests)
 - [GitHub Actions](#github-actions)
+- [Clone from GitHub when you're not in a repo](#clone-from-github-when-youre-not-in-a-repo)
 - [Browse all files at a commit (killer feature that git extensions on Windows had!)](#browse-all-files-at-a-commit)
 - [Commit overview mode](#commit-overview-mode)
 - [Show the final version of changed files](#show-the-final-version-of-changed-files)
@@ -87,6 +88,37 @@ Press `<ctrl+a>` in a repo that has a GitHub remote. The runs list replaces the 
 It uses the same token as the `gh` CLI, found the way `gh auth token` finds it (environment, `hosts.yml`, system keyring), so `gh` doesn't even need to be installed. If you aren't logged in, lazygit offers a browser login (the same device flow `gh auth login --web` uses) or lets you paste a personal access token. Like `gh auth login`, it saves the token in the system keyring (or `gh`'s `hosts.yml` without one), so `gh` can use it too.
 
 Full reference: [docs-master/GitHub_Actions.md](docs-master/GitHub_Actions.md)
+
+## Clone from GitHub when you're not in a repo
+
+Start lazygit in a directory that isn't a git repo and, instead of upstream's "Create a new git repository? (y/N)", you get a repository picker: `gh repo list`, `gh search repos` and `gh repo clone`/`gh repo fork --clone` rolled into one fuzzy finder.
+
+```
+ ~/code is not a git repository. Pick a repository to clone or open, or press ctrl+n…     you on github.com
+┌─Search──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│jes laz                                                                                                  │
+└─────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+┌─Yours (0) - Starred (0) - GitHub (14) - Recent (1)─────────┐┌──────────────────────────────────────────┐
+│ ★   83k  jesseduffield/lazygit ⑂ ✓  Go  simple terminal…   ││jesseduffield/lazygit                     │
+│ ★   53k  jesseduffield/lazydocker ⑂  Go  The lazier way…   ││simple terminal UI for git commands       │
+│ ★   863  jesseduffield/lazynpm  Go  terminal UI for npm    ││                                          │
+│ ★   435  jesseduffield/lazycli  Rust  Turn static CLI…     ││★ 83k stars · 3.1k forks · Go             │
+│                                                            ││pushed 6d ago                             │
+│                                                            ││                                          │
+│                                                            ││⑂ You have a fork: you/lazygit            │
+│                                                            ││✓ Cloned at ~/code/lazygit/main           │
+└────────────────────────────────────────────────────────────┘└──────────────────────────────────────────┘
+ enter: choose  tab: switch list  ctrl+n: new repo here  ctrl+o: open in browser  esc: quit
+```
+
+- **Four lists, one search box.** *Yours* (your repos, then your organizations'), *Starred*, *GitHub* (all of it) and *Recent* (your recent local repos). Type to filter; `<tab>`/`<shift+tab>` switch lists, keeping what you typed.
+- **Fuzzy matching, even against GitHub.** GitHub's own search only matches whole words, so `jes laz` finds nothing there. The picker sends GitHub just the longest word, and filters the results (up to 300, fetched a page at a time as you scroll) by fuzzy-matching every word against `owner/name`. So `jes laz` finds `jesseduffield/lazygit` and `jesseduffield/lazydocker`. A word that's a login it knows about (yours, your orgs', owners of repos you starred) is searched as `user:<login>`. Qualifiers like `language:go` go to GitHub as they are.
+- **Paste a URL.** Paste `owner/name`, a GitHub web URL or a clone URL, and the picker looks that repository up directly.
+- **It knows what you already have.** Your repos and the remotes of your recent repos load in the background as soon as the picker opens. In the list, ⑂ means you have a fork and ✓ means you've cloned it already. Pressing `<enter>` on a repo offers, in order: open the clone you already have, clone your fork, clone it, fork it to your account and clone that, or open it in the browser.
+- **Clones like `gh` does.** It uses `gh`'s `git_protocol` (ssh or https). A fork gets the repo it was forked from as its `upstream` remote, set as the base repo (`gh-resolved`), so the [pull requests](#pull-requests) panel targets the parent right away. A new fork's clone is retried while GitHub is still creating it. git runs in your terminal with its usual progress output and passphrase prompts. Then lazygit opens in the new clone.
+- **`<ctrl+n>`** runs `git init` here instead, asking for the initial branch name.
+
+Searches are debounced and cached, and when GitHub's search rate limit (30 a minute) is hit, the picker says when it will retry and then retries by itself. It uses the same token as the `gh` CLI. Without a login, the *GitHub* and *Recent* lists still work. Set `notARepository` to `create`, `skip` or `quit` to get upstream's other behaviours.
 
 ## Browse all files at a commit
 
