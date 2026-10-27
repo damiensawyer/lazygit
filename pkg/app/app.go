@@ -2,12 +2,14 @@ package app
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/go-errors/errors"
 	"github.com/sirupsen/logrus"
@@ -16,6 +18,7 @@ import (
 	appTypes "github.com/jesseduffield/lazygit/pkg/app/types"
 	"github.com/jesseduffield/lazygit/pkg/commands/direnv"
 	"github.com/jesseduffield/lazygit/pkg/commands/git_commands"
+	"github.com/jesseduffield/lazygit/pkg/commands/github_commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/oscommands"
 	"github.com/jesseduffield/lazygit/pkg/common"
 	"github.com/jesseduffield/lazygit/pkg/config"
@@ -24,6 +27,7 @@ import (
 	"github.com/jesseduffield/lazygit/pkg/gui"
 	"github.com/jesseduffield/lazygit/pkg/i18n"
 	integrationTypes "github.com/jesseduffield/lazygit/pkg/integration/types"
+	"github.com/jesseduffield/lazygit/pkg/launcher"
 	"github.com/jesseduffield/lazygit/pkg/logs"
 	"github.com/jesseduffield/lazygit/pkg/updates"
 )
@@ -222,6 +226,10 @@ func (app *App) setupRepo(
 		initialBranchArg := ""
 		switch app.UserConfig().NotARepository {
 		case "prompt":
+			if launcher.CanRun() {
+				return false, app.runLauncher()
+			}
+
 			// Offer to initialize a new repository in current directory.
 			fmt.Print(app.Tr.CreateRepo)
 			response, _ := bufio.NewReader(os.Stdin).ReadString('\n')
@@ -287,6 +295,48 @@ func (app *App) setupRepo(
 	}
 
 	return false, nil
+}
+
+// runLauncher shows the repository picker, and carries out what the user
+// chose there, until that gives us a repo to open. If carrying it out fails,
+// the user gets to read why before going back to the picker.
+func (app *App) runLauncher() error {
+	const host = "github.com"
+	for {
+		choice, err := launcher.Run(launcher.Deps{
+			Tr:           app.Tr,
+			UserConfig:   app.UserConfig(),
+			Log:          app.Log,
+			Host:         host,
+			RecentRepos:  app.Config.GetAppState().RecentRepos,
+			OpenLink:     app.OSCommand.OpenLink,
+			TokenForHost: github_commands.TokenForHost,
+		})
+		if err != nil {
+			return err
+		}
+		if choice.Kind == launcher.ChoiceQuit {
+			os.Exit(0)
+		}
+
+		executor := &launcher.Executor{
+			Tr:             app.Tr,
+			Out:            os.Stdout,
+			GitProtocol:    github_commands.GitProtocolForHost(host),
+			ForkRetryDelay: 2 * time.Second,
+		}
+		repoDir, err := executor.Execute(context.Background(), choice)
+		if err == nil {
+			err = app.enterRepo(repoDir)
+		}
+		if err == nil {
+			return nil
+		}
+
+		fmt.Fprintln(os.Stderr, err)
+		fmt.Print(app.Tr.LauncherPressEnterToReturn)
+		_, _ = bufio.NewReader(os.Stdin).ReadString('\n')
+	}
 }
 
 func (app *App) Run(startArgs appTypes.StartArgs) error {

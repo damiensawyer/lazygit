@@ -31,7 +31,7 @@ type UserConfig struct {
 	// See https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md#custom-pull-request-urls
 	Services map[string]string `yaml:"services"`
 	// What to do when opening Lazygit outside of a git repo.
-	// - 'prompt': (default) ask whether to initialize a new repo or open in the most recent repo
+	// - 'prompt': (default) show a picker for cloning one of your GitHub repositories, or any found by searching GitHub, for opening a recent repo, or for initializing a new repo here; without a terminal to show it in, ask whether to initialize a new repo or open in the most recent repo
 	// - 'create': initialize a new repo
 	// - 'skip': open most recent repo
 	// - 'quit': exit Lazygit

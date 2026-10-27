@@ -4693,7 +4693,7 @@
             "skip",
             "quit"
           ],
-          "description": "What to do when opening Lazygit outside of a git repo.\n- 'prompt': (default) ask whether to initialize a new repo or open in the most recent repo\n- 'create': initialize a new repo\n- 'skip': open most recent repo\n- 'quit': exit Lazygit",
+          "description": "What to do when opening Lazygit outside of a git repo.\n- 'prompt': (default) show a picker for cloning one of your GitHub repositories, or any found by searching GitHub, for opening a recent repo, or for initializing a new repo here; without a terminal to show it in, ask whether to initialize a new repo or open in the most recent repo\n- 'create': initialize a new repo\n- 'skip': open most recent repo\n- 'quit': exit Lazygit",
           "default": "prompt"
         },
         "promptToReturnFromSubprocess": {

@@ -684,8 +684,10 @@ customCommands: []
 services: {}
 
 # What to do when opening Lazygit outside of a git repo.
-# - 'prompt': (default) ask whether to initialize a new repo or open in the most
-# recent repo
+# - 'prompt': (default) show a picker for cloning one of your GitHub
+# repositories, or any found by searching GitHub, for opening a recent repo, or
+# for initializing a new repo here; without a terminal to show it in, ask
+# whether to initialize a new repo or open in the most recent repo
 # - 'create': initialize a new repo
 # - 'skip': open most recent repo
 # - 'quit': exit Lazygit
@@ -1382,7 +1384,9 @@ Result:
 
 ## Launching not in a repository behaviour
 
-By default, when launching lazygit from a directory that is not a repository, you will be prompted to choose if you would like to initialize a repo. You can override this behaviour in the config with one of the following:
+By default, when launching lazygit from a directory that is not a repository, it shows a repository picker. Type to fuzzy-filter your own GitHub repositories (and your organizations'), your starred ones, and your recent repos, and to search all of GitHub; `<tab>` switches between those lists. Paste a repository's URL or `owner/name` to look it up directly. Choosing a repository offers to open a clone of it you already have, to clone your existing fork of it, to clone it, or to fork and clone it; a fork gets the repository it's a fork of as its `upstream` remote, like `gh repo clone` does. `<ctrl+n>` initializes a new repo in the current directory instead. The picker uses the GitHub CLI's login (run `gh auth login`); without one, only searching GitHub and the recent repos are available.
+
+You can override this behaviour in the config with one of the following:
 
 ```yaml
 # for default prompting behaviour
