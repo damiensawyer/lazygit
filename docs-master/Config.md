@@ -1384,7 +1384,7 @@ Result:
 
 ## Launching not in a repository behaviour
 
-By default, when launching lazygit from a directory that is not a repository, it shows a repository picker. Type to fuzzy-filter your own GitHub repositories (and your organizations'), your starred ones, and your recent repos, and to search all of GitHub; `<tab>` switches between those lists. Paste a repository's URL or `owner/name` to look it up directly. Choosing a repository offers to open a clone of it you already have, to clone your existing fork of it, to clone it, or to fork and clone it; a fork gets the repository it's a fork of as its `upstream` remote, like `gh repo clone` does. `<ctrl+n>` initializes a new repo in the current directory instead. The picker uses the GitHub CLI's login (run `gh auth login`); without one, only searching GitHub and the recent repos are available.
+By default, when launching lazygit from a directory that is not a repository, it shows a repository picker. Type to fuzzy-filter your own GitHub repositories (and your organizations'), your starred ones, and your recent repos, and to search all of GitHub; `[` and `]` (or `<tab>`) switch between those lists. Paste a repository's URL or `owner/name` to look it up directly. Choosing a repository offers to open a clone of it you already have, to clone your existing fork of it, to clone it, or to fork and clone it; a fork gets the repository it's a fork of as its `upstream` remote, like `gh repo clone` does. `<ctrl+n>` initializes a new repo in the current directory instead. The picker uses the GitHub CLI's login (run `gh auth login`); without one, only searching GitHub and the recent repos are available.
 
 You can override this behaviour in the config with one of the following:
 
