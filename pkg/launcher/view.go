@@ -168,6 +168,19 @@ func (self *launcher) layout(g *gocui.Gui) error {
 		search.Title = self.deps.Tr.LauncherSearchTitle
 		search.Editable = true
 		search.Editor = gocui.EditorFunc(func(v *gocui.View, key gocui.Key) bool {
+			// Switch lists with [ and ], like the tabs of lazygit's panels.
+			// Neither can be part of a repository's name, nor of a search,
+			// so they're free to take from the search field.
+			if !g.IsPasting {
+				switch {
+				case key.Equals(gocui.NewKeyRune('[')):
+					_ = self.selectTab(self.model.tab - 1)
+					return true
+				case key.Equals(gocui.NewKeyRune(']')):
+					_ = self.selectTab(self.model.tab + 1)
+					return true
+				}
+			}
 			matched := gocui.SimpleEditor(v, key)
 			self.onQueryChanged(v.TextArea.GetContent())
 			return matched
@@ -270,7 +283,7 @@ func (self *launcher) renderFooter() string {
 	tr := self.deps.Tr
 	keys := [][2]string{
 		{"enter", tr.LauncherKeyChoose},
-		{"tab", tr.LauncherKeySwitchList},
+		{"[/]", tr.LauncherKeySwitchList},
 		{"ctrl+n", tr.LauncherKeyNewRepo},
 		{"ctrl+o", tr.LauncherKeyOpenInBrowser},
 		{"esc", tr.LauncherKeyQuit},
