@@ -108,10 +108,10 @@ Start lazygit in a directory that isn't a git repo and, instead of upstream's "C
 │                                                            ││⑂ You have a fork: you/lazygit            │
 │                                                            ││✓ Cloned at ~/code/lazygit/main           │
 └────────────────────────────────────────────────────────────┘└──────────────────────────────────────────┘
- enter: choose  tab: switch list  ctrl+n: new repo here  ctrl+o: open in browser  esc: quit
+ enter: choose  [/]: switch list  ctrl+n: new repo here  ctrl+o: open in browser  esc: quit
 ```
 
-- **Four lists, one search box.** *Yours* (your repos, then your organizations'), *Starred*, *GitHub* (all of it) and *Recent* (your recent local repos). Type to filter; `<tab>`/`<shift+tab>` switch lists, keeping what you typed.
+- **Four lists, one search box.** *Yours* (your repos, then your organizations'), *Starred*, *GitHub* (all of it) and *Recent* (your recent local repos). Type to filter; `[`/`]` (or `<tab>`/`<shift+tab>`) switch lists, like the tabs of lazygit's panels, keeping what you typed.
 - **Fuzzy matching, even against GitHub.** GitHub's own search only matches whole words, so `jes laz` finds nothing there. The picker sends GitHub just the longest word, and filters the results (up to 300, fetched a page at a time as you scroll) by fuzzy-matching every word against `owner/name`. So `jes laz` finds `jesseduffield/lazygit` and `jesseduffield/lazydocker`. A word that's a login it knows about (yours, your orgs', owners of repos you starred) is searched as `user:<login>`. Qualifiers like `language:go` go to GitHub as they are.
 - **Paste a URL.** Paste `owner/name`, a GitHub web URL or a clone URL, and the picker looks that repository up directly.
 - **It knows what you already have.** Your repos and the remotes of your recent repos load in the background as soon as the picker opens. In the list, ⑂ means you have a fork and ✓ means you've cloned it already. Pressing `<enter>` on a repo offers, in order: open the clone you already have, clone your fork, clone it, fork it to your account and clone that, or open it in the browser.
