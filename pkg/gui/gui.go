@@ -1367,7 +1367,7 @@ func (gui *Gui) showBreakingChangesMessage() {
 // applyTheme sets the colors of the app from the theme in the user config,
 // with the overrides for the terminal's background applied
 func (gui *Gui) applyTheme() {
-	themeConfig := gui.UserConfig().Gui.ThemeForBackground(gui.terminalHasLightBackground(), gui.terminalBackgroundColor())
+	themeConfig := theme.ConfigForTerminal(&gui.UserConfig().Gui, gui.g.DetectedColorScheme())
 	theme.UpdateTheme(themeConfig)
 	authors.SetCustomAuthors(themeConfig.AuthorColors)
 	presentation.SetCustomBranches(themeConfig.BranchColorPatterns)
@@ -1386,28 +1386,8 @@ func (gui *Gui) applyTerminalBackground() {
 	authors.SetLightBackground(gui.terminalHasLightBackground())
 }
 
-// terminalHasLightBackground goes by gui.colorScheme, or by what the terminal
-// tells us if that is 'auto'.
 func (gui *Gui) terminalHasLightBackground() bool {
-	switch gui.UserConfig().Gui.ColorScheme {
-	case "dark":
-		return false
-	case "light":
-		return true
-	default:
-		return gui.g.DetectedColorScheme().ColorScheme == gocui.ColorSchemeLight
-	}
-}
-
-// terminalBackgroundColor returns the background color that the terminal told
-// us, as #rrggbb. It returns "" if the terminal didn't tell us, or if
-// gui.colorScheme disagrees with it about whether the background is light.
-func (gui *Gui) terminalBackgroundColor() string {
-	detected := gui.g.DetectedColorScheme()
-	if (detected.ColorScheme == gocui.ColorSchemeLight) != gui.terminalHasLightBackground() {
-		return ""
-	}
-	return detected.Background
+	return theme.TerminalHasLightBackground(gui.UserConfig().Gui.ColorScheme, gui.g.DetectedColorScheme())
 }
 
 func (gui *Gui) onUIThread(f func() error) {
