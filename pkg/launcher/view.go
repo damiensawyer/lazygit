@@ -193,6 +193,9 @@ func (self *launcher) layout(g *gocui.Gui) error {
 	if err != nil {
 		return err
 	}
+	// The list's title is mostly taken up by its tabs, so say how its loading
+	// is going here, where it's in view of what the user types anyway.
+	search.Subtitle = self.listStatus()
 	if search.Title == "" {
 		search.Title = self.deps.Tr.LauncherSearchTitle
 		search.Editable = true
@@ -437,7 +440,6 @@ func (self *launcher) renderList(v *gocui.View) {
 	m := self.model
 	v.Tabs = self.tabTitles()
 	v.TabIndex = int(m.tab)
-	v.Subtitle = self.listStatus()
 
 	entries := m.entries[m.tab]
 	if len(entries) == 0 {
