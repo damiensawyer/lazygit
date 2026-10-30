@@ -26,12 +26,12 @@ var ViewJobsAndSteps = NewIntegrationTest(NewIntegrationTestArgs{
 			IsFocused().
 			Title(Equals("Jobs · Fix the frobnicator")).
 			Lines(
-				Contains("✓ build").IsSelected(),
-				Contains("X test"),
+				Contains("✓ Succeeded").Contains("build").IsSelected(),
+				Contains("X Failed").Contains("test"),
 			)
 
 		t.Views().Main().
-			Title(Equals("Job")).
+			Title(Equals("Job · Succeeded")).
 			ContainsLines(
 				Equals("Log"),
 				Equals("━━ Set up job"),
@@ -42,7 +42,7 @@ var ViewJobsAndSteps = NewIntegrationTest(NewIntegrationTestArgs{
 			)
 
 		t.Views().GithubJobs().
-			NavigateToLine(Contains("X test"))
+			NavigateToLine(Contains("X Failed").Contains("test"))
 
 		t.Views().Main().
 			ContainsLines(
@@ -57,13 +57,13 @@ var ViewJobsAndSteps = NewIntegrationTest(NewIntegrationTestArgs{
 			IsFocused().
 			Title(Equals("Steps · test")).
 			Lines(
-				Contains("✓ Set up job"),
-				Contains("X Run tests").IsSelected(),
-				Contains("- Upload coverage"),
+				Contains("✓ Succeeded").Contains("Set up job"),
+				Contains("X Failed").Contains("Run tests").IsSelected(),
+				Contains("- Skipped").Contains("Upload coverage"),
 			)
 
 		t.Views().Main().
-			Title(Equals("Step")).
+			Title(Equals("Step · Failed")).
 			Content(Contains("frobnicator_test.go:12: expected 1, got 2")).
 			Content(Contains("Error: Process completed with exit code 1."))
 

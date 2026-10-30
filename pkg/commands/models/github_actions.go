@@ -4,17 +4,20 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/samber/lo"
 )
 
 // The REST API reports a workflow run, job, or step through two fields: a
 // status that says how far along it is, and, once the status is "completed", a
 // conclusion that says how it ended.
 const (
-	GithubStatusCompleted = "completed"
-	GithubStatusQueued    = "queued"
-	GithubStatusWaiting   = "waiting"
-	GithubStatusPending   = "pending"
-	GithubStatusRequested = "requested"
+	GithubStatusCompleted  = "completed"
+	GithubStatusQueued     = "queued"
+	GithubStatusWaiting    = "waiting"
+	GithubStatusPending    = "pending"
+	GithubStatusRequested  = "requested"
+	GithubStatusInProgress = "in_progress"
 
 	GithubConclusionSuccess        = "success"
 	GithubConclusionFailure        = "failure"
@@ -125,6 +128,18 @@ func (self *GithubRun) Description() string {
 
 func (self *GithubRun) State() GithubActionsState {
 	return githubActionsState(self.Status, self.Conclusion)
+}
+
+// CorrectQueuedStatus marks a queued run as in progress if any of its jobs
+// has left the queue. GitHub keeps a run "queued" for as long as any one of
+// its jobs is waiting for a runner, even while the others run.
+func (self *GithubRun) CorrectQueuedStatus(jobs []*GithubJob) {
+	if self.State() != GithubActionsStateQueued {
+		return
+	}
+	if lo.SomeBy(jobs, func(job *GithubJob) bool { return job.State() != GithubActionsStateQueued }) {
+		self.Status = GithubStatusInProgress
+	}
 }
 
 // Title is what GitHub's web UI shows as the run's headline: usually the

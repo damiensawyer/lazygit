@@ -32,7 +32,7 @@ var RefreshJobs = NewIntegrationTest(NewIntegrationTestArgs{
 		t.Views().GithubJobs().
 			IsFocused().
 			Lines(
-				Contains("* lint").IsSelected(),
+				Contains("* In progress").Contains("lint").IsSelected(),
 			)
 
 		t.FakeGithub().Update(func(fake *FakeGithub) {
@@ -44,7 +44,7 @@ var RefreshJobs = NewIntegrationTest(NewIntegrationTestArgs{
 		t.Views().GithubJobs().
 			Press(keys.Universal.Refresh).
 			Lines(
-				Contains("✓ lint").IsSelected(),
+				Contains("✓ Succeeded").Contains("lint").IsSelected(),
 			)
 	},
 })

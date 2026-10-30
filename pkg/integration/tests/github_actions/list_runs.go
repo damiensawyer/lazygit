@@ -29,7 +29,7 @@ var ListRuns = NewIntegrationTest(NewIntegrationTestArgs{
 			NavigateToLine(Contains("Fix the frobnicator"))
 
 		t.Views().Main().
-			Title(Equals("Run")).
+			Title(Equals("Run · Failed")).
 			ContainsLines(
 				Equals("X Fix the frobnicator"),
 				Equals("CI #12 · main 01234567 · .github/workflows/ci.yml"),

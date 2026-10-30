@@ -61,7 +61,22 @@ func (self *Client) ListRuns(ctx context.Context, opts ListRunsOptions) ([]*mode
 	if err := self.getJSON(ctx, path, query, &result); err != nil {
 		return nil, err
 	}
+	for _, run := range result.WorkflowRuns {
+		self.correctQueuedStatus(ctx, run)
+	}
 	return result.WorkflowRuns, nil
+}
+
+// correctQueuedStatus looks at a queued run's jobs to tell whether it has
+// really started; see GithubRun.CorrectQueuedStatus. If the jobs can't be
+// loaded, GitHub's status stands.
+func (self *Client) correctQueuedStatus(ctx context.Context, run *models.GithubRun) {
+	if run.State() != models.GithubActionsStateQueued {
+		return
+	}
+	if jobs, err := self.ListJobs(ctx, run.RunId); err == nil {
+		run.CorrectQueuedStatus(jobs)
+	}
 }
 
 func (self *Client) GetRun(ctx context.Context, runId int64) (*models.GithubRun, error) {
@@ -69,6 +84,7 @@ func (self *Client) GetRun(ctx context.Context, runId int64) (*models.GithubRun,
 	if err := self.getJSON(ctx, self.repoPath("actions/runs/%d", runId), nil, &run); err != nil {
 		return nil, err
 	}
+	self.correctQueuedStatus(ctx, &run)
 	return &run, nil
 }
 

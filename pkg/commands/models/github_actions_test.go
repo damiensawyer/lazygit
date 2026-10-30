@@ -224,3 +224,26 @@ func TestGithubRunTitle(t *testing.T) {
 	run.DisplayTitle = "Pull request title"
 	assert.Equal(t, "Pull request title", run.Title())
 }
+
+func TestCorrectQueuedStatus(t *testing.T) {
+	job := func(status string) *GithubJob { return &GithubJob{Status: status} }
+	scenarios := []struct {
+		name     string
+		status   string
+		jobs     []*GithubJob
+		expected string
+	}{
+		{"a job is running", "queued", []*GithubJob{job("completed"), job("in_progress"), job("queued")}, "in_progress"},
+		{"a job has finished", "queued", []*GithubJob{job("completed"), job("waiting")}, "in_progress"},
+		{"every job is waiting", "queued", []*GithubJob{job("queued"), job("pending")}, "queued"},
+		{"no jobs yet", "queued", nil, "queued"},
+		{"a completed run is left alone", "completed", []*GithubJob{job("in_progress")}, "completed"},
+	}
+	for _, s := range scenarios {
+		t.Run(s.name, func(t *testing.T) {
+			run := &GithubRun{Status: s.status}
+			run.CorrectQueuedStatus(s.jobs)
+			assert.Equal(t, s.expected, run.Status)
+		})
+	}
+}
