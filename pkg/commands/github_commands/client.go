@@ -152,7 +152,38 @@ func (self *Client) do(ctx context.Context, method string, path string, query ur
 	return self.send(ctx, method, u, body, accept)
 }
 
+// A GET that GitHub answers with a gateway error is tried once more after
+// this long: those are usually a passing hiccup on GitHub's side, not worth
+// interrupting anyone over. Other methods aren't retried, since they may have
+// taken effect.
+const gatewayErrorRetryDelay = 500 * time.Millisecond
+
 func (self *Client) send(ctx context.Context, method string, u string, body any, accept string) ([]byte, error) {
+	respBody, err := self.sendOnce(ctx, method, u, body, accept)
+	if method != http.MethodGet || !isGatewayError(err) {
+		return respBody, err
+	}
+	select {
+	case <-ctx.Done():
+		return respBody, err
+	case <-time.After(gatewayErrorRetryDelay):
+	}
+	return self.sendOnce(ctx, method, u, body, accept)
+}
+
+func isGatewayError(err error) bool {
+	var apiErr *APIError
+	if !errors.As(err, &apiErr) {
+		return false
+	}
+	switch apiErr.StatusCode {
+	case http.StatusBadGateway, http.StatusServiceUnavailable, http.StatusGatewayTimeout:
+		return true
+	}
+	return false
+}
+
+func (self *Client) sendOnce(ctx context.Context, method string, u string, body any, accept string) ([]byte, error) {
 	var reqBody io.Reader
 	if body != nil {
 		encoded, err := json.Marshal(body)

@@ -761,3 +761,44 @@ func TestExtractArtifactRefusesSiblingDirWithSamePrefix(t *testing.T) {
 	assert.EqualError(t, err, "artifact contains an invalid path: ../artifact-evil/x.txt")
 	assert.NoDirExists(t, filepath.Join(parent, "artifact-evil"))
 }
+
+func TestGatewayErrorsAreRetriedOnceForGets(t *testing.T) {
+	scenarios := []struct {
+		name             string
+		statuses         []int
+		post             bool
+		expectedRequests int
+		expectedError    string
+	}{
+		{"a GET succeeds on retry", []int{http.StatusBadGateway, http.StatusOK}, false, 2, ""},
+		{"a GET fails twice", []int{http.StatusGatewayTimeout, http.StatusServiceUnavailable}, false, 2, "HTTP 503"},
+		{"a GET isn't retried after other errors", []int{http.StatusInternalServerError, http.StatusOK}, false, 1, "HTTP 500"},
+		{"a POST isn't retried", []int{http.StatusBadGateway, http.StatusOK}, true, 1, "HTTP 502"},
+	}
+	for _, s := range scenarios {
+		t.Run(s.name, func(t *testing.T) {
+			requests := 0
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(s.statuses[requests])
+				requests++
+				_, _ = w.Write([]byte(`{"id": 1}`))
+			}))
+			t.Cleanup(server.Close)
+			client := NewClientWithBaseURL(Repo{Host: "github.com", Owner: "owner", Name: "repo"}, server.URL)
+
+			var err error
+			if s.post {
+				err = client.CancelRun(context.Background(), 1)
+			} else {
+				_, err = client.GetRun(context.Background(), 1)
+			}
+
+			assert.Equal(t, s.expectedRequests, requests)
+			if s.expectedError == "" {
+				assert.NoError(t, err)
+			} else {
+				assert.ErrorContains(t, err, s.expectedError)
+			}
+		})
+	}
+}
