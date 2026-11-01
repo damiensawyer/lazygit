@@ -35,9 +35,37 @@ func TestFuzzyFilterSortsByScore(t *testing.T) {
 		return lo.Map(fuzzyFilter([]string{"git"}, targets, sortByScore), func(m match, _ int) string { return targets[m.index] })
 	}
 
-	assert.Equal(t, targets, matched(false))
-	// A contiguous match beats a scattered one; equal ones keep their order.
-	assert.Equal(t, []string{"owner/git", "other/git", "agree/sight"}, matched(true))
+	// A match scattered over several segments isn't what "git" names, and
+	// drops out once some target matches it within one.
+	assert.Equal(t, []string{"owner/git", "other/git"}, matched(false))
+	// Equal ones keep their order.
+	assert.Equal(t, []string{"owner/git", "other/git"}, matched(true))
+}
+
+func TestFuzzyFilterPrefersMatchesWithinASegment(t *testing.T) {
+	targets := []string{
+		"damiensawyer/mmp",
+		"damiensawyer/NodaMoney",
+		"damiensawyer/samtests",
+		"samuelstranges/sams_nim",
+	}
+	matched := lo.Map(fuzzyFilter([]string{"sam"}, targets, true), func(m match, _ int) string { return targets[m.index] })
+
+	// The repositories whose name starts with "sam" come first, not the ones
+	// whose full name merely contains an "s", an "a" and an "m"; the shorter
+	// of two equally well-matched names wins.
+	assert.Equal(t,
+		[]string{"samuelstranges/sams_nim", "damiensawyer/samtests"},
+		matched)
+}
+
+func TestFuzzyFilterFallsBackToScatteredMatches(t *testing.T) {
+	targets := []string{"damiensawyer/NodaMoney", "other/thing"}
+	matched := lo.Map(fuzzyFilter([]string{"odam"}, targets, true), func(m match, _ int) string { return targets[m.index] })
+
+	// No target matches "odam" within one segment, so matching across them is
+	// still allowed.
+	assert.Equal(t, []string{"damiensawyer/NodaMoney"}, matched)
 }
 
 func TestFuzzyFilterPositions(t *testing.T) {

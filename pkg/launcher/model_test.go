@@ -57,7 +57,9 @@ func TestModelFiltersYoursByScore(t *testing.T) {
 	assert.Equal(t, []string{"me/agree-sight", "me/git", "me/notes"}, entryNames(m.entries[tabYours]))
 
 	m.setQuery("git")
-	assert.Equal(t, []string{"me/git", "me/agree-sight"}, entryNames(m.entries[tabYours]))
+	// "agree-sight" only matches "git" scattered over its name, which isn't
+	// what the query means.
+	assert.Equal(t, []string{"me/git"}, entryNames(m.entries[tabYours]))
 }
 
 func TestModelExcludesCurrentDirectoryFromRecent(t *testing.T) {
