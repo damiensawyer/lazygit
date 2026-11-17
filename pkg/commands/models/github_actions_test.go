@@ -223,6 +223,12 @@ func TestGithubRunTitle(t *testing.T) {
 
 	run.DisplayTitle = "Pull request title"
 	assert.Equal(t, "Pull request title", run.Title())
+
+	run.DisplayTitle = "Deploy — Fix the thing\n\nWith a body"
+	/* EXPECTED:
+	assert.Equal(t, "Deploy — Fix the thing", run.Title())
+	ACTUAL: */
+	assert.Equal(t, "Deploy — Fix the thing\n\nWith a body", run.Title())
 }
 
 func TestCorrectQueuedStatus(t *testing.T) {
