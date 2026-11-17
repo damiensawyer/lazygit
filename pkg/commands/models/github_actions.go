@@ -145,11 +145,12 @@ func (self *GithubRun) CorrectQueuedStatus(jobs []*GithubJob) {
 // Title is what GitHub's web UI shows as the run's headline: usually the
 // commit subject or the PR title.
 func (self *GithubRun) Title() string {
-	if self.DisplayTitle != "" {
-		return self.DisplayTitle
+	raw := self.DisplayTitle
+	if raw == "" {
+		raw = self.HeadCommit.Message
 	}
-	subject, _, _ := strings.Cut(self.HeadCommit.Message, "\n")
-	return subject
+	subject, _, _ := strings.Cut(raw, "\n")
+	return strings.TrimSuffix(subject, "\r")
 }
 
 // Duration is the time from the run's (latest attempt's) start until its last
