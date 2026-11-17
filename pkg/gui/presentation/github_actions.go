@@ -17,6 +17,10 @@ import (
 // for text that is there for reference rather than to be read
 var githubDim = style.FromBasicFg(color.FgDarkGray)
 
+// glow is a bright yellow with bold decoration, used to briefly highlight
+// when a value has just been reconciled with the GitHub API.
+var glow = style.AttrBold.MergeStyle(style.FromBasicFg(color.FgYellow))
+
 // GithubActionsStateIcon returns the coloured symbol gh uses for a run, job,
 // or step in this state.
 func GithubActionsStateIcon(state models.GithubActionsState) string {
@@ -87,6 +91,18 @@ func GetGithubRunListDisplayStrings(tr *i18n.TranslationSet, runs []*models.Gith
 			}
 		}
 
+		durationCol := FormatGithubDuration(run.Duration(now))
+		// For active runs, append the locally counting elapsed time next to
+		// the GitHub-reported duration, with a glow when just reconciled.
+		if state.IsActive() {
+			elapsedStyle := githubDim
+			if run.EstimatedElapsedReconcileGlow() {
+				elapsedStyle = glow
+				run.ClearEstimatedElapsedReconcileGlow()
+			}
+			durationCol += " " + elapsedStyle.Sprint(FormatGithubDuration(run.EstimatedElapsed()))
+		}
+
 		return []string{
 			GithubActionsStateIcon(state),
 			GithubActionsStatusLabel(tr, state),
@@ -94,7 +110,7 @@ func GetGithubRunListDisplayStrings(tr *i18n.TranslationSet, runs []*models.Gith
 			style.FgCyan.Sprint(run.Name),
 			style.FgMagenta.Sprint(run.HeadBranch),
 			githubDim.Sprint(run.Event),
-			FormatGithubDuration(run.Duration(now)),
+			durationCol,
 			run.Title(),
 		}
 	})

@@ -26,6 +26,11 @@ const (
 	githubIdleRefreshInterval   = 30 * time.Second
 
 	githubRunsLimit = 50
+
+	// How often the estimated elapsed time is updated (every second) and
+	// reconciled with the GitHub API (every 20 seconds).
+	elapsedTickInterval      = time.Second
+	elapsedReconcileInterval = 20 * time.Second
 )
 
 // GithubRunDetails is what we load about a run in addition to what the runs
@@ -64,6 +69,11 @@ type GithubActionsHelper struct {
 	// keyed by job ID; only touched on the UI thread
 	jobLogs        map[int64]*GithubJobLog
 	jobLogsLoading map[int64]bool
+
+	// elapsed ticker state; only touched on the UI thread
+	elapsedTicker        *time.Ticker
+	elapsedTickerStop    chan struct{}
+	elapsedLastReconcile time.Time
 }
 
 // GithubJobLog is a completed job's log, along with its annotations.
@@ -102,6 +112,10 @@ func (self *GithubActionsHelper) Open() error {
 			return self.loadRuns(false, func() {
 				runsContext.SetSelection(0)
 				self.c.Context().Push(runsContext, types.OnFocusOpts{})
+				self.startElapsedTicker()
+				runsContext.AddOnFocusLostFn(func(_ types.OnFocusLostOpts) {
+					self.stopElapsedTicker()
+				})
 			})
 		})
 	})
@@ -135,6 +149,84 @@ func (self *GithubActionsHelper) HandleError(err error) error {
 // handleError reports a failed API request. Must be called on the UI thread.
 func (self *GithubActionsHelper) handleError(err error) error {
 	return self.clientHelper.HandleError(err, self.Open)
+}
+
+// startElapsedTicker starts a goroutine that increments the estimated elapsed
+// time for active runs every second, and reconciles with the GitHub API every
+// 20 seconds to keep the estimate in sync.
+func (self *GithubActionsHelper) startElapsedTicker() {
+	if self.elapsedTicker != nil {
+		return // already running
+	}
+	self.elapsedLastReconcile = time.Time{}
+
+	// The goroutine works only with its own copies: stopElapsedTicker clears
+	// the fields on the UI thread, and a later start may replace them.
+	ticker := time.NewTicker(elapsedTickInterval)
+	stop := make(chan struct{})
+	self.elapsedTicker = ticker
+	self.elapsedTickerStop = stop
+	go utils.Safe(func() {
+		defer ticker.Stop()
+		for {
+			select {
+			case <-stop:
+				return
+			case <-ticker.C:
+				self.c.OnUIThread(func() error {
+					self.tickElapsed()
+					return nil
+				})
+			}
+		}
+	})
+}
+
+// stopElapsedTicker stops the elapsed time ticker and goroutine.
+func (self *GithubActionsHelper) stopElapsedTicker() {
+	if self.elapsedTicker == nil {
+		return
+	}
+	close(self.elapsedTickerStop)
+	self.elapsedTicker = nil
+	self.elapsedTickerStop = nil
+}
+
+// tickElapsed increments the estimated elapsed time for active runs and
+// reconciles with GitHub if enough time has passed.
+func (self *GithubActionsHelper) tickElapsed() {
+	now := time.Now()
+	runs := self.c.Model().GithubRuns
+
+	// Increment elapsed for active runs.
+	for _, run := range runs {
+		if run.State().IsActive() {
+			run.SetEstimatedElapsed(run.EstimatedElapsed() + elapsedTickInterval)
+		}
+	}
+
+	// Reconcile with GitHub every 20 seconds.
+	if now.Sub(self.elapsedLastReconcile) >= elapsedReconcileInterval {
+		self.reconcileElapsed(runs)
+		self.elapsedLastReconcile = now
+	}
+
+	// Re-render the runs list to show the updated elapsed times.
+	if self.IsShowing() {
+		self.c.Contexts().GithubRuns.HandleRenderToMain()
+	}
+}
+
+// reconcileElapsed resets the estimated elapsed time for active runs to match
+// the GitHub-reported duration, and marks them for a brief glow effect.
+func (self *GithubActionsHelper) reconcileElapsed(runs []*models.GithubRun) {
+	now := time.Now()
+	for _, run := range runs {
+		if run.State().IsActive() {
+			run.SetEstimatedElapsed(run.Duration(now))
+			run.SetEstimatedElapsedReconcileGlow(true)
+		}
+	}
 }
 
 func (self *GithubActionsHelper) updateTitle() {
@@ -270,6 +362,16 @@ func (self *GithubActionsHelper) setRuns(runs []*models.GithubRun) {
 	selectedId := runsContext.GetSelectedItemId()
 
 	self.c.Model().GithubRuns = runs
+
+	// Initialize estimated elapsed for active runs so the ticker has a starting
+	// point. The ticker will increment this every second and reconcile every
+	// 20 seconds.
+	for _, run := range runs {
+		if run.State().IsActive() {
+			run.SetEstimatedElapsed(run.Duration(time.Now()))
+		}
+	}
+
 	runsContext.ReApplyFilter(self.c.UserConfig().Gui.UseFuzzySearch())
 
 	// New runs show up at the top, so the selected one may have moved down.

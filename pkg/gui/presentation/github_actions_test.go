@@ -267,7 +267,7 @@ func TestGetGithubRunListDisplayStringsMeasuresAgeToNow(t *testing.T) {
 	}
 
 	assert.Equal(t, [][]string{
-		{"*", "In progress", "5m", "CI", "main", "push", "5m0s", "One"},
+		{"*", "In progress", "5m", "CI", "main", "push", "5m0s 0s", "One"},
 	}, GetGithubRunListDisplayStrings(i18n.EnglishTranslationSet(), []*models.GithubRun{run}, true, created.Add(5*time.Minute)))
 }
 

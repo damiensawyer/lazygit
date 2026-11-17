@@ -112,6 +112,15 @@ type GithubRun struct {
 	HeadCommit   struct {
 		Message string `json:"message"`
 	} `json:"head_commit"`
+
+	// estimatedElapsed is a locally counting elapsed duration for active runs.
+	// It starts from an estimated start time and increments every second.
+	// It is periodically reconciled with the GitHub API value.
+	estimatedElapsed time.Duration
+
+	// elapsedReconcileGlow is set true when the estimated elapsed is
+	// reconciled with GitHub data, so the UI can show a brief glow effect.
+	estimatedElapsedReconcileGlow bool
 }
 
 type GithubUser struct {
@@ -165,6 +174,37 @@ func (self *GithubRun) Duration(now time.Time) time.Duration {
 		end = time.Time{}
 	}
 	return elapsed(start, end, now)
+}
+
+// EstimatedElapsed returns the locally counting elapsed duration for active
+// runs. It starts from an estimated start time and increments every second.
+func (self *GithubRun) EstimatedElapsed() time.Duration {
+	return self.estimatedElapsed
+}
+
+// SetEstimatedElapsed sets the estimated elapsed duration. Used by the
+// helper when initializing or reconciling with the GitHub API.
+func (self *GithubRun) SetEstimatedElapsed(d time.Duration) {
+	self.estimatedElapsed = d
+}
+
+// EstimatedElapsedReconcileGlow returns whether the estimated elapsed time
+// was just reconciled with the GitHub API, so the UI can show a brief glow.
+// The caller should clear the glow after rendering.
+func (self *GithubRun) EstimatedElapsedReconcileGlow() bool {
+	return self.estimatedElapsedReconcileGlow
+}
+
+// ClearEstimatedElapsedReconcileGlow clears the glow flag after it has been
+// rendered.
+func (self *GithubRun) ClearEstimatedElapsedReconcileGlow() {
+	self.estimatedElapsedReconcileGlow = false
+}
+
+// SetEstimatedElapsedReconcileGlow sets the glow flag. Used by the helper
+// when reconciling with the GitHub API.
+func (self *GithubRun) SetEstimatedElapsedReconcileGlow(v bool) {
+	self.estimatedElapsedReconcileGlow = v
 }
 
 // GithubJob is a job within a workflow run, with its steps.
