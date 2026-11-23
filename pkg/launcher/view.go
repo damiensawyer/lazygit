@@ -202,21 +202,26 @@ func (self *launcher) layout(g *gocui.Gui) error {
 		search.Editor = gocui.EditorFunc(func(v *gocui.View, key gocui.Key) bool {
 			// Switch lists with [ and ] here too, as in the list. Neither can
 			// be part of a repository's name, nor of a search, so they're
-			// free to take from the search field.
-			if !g.IsPasting {
-				switch {
-				case key.Equals(gocui.NewKeyRune('[')):
-					_ = self.selectTab(self.model.tab - 1)
-					return true
-				case key.Equals(gocui.NewKeyRune(']')):
-					_ = self.selectTab(self.model.tab + 1)
-					return true
-				}
+			// free to take from the search field. Pasted text doesn't come
+			// through here, so pasting them still types them.
+			switch {
+			case key.Equals(gocui.NewKeyRune('[')):
+				_ = self.selectTab(self.model.tab - 1)
+				return true
+			case key.Equals(gocui.NewKeyRune(']')):
+				_ = self.selectTab(self.model.tab + 1)
+				return true
 			}
 			matched := gocui.SimpleEditor(v, key)
 			self.onQueryChanged(v.TextArea.GetContent())
 			return matched
 		})
+		search.OnPaste = func(text string) error {
+			if typePastedText(search, text) {
+				self.onQueryChanged(search.TextArea.GetContent())
+			}
+			return nil
+		}
 	}
 
 	listWidth := width
@@ -615,6 +620,12 @@ func (self *launcher) layoutPrompt(width int, height int) error {
 			self.promptError = ""
 			return gocui.SimpleEditor(v, key)
 		})
+		v.OnPaste = func(text string) error {
+			if typePastedText(v, text) {
+				self.promptError = ""
+			}
+			return nil
+		}
 		v.TextArea.TypeString(self.promptInitialText)
 		v.RenderTextArea()
 	}
@@ -666,4 +677,19 @@ func formatCount(n int) string {
 
 func singleLine(s string) string {
 	return strings.Join(strings.Fields(s), " ")
+}
+
+// typePastedText types pasted text into a single-line view, without the
+// newlines at its start and end, which are often part of a copied line, and
+// with spaces in place of the newlines and tabs inside it. It returns whether
+// it typed anything.
+func typePastedText(v *gocui.View, text string) bool {
+	text = strings.Trim(text, "\n")
+	text = strings.NewReplacer("\n", " ", "\t", " ").Replace(text)
+	if text == "" {
+		return false
+	}
+	v.TextArea.TypeString(text)
+	v.RenderTextArea()
+	return true
 }

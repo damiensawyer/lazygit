@@ -111,7 +111,7 @@ func TestGetGithubRemotes(t *testing.T) {
 		"ssh.acme.com":   "github:web.acme.com:8443",
 		"gitlab.acme.io": "gitlab:gitlab.acme.io",
 	}
-	cmn := common.NewDummyCommonWithUserConfigAndAppState(userConfig, &config.AppState{})
+	cmn := common.NewDummyCommonWithUserConfig(userConfig)
 	hostingService := git_commands.NewHostingServiceCommand(git_commands.NewGitCommon(cmn, nil, nil, nil, nil, nil, nil))
 
 	remotes := []*models.Remote{

@@ -33,7 +33,7 @@ type AppConfig struct {
 	userConfigFiles        []*ConfigFile
 	userConfigDir          string
 	tempDir                string
-	appState               *AppState
+	appStatePath           string
 	githubPullRequestCache *githubPullRequestCache
 }
 
@@ -52,8 +52,8 @@ type AppConfigurer interface {
 	ReloadChangedUserConfigFiles() (error, bool)
 	GetTempDir() string
 
-	GetAppState() *AppState
-	SaveAppState() error
+	ReadAppState() (*AppState, error)
+	UpdateAppState(update func(state *AppState)) error
 	// SaveSidePanelWidth writes sidePanelWidth to the given per-repo config
 	// file path.
 	SaveSidePanelWidth(path string, value float64) error
@@ -120,7 +120,7 @@ func NewAppConfig(
 		return nil, err
 	}
 
-	appState, err := loadAppState()
+	appStatePath, err := appStateFilePath()
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +137,7 @@ func NewAppConfig(
 		userConfigFiles:        configFiles,
 		userConfigDir:          configDir,
 		tempDir:                tempDir,
-		appState:               appState,
+		appStatePath:           appStatePath,
 		githubPullRequestCache: githubPullRequestCache,
 	}
 
@@ -734,11 +734,6 @@ func (c *AppConfig) GetUserConfig() *UserConfig {
 	return c.userConfig
 }
 
-// GetAppState returns the app state
-func (c *AppConfig) GetAppState() *AppState {
-	return c.appState
-}
-
 func (c *AppConfig) GetCachedGithubPullRequests(repoPath string) ([]CachedPullRequest, error) {
 	if c.githubPullRequestCache == nil {
 		return nil, nil
@@ -837,27 +832,6 @@ func stateFilePath(filename string) (string, error) {
 
 	// looks for XDG_STATE_HOME/lazygit/filename
 	return xdg.StateFile(filepath.Join("lazygit", filename))
-}
-
-// SaveAppState marshalls the AppState struct and writes it to the disk
-func (c *AppConfig) SaveAppState() error {
-	marshalledAppState, err := yaml.Marshal(c.appState)
-	if err != nil {
-		return err
-	}
-
-	filepath, err := stateFilePath(stateFileName)
-	if err != nil {
-		return err
-	}
-
-	err = os.WriteFile(filepath, marshalledAppState, 0o644)
-	if err != nil && os.IsPermission(err) {
-		// apparently when people have read-only permissions they prefer us to fail silently
-		return nil
-	}
-
-	return err
 }
 
 // SaveSidePanelWidth writes the side panel width to the given per-repo
@@ -985,38 +959,6 @@ func writeRepoConfig(path string, rootNode *yaml.Node) error {
 	return os.WriteFile(path, marshalled, 0o644)
 }
 
-var stateFileName = "state.yml"
-
-// loadAppState loads recorded AppState from file
-func loadAppState() (*AppState, error) {
-	appState := getDefaultAppState()
-
-	filepath, err := stateFilePath(stateFileName)
-	if err != nil {
-		if os.IsPermission(err) {
-			// apparently when people have read-only permissions they prefer us to fail silently
-			return appState, nil
-		}
-		return nil, err
-	}
-
-	appStateBytes, err := os.ReadFile(filepath)
-	if err != nil && !os.IsNotExist(err) {
-		return nil, err
-	}
-
-	if len(appStateBytes) == 0 {
-		return appState, nil
-	}
-
-	err = yaml.Unmarshal(appStateBytes, appState)
-	if err != nil {
-		return nil, err
-	}
-
-	return appState, nil
-}
-
 // SaveGlobalUserConfig saves the UserConfig back to disk. This is only used in
 // integration tests, so we are a bit sloppy with error handling.
 func (c *AppConfig) SaveGlobalUserConfig() {
@@ -1033,25 +975,6 @@ func (c *AppConfig) SaveGlobalUserConfig() {
 	if err != nil {
 		log.Fatalf("error saving user config: %v", err)
 	}
-}
-
-// AppState stores data between runs of the app like when the last update check
-// was performed and which other repos have been checked out
-type AppState struct {
-	LastUpdateCheck     int64
-	RecentRepos         []string
-	StartupPopupVersion int
-	LastVersion         string // this is the last version the user was using, for the purpose of showing release notes
-
-	// these are for shell commands typed in directly, not for custom commands in the lazygit config.
-	// For backwards compatibility we keep the old name in yaml files.
-	ShellCommandsHistory []string `yaml:"customcommandshistory"`
-
-	HideCommandLog bool
-}
-
-func getDefaultAppState() *AppState {
-	return &AppState{}
 }
 
 func LogPath() (string, error) {

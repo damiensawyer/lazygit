@@ -67,17 +67,15 @@ func Run(
 
 func NewCommon(config config.AppConfigurer, log *logrus.Entry) (*common.Common, error) {
 	userConfig := config.GetUserConfig()
-	appState := config.GetAppState()
 	// Initialize with English for the time being; the real translation set for
 	// the configured language will be read after reading the user config
 	tr := i18n.EnglishTranslationSet()
 
 	cmn := &common.Common{
-		Log:      log,
-		Tr:       tr,
-		AppState: appState,
-		Debug:    config.GetDebug(),
-		Fs:       afero.NewOsFs(),
+		Log:   log,
+		Tr:    tr,
+		Debug: config.GetDebug(),
+		Fs:    afero.NewOsFs(),
 	}
 	cmn.SetUserConfig(userConfig)
 	return cmn, nil
@@ -172,7 +170,11 @@ func isDirectoryAGitRepository(dir string) (bool, error) {
 }
 
 func openRecentRepo(app *App) bool {
-	for _, repoDir := range app.Config.GetAppState().RecentRepos {
+	appState, err := app.Config.ReadAppState()
+	if err != nil {
+		app.Log.Errorf("error when reading app state: %v", err)
+	}
+	for _, repoDir := range appState.RecentRepos {
 		if isRepo, _ := isDirectoryAGitRepository(repoDir); isRepo {
 			if err := app.enterRepo(repoDir); err == nil {
 				return true
@@ -303,12 +305,16 @@ func (app *App) setupRepo(
 func (app *App) runLauncher() error {
 	const host = "github.com"
 	for {
+		appState, err := app.Config.ReadAppState()
+		if err != nil {
+			app.Log.Errorf("error when reading app state: %v", err)
+		}
 		choice, err := launcher.Run(launcher.Deps{
 			Tr:           app.Tr,
 			UserConfig:   app.UserConfig(),
 			Log:          app.Log,
 			Host:         host,
-			RecentRepos:  app.Config.GetAppState().RecentRepos,
+			RecentRepos:  appState.RecentRepos,
 			OpenLink:     app.OSCommand.OpenLink,
 			TokenForHost: github_commands.TokenForHost,
 		})

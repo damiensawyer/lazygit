@@ -95,9 +95,10 @@ type IGuiCommon interface {
 	ContextForKey(key ContextKey) Context
 
 	GetConfig() config.AppConfigurer
-	GetAppState() *config.AppState
-	SaveAppState() error
-	SaveAppStateAndLogError()
+	// Reads state.yml. If it can't be read, logs the error and returns the defaults.
+	ReadAppState() *config.AppState
+	// Calls update to change state.yml, and logs any error.
+	UpdateAppState(update func(state *config.AppState))
 	SaveSidePanelWidth()
 	SaveHalfScreenModeSidePanelWidth()
 	// ResetSidePanelWidth and ResetHalfScreenModeSidePanelWidth remove the

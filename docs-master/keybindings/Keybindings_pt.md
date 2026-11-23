@@ -113,6 +113,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | Key | Action | Info |
 |-----|--------|-------------|
 | `` <ctrl+o> `` | Copiar nome da branch para área de transferência |  |
+| `` b `` | Ver opções de bissecção |  |
 | `` i `` | Exibir opções do git-flow |  |
 | `` <space> `` | Verificar | Checar item selecionado |
 | `` n `` | Nova branch |  |
@@ -155,6 +156,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | `` s `` | Sort order |  |
 | `` g `` | Restaurar | Ver opções de redefinição (soft/mixed/hard) para redefinir para o item selecionado. |
 | `` <ctrl+t> `` | Abrir ferramenta de diff externa (git difftool) |  |
+| `` b `` | Ver opções de bissecção |  |
 | `` 0 `` | Focar visualização principal |  |
 | `` E `` | Browse all files at commit | Open a panel showing all files in the repository as they existed at the selected item, so you can explore, view, and restore them. |
 | `` <enter> `` | Ver commits |  |
@@ -229,6 +231,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | Key | Action | Info |
 |-----|--------|-------------|
 | `` <ctrl+o> `` | Copiar etiqueta para área de transferência |  |
+| `` b `` | Ver opções de bissecção |  |
 | `` <space> `` | Verificar | Checar a tag selecionada como um HEAD, desanexado |
 | `` n `` | Nova etiqueta | Crie uma nova etiqueta a partir do commit atual. Você será solicitado a digitar um nome e uma descrição opcional. |
 | `` w `` | Nova árvore de trabalho |  |
@@ -349,6 +352,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | Key | Action | Info |
 |-----|--------|-------------|
 | `` <ctrl+o> `` | Copy abbreviated commit hash to clipboard |  |
+| `` b `` | Ver opções de bissecção |  |
 | `` <space> `` | Verificar | Checkout the selected commit as a detached HEAD. |
 | `` y `` | Copy commit attribute to clipboard | Copy commit attribute to clipboard (e.g. hash, URL, diff, message, author). |
 | `` o `` | Abrir commit no navegador |  |
@@ -461,6 +465,7 @@ _This file is auto-generated. To update, make the changes in the pkg/i18n direct
 | Key | Action | Info |
 |-----|--------|-------------|
 | `` <ctrl+o> `` | Copy abbreviated commit hash to clipboard |  |
+| `` b `` | Ver opções de bissecção |  |
 | `` <space> `` | Verificar | Checkout the selected commit as a detached HEAD. |
 | `` y `` | Copy commit attribute to clipboard | Copy commit attribute to clipboard (e.g. hash, URL, diff, message, author). |
 | `` o `` | Abrir commit no navegador |  |

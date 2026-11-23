@@ -268,7 +268,7 @@ func newTestRepoFileTreeWithConfig(paths []string, showTree bool, configure func
 	configure(userConfig)
 	return NewRepoFileTree(
 		func() []*models.TreeFile { return files },
-		common.NewDummyCommonWithUserConfigAndAppState(userConfig, nil),
+		common.NewDummyCommonWithUserConfig(userConfig),
 		showTree,
 	)
 }
@@ -608,7 +608,7 @@ func TestRepoFileTreeViewModelCollapseAllSelectsTopLevelAncestor(t *testing.T) {
 			userConfig.Gui.ShowRootItemInFileTree = s.showRootItem
 			viewModel := NewRepoFileTreeViewModel(
 				func() []*models.TreeFile { return files },
-				common.NewDummyCommonWithUserConfigAndAppState(userConfig, nil),
+				common.NewDummyCommonWithUserConfig(userConfig),
 				true,
 			)
 			viewModel.SetTree()
