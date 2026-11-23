@@ -71,6 +71,16 @@ func (self *PullRequestsController) GetKeybindings(opts types.KeybindingsOpts) [
 			DisplayOnScreen:   true,
 		},
 		{
+			Keys:              opts.GetKeys(opts.Config.Universal.NewWorktree),
+			Handler:           self.withItem(self.checkOutInNewWorktree),
+			GetDisabledReason: self.require(self.singleItemSelected()),
+			Description:       tr.CheckOutInWorktree,
+			ShortDescription:  tr.CheckOutInWorktreeShort,
+			Tooltip:           tr.CheckOutInWorktreeTooltip,
+			OpensMenu:         true,
+			DisplayOnScreen:   true,
+		},
+		{
 			Keys:              opts.GetKeys(opts.Config.PullRequests.Merge),
 			Handler:           self.withItem(self.merge),
 			GetDisabledReason: self.require(self.singleItemSelected(self.isOpen)),
@@ -244,7 +254,7 @@ func (self *PullRequestsController) checkOut(pr *models.GithubPullRequest) error
 		Keys:      menuKey('w'),
 		OpensMenu: true,
 		OnPress: func() error {
-			return self.checkOutInWorktree(pr)
+			return self.checkOutInWorktree(pr, tr.CheckOutInWorktreeTitle)
 		},
 	}
 	return self.c.Menu(types.CreateMenuOptions{
@@ -254,10 +264,20 @@ func (self *PullRequestsController) checkOut(pr *models.GithubPullRequest) error
 	})
 }
 
-func (self *PullRequestsController) checkOutInWorktree(pr *models.GithubPullRequest) error {
+// Asks how to check the pull request out in a new worktree, straight from the
+// pull requests view. With no check out menu before it in the breadcrumbs to
+// name the pull request, the menu's title names it itself.
+func (self *PullRequestsController) checkOutInNewWorktree(pr *models.GithubPullRequest) error {
+	return self.checkOutInWorktree(pr, utils.ResolvePlaceholderString(
+		self.c.Tr.PullRequests.CheckOutInWorktreeOfTitle,
+		map[string]string{"number": fmt.Sprint(pr.Number)},
+	))
+}
+
+func (self *PullRequestsController) checkOutInWorktree(pr *models.GithubPullRequest, title string) error {
 	helper := self.c.Helpers().GithubPullRequests
 	return self.c.Menu(types.CreateMenuOptions{
-		Title: self.c.Tr.PullRequests.CheckOutInWorktreeTitle,
+		Title: title,
 		Items: self.checkOutItems(pr, true, func(opts helpers.PullRequestCheckoutOpts) error {
 			return helper.CheckOutInWorktree(pr, self.c.Helpers().Worktree, opts)
 		}),

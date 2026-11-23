@@ -626,6 +626,7 @@ var tests = []*components.IntegrationTest{
 	pull_requests.CheckOutPullRequest,
 	pull_requests.CheckOutPullRequestFromFork,
 	pull_requests.CheckOutPullRequestInWorktree,
+	pull_requests.CheckOutPullRequestInWorktreeDirectly,
 	pull_requests.ChooseRepository,
 	pull_requests.CloseAndReopenPullRequest,
 	pull_requests.CommentOnDiffLines,

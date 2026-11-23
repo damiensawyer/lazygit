@@ -1275,6 +1275,9 @@ type PullRequests struct {
 	CheckOutDetached                 string
 	CheckOutInWorktree               string
 	CheckOutInWorktreeTitle          string
+	CheckOutInWorktreeOfTitle        string
+	CheckOutInWorktreeTooltip        string
+	CheckOutInWorktreeShort          string
 	CheckOutForce                    string
 	CheckOutForceTooltip             string
 	CheckOutOptionsTitle             string
@@ -3128,6 +3131,9 @@ func EnglishTranslationSet() *TranslationSet {
 			CheckOutDetached:                 "Check out detached",
 			CheckOutInWorktree:               "Check out in a new worktree",
 			CheckOutInWorktreeTitle:          "In a new worktree",
+			CheckOutInWorktreeOfTitle:        "Check out #{{.number}} in a new worktree",
+			CheckOutInWorktreeTooltip:        "Check the pull request out in a new worktree, leaving the current one alone: as `gh pr checkout` would, under another branch name, or detached. Then choose where to put the worktree.",
+			CheckOutInWorktreeShort:          "Worktree",
 			CheckOutForce:                    "Check out, resetting the local branch to the pull request",
 			CheckOutForceTooltip:             "Like checking it out, but if the local branch has diverged from the pull request, reset it to the pull request rather than failing. Commits only on the local branch are lost.",
 			CheckOutOptionsTitle:             "Check out #{{.number}}",
